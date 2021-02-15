@@ -25,15 +25,44 @@ class App extends Component {
 				shape: [],
 				loss: null,
 				yhat: null,
+				epoch: 0,
 			},
 			/* Stores the controls */
 			controls: {
 				playing: false,
+				speed: 100,
 			},
 		};
 
 		/* Functions Binds to This: Prototype */
+		this.mutateOutput = this.mutateOutput.bind(this);
 		this.mutatePlaying = this.mutatePlaying.bind(this);
+		this.initializeModel = this.initializeModel.bind(this);
+		this.forwardModel = this.forwardModel.bind(this);
+		this.backwardModel = this.backwardModel.bind(this);
+		this.updateModel = this.updateModel.bind(this);
+	}
+
+	/* 
+    Name: mutateOutput
+    Purpose: mutate all the values seen to user by delay of this.state.controls.speed 
+    @mutate: this.state.model
+  */
+	async mutateOutput() {
+		let count = 0;
+		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+		/* Until broken by user */
+		while (true) {
+			/* Destructure neccesary state */
+			const { controls } = this.state;
+			const { playing, speed } = controls;
+			if (playing === false) {
+				break;
+			}
+			await timer(speed);
+			console.log(count++);
+			/* Where we would do all the calculations */
+		}
 	}
 
 	/* 
@@ -50,6 +79,11 @@ class App extends Component {
 		});
 	}
 
+	initializeModel() {}
+	forwardModel() {}
+	backwardModel() {}
+	updateModel() {}
+
 	/* Create a function that initializes the values for the Nerual network */
 	/* Create a function that constructs the or perhaps put this in a component */
 	/* Create a function that performs the forward pass */
@@ -63,7 +97,12 @@ class App extends Component {
 		/* Making return less complex */
 		const PlayButtonClick = (
 			// eslint-disable-next-line
-			<a onClick={this.mutatePlaying}>
+			<a
+				onClick={async () => {
+					await this.mutatePlaying();
+					await this.mutateOutput();
+				}}
+			>
 				<PlayButton playing={controls.playing} />
 			</a>
 		);
