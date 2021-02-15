@@ -14,5 +14,24 @@ Designs created in <a href="https://www.figma.com/file/y2qzrIE26gBjLvsBYxj72M/Ba
 
 <img src="design.gif"></img>
 
+## Progress
+
+|Big Picture TODO          |Status                          |                
+|----------------|-------------------------------
+|Design          |Done ✅            |
+|Implementation  |In Progress 🖍|
+|Testing/Trying to break  ||
+
+|Implementation TODO|Status|                
+|----------------|-------------------------------
+|Create React App  |Done ✅ |
+|Implement Neural Network  | |
+|Test Neural Network  ||
+|Create Scatter Plot  ||
+|Plot Best Fit ||
+|Neural Network Graph  ||
+|On Click Graph  ||
+|On Hover Graph  ||
+| Polish and Test ||
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
