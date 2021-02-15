@@ -8,6 +8,11 @@ In the project directory, you can run:
 
 `yarn start` to run on port 3000
 
+## Design
+<img src="design.gif"></img>
+
+<a href="https://docs.google.com/presentation/d/1wRmh6yn-17HEIQ0m4AQByZvGDS4vMtlV-SzJeSvFIpw/edit?usp=sharing">Design Process</a>
+
 
 
 
