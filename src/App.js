@@ -47,6 +47,7 @@ class App extends Component {
 		this.forwardModel = this.forwardModel.bind(this);
 		this.backwardModel = this.backwardModel.bind(this);
 		this.updateModel = this.updateModel.bind(this);
+		this.linkModel = this.linkModel.bind(this);
 
 		/* Data Generation */
 		this.generateData = this.generateData.bind(this);
@@ -105,32 +106,39 @@ class App extends Component {
 		// let newsShape = [0, 1, 3, 3, 1];
 		// const numLayers     1  2  3  4 = 4
 		let newShape = [0, ...shape];
-		const numLayers = shape.length;
+		const numLayers = newShape.length;
 
 		/* Define the model */
 		/* [[neuron], [neuron, neuron, neuron],[neuron, neuron, neuron], [neuron]] model: [1,3,3,1] shape */
 		let model = [];
 
 		/* Add input neuron to the model */
-		for (let i = 0; i < numLayers; i++) {
+		for (let i = 1; i < numLayers; i++) {
 			/* Initialize layer */
 			let layer = [];
 			/* Get the number of neurons to generate */
-			let numNeurons = shape[i];
+			let numNeurons = newShape[i];
 			/* Add neurons to the to the layer */
 			for (let e = 0; e < numNeurons; e++) {
 				/* Number of inputs from the previous layer to devlay Neuron */
-				let neuron = this.initDenseNeuron(shape[i - 1]);
+				let neuron = this.initDenseNeuron(newShape[i - 1]);
 				/* Push to layer */
 				layer.push(neuron);
 			}
 			/* Add to the model */
 			model.push(layer);
 		}
+
+		/* update the state */
 		this.mutate("model", "neurons", model);
 		this.mutate("model", "shape", shape);
 	}
 
+	/* 
+    Name: initDenseNeuron
+    @param: numInputs
+    @return: intialized neuron object 
+  */
 	initDenseNeuron(numInputs) {
 		let DenseNeuronTemplate = {
 			forward: {
@@ -158,9 +166,15 @@ class App extends Component {
 			DenseNeuronTemplate.forward.weights.push(number);
 		}
 		DenseNeuronTemplate.forward.bias = 0;
+		DenseNeuronTemplate.links = this.linkModel(numInputs);
 
 		return DenseNeuronTemplate;
 	}
+
+	linkModel(numInputs) {
+		return this.linearData(0, numInputs - 1, 1);
+	}
+
 	forwardModel(model) {}
 	backwardModel(model) {}
 	updateModel(model) {}
@@ -227,7 +241,7 @@ class App extends Component {
 	}
 
 	componentDidMount() {
-		this.initializeModel([1, 3, 3, 1]);
+		this.initializeModel([1, 4, 4, 1]);
 	}
 
 	render() {
@@ -235,7 +249,7 @@ class App extends Component {
 		const { data, model, controls } = this.state;
 
 		/* Destructuring model */
-		const { epoch, loss, neurons, shape } = model;
+		const { epoch, loss, shape } = model;
 
 		/* Destructuring of data */
 		const { X, y } = data;
