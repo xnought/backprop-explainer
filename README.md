@@ -11,7 +11,7 @@
 |Implementation TODO|Status|                
 |----------------|-------------------------------
 |Create React App  |Done ✅ |
-|Implement Neural Network  | |
+|Implement Neural Network  |In Progress 🖍 |
 |Test Neural Network  ||
 |Create Scatter Plot  ||
 |Plot Best Fit ||
