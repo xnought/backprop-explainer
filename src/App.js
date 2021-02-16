@@ -185,8 +185,8 @@ class App extends Component {
 			links: [],
 		};
 		for (let i = 0; i < numInputs; i++) {
-			//let number = Math.random() < 0.5 ? -Math.random() : Math.random();
-			let number = Math.random();
+			let number = Math.random() < 0.5 ? -Math.random() : Math.random();
+			//let number = Math.random();
 			DenseNeuronTemplate.forward.weights.push(number);
 		}
 		DenseNeuronTemplate.forward.bias = 0;
@@ -259,9 +259,9 @@ class App extends Component {
 		this.mutate("model", "yhat", yhat);
 		this.mutate("model", "loss", loss);
 
-		console.log(`yhat: ${this.state.model.yhat}`);
-		console.log(`y: ${this.state.data.y[index]}`);
-		console.log(this.state.model.loss);
+		//console.log(`yhat: ${this.state.model.yhat}`);
+		//console.log(`y: ${this.state.data.y[index]}`);
+		//console.log(this.state.model.loss);
 	}
 	backwardModel(model) {}
 	updateModel(model) {}
@@ -373,7 +373,7 @@ class App extends Component {
 	}
 
 	async componentDidMount() {
-		await this.initializeModel([1, 2, 1]);
+		await this.initializeModel([1, 2, 2, 1]);
 		await this.neuralNetwork();
 	}
 
