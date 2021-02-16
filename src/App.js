@@ -111,16 +111,19 @@ class App extends Component {
 
 	/* 
     Name: generateData
+    @param: start
+    @param: end
+    @param increment
     @param: equation (a function the user passes in)
     @mutate: this.data
   */
-	generateData(equation) {
+	generateData(start, stop, increment, equation) {
 		if (typeof equation === "function") {
 			/* Create the X input data */
-			const X = this.linearData(0, 10, 1);
+			const X = this.linearData(start, stop, increment);
 			/* Create the labels to the input data */
 			const y = X.map((input) => {
-				return equation(input);
+				return equation(input).toPrecision(3);
 			});
 			/* Set State */
 			this.mutate("data", "X", X);
@@ -168,7 +171,7 @@ class App extends Component {
 	}
 
 	componentDidMount() {
-		this.generateData(Math.sin);
+		this.generateData(0, 5, 1, Math.cos);
 	}
 
 	render() {
@@ -177,6 +180,9 @@ class App extends Component {
 
 		/* Destructuring model */
 		const { epoch, loss } = model;
+
+		/* Destructuring of data */
+		const { X, y } = data;
 
 		/* Destructure render */
 		const PlayButtonClick = (
@@ -189,7 +195,8 @@ class App extends Component {
 		return (
 			<div>
 				<Typography variant="h6">
-					Epoch: {epoch}, Loss: {loss}
+					X: [{X.toString()}], y: [{y.toString()}], Loss: {loss},
+					Epoch: {epoch},
 				</Typography>
 				{PlayButtonClick}
 			</div>
