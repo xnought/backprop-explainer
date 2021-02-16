@@ -35,12 +35,10 @@ class App extends Component {
 			},
 		};
 
-		/* 
-      Prototype: Functions Binds to "this" 
-    */
+		/* Prototype: Functions Binds to "this" */
 		/* Main Logic */
 		this.main = this.main.bind(this);
-
+		this.run = this.run.bind(this);
 		/* Neural Network Logic */
 		this.neuralNetwork = this.neuralNetwork.bind(this);
 		/* Neural Network Implementation */
@@ -48,6 +46,10 @@ class App extends Component {
 		this.forwardModel = this.forwardModel.bind(this);
 		this.backwardModel = this.backwardModel.bind(this);
 		this.updateModel = this.updateModel.bind(this);
+
+		/* Data Generation */
+		this.generateData = this.generateData.bind(this);
+		this.linearData = this.linearData.bind(this);
 		/* Mutators of State */
 		this.mutate = this.mutate.bind(this);
 	}
@@ -75,53 +77,120 @@ class App extends Component {
 		}
 	}
 
+	/* 
+    Name: start
+    Purpose: start the main logic and choose to stop
+    @mutate: this.state.controls.playing
+  */
+	async run() {
+		await this.mutate("controls", "playing", !this.state.controls.playing);
+		await this.main();
+	}
+
 	neuralNetwork(model) {
 		this.forwardModel(model);
 		this.backwardModel(model);
 		this.updateModel(model);
 	}
 
-	initializeModel() {}
+	/* 
+    Name: initializeModel
+    Purpose: to invoke generation of data and initializing the neural network model
+    @mutate: this.model
+  */
+	initializeModel() {
+		/* Generate Data */
+		this.generateData();
+		/* Update Data is State */
+		/* Generate Neural Network Model */
+		/* Initialize the weights and biases */
+	}
 	forwardModel(model) {}
 	backwardModel(model) {}
 	updateModel(model) {}
 
 	/* 
+    Name: generateData
+    @param: equation (a function the user passes in)
+    @mutate: this.data
+  */
+	generateData(equation) {
+		if (typeof equation === "function") {
+			/* Create the X input data */
+			const X = this.linearData(0, 10, 1);
+			/* Create the labels to the input data */
+			const y = X.map((input) => {
+				return equation(input);
+			});
+			/* Set State */
+			this.mutate("data", "X", X);
+			this.mutate("data", "y", y);
+		} else {
+			console.error(
+				"Enter a valid equation: must be function with input parameter and returns a number"
+			);
+		}
+	}
+
+	/* 
+    Name: linearData
+    @param: start
+    @param: end
+    @param increment
+    @return: output array
+  */
+	linearData(start, end, increment) {
+		let output = [];
+		for (let i = start; i <= end; i += increment) {
+			output.push(i);
+		}
+		return output;
+	}
+
+	/* 
     Name: mutate
-    @param key
-    @param subkey
+    @param key: corresponds to this.state.key
+    @param subkey: corresponds to this.state.key.subkey
     @param value
     @mutate: this.state.key.subkey with value
   */
 	mutate(key, subkey, value) {
+		/* copy of the state */
 		let state = { ...this.state };
-		state[key][subkey] = value;
-		this.setState({ state });
+		/* If this.state.key.subkey exists */
+		if (key in state && subkey in state[key]) {
+			/* Mutate the state */
+			state[key][subkey] = value;
+			this.setState({ state });
+		} else {
+			console.error("Could not be found in state");
+		}
+	}
+
+	componentDidMount() {
+		this.generateData(Math.sin);
 	}
 
 	render() {
-		/* Destructuring State*/
+		/* Destructure State*/
 		const { data, model, controls } = this.state;
-		/* Destructuring model */
-		const { epoch } = model;
 
-		/* Making return less complex */
+		/* Destructuring model */
+		const { epoch, loss } = model;
+
+		/* Destructure render */
 		const PlayButtonClick = (
 			// eslint-disable-next-line
-			<a
-				onClick={async () => {
-					await this.mutate("controls", "playing", !controls.playing);
-					await this.main();
-				}}
-			>
+			<a onClick={async () => await this.run()}>
 				<PlayButton playing={controls.playing} />
 			</a>
 		);
 
-		/* rendered to virtual DOM */
 		return (
 			<div>
-				<Typography variant="h3">Epoch: {epoch}</Typography>
+				<Typography variant="h6">
+					Epoch: {epoch}, Loss: {loss}
+				</Typography>
 				{PlayButtonClick}
 			</div>
 		);
