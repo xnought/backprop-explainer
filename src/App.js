@@ -263,8 +263,25 @@ class App extends Component {
 		//console.log(`y: ${this.state.data.y[index]}`);
 		//console.log(this.state.model.loss);
 	}
-	backwardModel(model) {}
-	updateModel(model) {}
+	/* 
+    Name: backwardModel
+    Purpose: compute derivative backwards
+    @mutate: this.model
+  */
+	backwardModel() {
+		/* Compute Derivative of loss */
+		/* Iterate backwards of neurons */
+		/* Compute derivative of a neuron */
+		/* print the derivatives */
+	}
+	/* 
+    Name: updateModel
+    Purpose: to perform gradient descent and update the weights
+    @mutate: this.model
+  */
+	updateModel() {
+		/* Use the derivatives to perform gradient descent */
+	}
 	/* 
     Name: setInputs
     @param: inputs
