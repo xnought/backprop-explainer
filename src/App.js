@@ -24,6 +24,7 @@ class App extends Component {
 				neurons: [],
 				shape: [],
 				loss: null,
+				y: null,
 				yhat: null,
 				epoch: 0,
 				lr: 0.01,
@@ -31,7 +32,7 @@ class App extends Component {
 			/* Stores the controls */
 			controls: {
 				playing: false,
-				speed: 50,
+				speed: 100,
 			},
 		};
 
@@ -75,6 +76,9 @@ class App extends Component {
 	sum(array) {
 		return array.reduce((a, b) => a + b);
 	}
+	getRandomInt(max) {
+		return Math.floor(Math.random() * Math.floor(max));
+	}
 	/* 
     Name: main
     Purpose: mutate all the values seen to user by delay of this.state.controls.speed 
@@ -93,6 +97,7 @@ class App extends Component {
 			}
 			await timer(speed);
 			/* this.nerualNetwork(model) */
+			await this.neuralNetwork();
 			this.mutate("model", "epoch", model.epoch + 1);
 		}
 	}
@@ -180,7 +185,8 @@ class App extends Component {
 			links: [],
 		};
 		for (let i = 0; i < numInputs; i++) {
-			let number = Math.random() < 0.5 ? -Math.random() : Math.random();
+			//let number = Math.random() < 0.5 ? -Math.random() : Math.random();
+			let number = Math.random();
 			DenseNeuronTemplate.forward.weights.push(number);
 		}
 		DenseNeuronTemplate.forward.bias = 0;
@@ -193,16 +199,23 @@ class App extends Component {
 		return this.linearData(0, numInputs - 1, 1);
 	}
 
+	/* 
+    Name: forwardModel
+    Purpose: one forward pass 
+    @mutate: this.model
+  */
 	forwardModel() {
 		/* Destructure State */
 		const { data, model } = this.state;
 		const { neurons, shape } = model;
 
 		/* Add the inputs to the first input neuron */
-		this.setInputs(data.X[1], 0);
+		const index = this.getRandomInt(data.X.length);
+		let X = [data.X[index]];
+		this.setInputs(X, 0);
 		/* First perform one forward pass */
 		/* iterate non-input layers */
-		let io = [data.X[2]];
+		let io = X;
 		for (let layer = 1; layer < shape.length; layer++) {
 			/* Pass the values from the last neuron */
 			this.setInputs(io, layer);
@@ -241,9 +254,14 @@ class App extends Component {
 		/* Calculate loss */
 		const yhat = this.state.model.neurons[shape.length - 1][0].forward
 			.output;
-		let loss = this.mseLoss(yhat, data.y[2]);
+		let loss = this.mseLoss(yhat, data.y[index]);
+		this.mutate("model", "y", data.y[index]);
 		this.mutate("model", "yhat", yhat);
 		this.mutate("model", "loss", loss);
+
+		console.log(`yhat: ${this.state.model.yhat}`);
+		console.log(`y: ${this.state.data.y[index]}`);
+		console.log(this.state.model.loss);
 	}
 	backwardModel(model) {}
 	updateModel(model) {}
@@ -282,7 +300,7 @@ class App extends Component {
 			const X = this.linearData(start, stop, increment);
 			/* Create the labels to the input data */
 			const y = X.map((input) => {
-				return equation(input).toPrecision(3);
+				return equation(input);
 			});
 			/* Set State */
 			this.mutate("data", "X", X);
@@ -354,12 +372,9 @@ class App extends Component {
 		}
 	}
 
-	componentDidMount() {
-		this.initializeModel([1, 2, 1]);
-		this.neuralNetwork();
-		console.log(this.state.model.yhat);
-		console.log(this.state.data.y[2]);
-		console.log(this.state.model.loss);
+	async componentDidMount() {
+		await this.initializeModel([1, 2, 1]);
+		await this.neuralNetwork();
 	}
 
 	render() {
@@ -367,7 +382,7 @@ class App extends Component {
 		const { data, model, controls } = this.state;
 
 		/* Destructuring model */
-		const { epoch, loss, shape } = model;
+		const { epoch, loss, shape, neurons, yhat } = model;
 
 		/* Destructuring of data */
 		const { X, y } = data;
@@ -385,11 +400,13 @@ class App extends Component {
 		return (
 			<div>
 				<Typography variant="h6">
-					X: [{X.toString()}], y: [{y.toString()}], Loss: {loss},
-					Epoch: {epoch},
+					X: [{X.toString()}], y: [{y.toString()}], Epoch: {epoch},
 				</Typography>
 				<Typography variant="h6">
 					Model Shape: [{shape.toString()}]
+				</Typography>
+				<Typography variant="h6">
+					y:{model.y}, yhat:{yhat}, Loss: {loss}
 				</Typography>
 				{PlayButtonClick}
 			</div>
