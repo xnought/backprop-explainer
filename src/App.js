@@ -42,6 +42,7 @@ class App extends Component {
 		/* Neural Network Logic */
 		this.neuralNetwork = this.neuralNetwork.bind(this);
 		/* Neural Network Implementation */
+		this.initDenseNeuron = this.initDenseNeuron.bind(this);
 		this.initializeModel = this.initializeModel.bind(this);
 		this.forwardModel = this.forwardModel.bind(this);
 		this.backwardModel = this.backwardModel.bind(this);
@@ -98,12 +99,63 @@ class App extends Component {
     Purpose: to invoke generation of data and initializing the neural network model
     @mutate: this.model
   */
-	initializeModel() {
-		/* Generate Data */
-		this.generateData();
-		/* Update Data is State */
+	initializeModel(shape) {
+		const numHiddenLayers = shape.length;
+		/* Generate Data and set this.state.data */
+		this.generateData(0, 4, 1, Math.sin);
 		/* Generate Neural Network Model */
+
+		/* Define what the model is adding */
+		let model = [];
+		/* Add input neuron to the model */
+		for (let i = 0; i < numHiddenLayers; i++) {
+			/* Initialize the dense Layer */
+			let layer = [];
+			let neuron = this.initDenseNeuron(3);
+			/* Intialize the object */
+
+			/* Intialize each neuron */
+			/* Add neuron the the layer */
+
+			/*push the layer to the model */
+			model.push(layer);
+		}
+		/* Add the output neuron to the model */
+
+		/* Connect the links */
+
+		/* Add Neurons dynamically based on parameters */
 		/* Initialize the weights and biases */
+	}
+	initDenseNeuron(numInputs) {
+		let DenseNeuronTemplate = {
+			forward: {
+				inputs: [],
+				weights: [],
+				bias: null,
+				product: [],
+				sum: null,
+				activation: null,
+				output: null,
+			},
+			backward: {
+				dprevNeurondLoss: null,
+				dActdSum: null,
+				dSumdBias: null,
+				dSumdMult: [],
+				dMultdWeights: [],
+				dMultdInputs: [],
+				dthisNeurondloss: null,
+			},
+			links: [],
+		};
+		for (let i = 0; i < numInputs; i++) {
+			let number = Math.random() < 0.5 ? -Math.random() : Math.random();
+			DenseNeuronTemplate.forward.weights.push(number);
+		}
+		DenseNeuronTemplate.forward.bias = 0;
+
+		return DenseNeuronTemplate;
 	}
 	forwardModel(model) {}
 	backwardModel(model) {}
@@ -118,7 +170,7 @@ class App extends Component {
     @mutate: this.data
   */
 	generateData(start, stop, increment, equation) {
-		if (typeof equation === "function") {
+		if (typeof equation === "function" && equation(start) !== undefined) {
 			/* Create the X input data */
 			const X = this.linearData(start, stop, increment);
 			/* Create the labels to the input data */
@@ -130,7 +182,7 @@ class App extends Component {
 			this.mutate("data", "y", y);
 		} else {
 			console.error(
-				"Enter a valid equation: must be function with input parameter and returns a number"
+				"Enter a valid equation: must be function with input parameter that returns a number"
 			);
 		}
 	}
@@ -172,6 +224,7 @@ class App extends Component {
 
 	componentDidMount() {
 		this.generateData(0, 5, 1, Math.cos);
+		console.log(this.initDenseNeuron(3));
 	}
 
 	render() {
