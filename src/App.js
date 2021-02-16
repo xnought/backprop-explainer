@@ -49,8 +49,7 @@ class App extends Component {
 		this.backwardModel = this.backwardModel.bind(this);
 		this.updateModel = this.updateModel.bind(this);
 		/* Mutators of State */
-		this.mutatePlaying = this.mutatePlaying.bind(this);
-		this.mutateIncrementEpoch = this.mutateIncrementEpoch.bind(this);
+		this.mutate = this.mutate.bind(this);
 	}
 
 	/* 
@@ -72,7 +71,7 @@ class App extends Component {
 			}
 			await timer(speed);
 			/* this.nerualNetwork(model) */
-			this.mutateIncrementEpoch(model);
+			this.mutate("model", "epoch", model.epoch + 1);
 		}
 	}
 
@@ -88,29 +87,16 @@ class App extends Component {
 	updateModel(model) {}
 
 	/* 
-    Name: mutateIncrementEpoch
-    Purpose: increment the current epoch
-    @mutate: this.state.model.epoch: add one to current epoch
+    Name: mutate
+    @param key
+    @param subkey
+    @param value
+    @mutate: this.state.key.subkey with value
   */
-	mutateIncrementEpoch(model) {
-		this.setState({
-			...this.state,
-			model: { ...model, epoch: model.epoch + 1 },
-		});
-	}
-
-	/* 
-    Name: mutatePlaying
-    Purpose: change playing to !playing, i.e true to false, or false to true
-    @mutate: this.state.controls.playing 
-  */
-	mutatePlaying() {
-		const { controls } = this.state;
-		const playing = !controls.playing;
-		this.setState({
-			...this.state,
-			controls: { ...controls, playing },
-		});
+	mutate(key, subkey, value) {
+		let state = { ...this.state };
+		state[key][subkey] = value;
+		this.setState({ state });
 	}
 
 	render() {
@@ -124,7 +110,7 @@ class App extends Component {
 			// eslint-disable-next-line
 			<a
 				onClick={async () => {
-					await this.mutatePlaying();
+					await this.mutate("controls", "playing", !controls.playing);
 					await this.main();
 				}}
 			>
