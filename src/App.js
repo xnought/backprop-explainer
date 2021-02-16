@@ -39,7 +39,6 @@ class App extends Component {
 		/* Main Logic */
 		this.main = this.main.bind(this);
 		this.run = this.run.bind(this);
-
 		/* Neural Network Logic */
 		this.neuralNetwork = this.neuralNetwork.bind(this);
 		/* Intialization */
@@ -50,8 +49,10 @@ class App extends Component {
 		this.forwardModel = this.forwardModel.bind(this);
 		this.backwardModel = this.backwardModel.bind(this);
 		this.updateModel = this.updateModel.bind(this);
-		this.passOutputs = this.passOutputs.bind(this);
-
+		this.setInputs = this.setInputs.bind(this);
+		/* Activation Functions */
+		/* Tools for forward */
+		/* Loss Functions */
 		/* Data Generation */
 		this.generateData = this.generateData.bind(this);
 		this.linearData = this.linearData.bind(this);
@@ -59,14 +60,27 @@ class App extends Component {
 		this.mutate = this.mutate.bind(this);
 		this.mutateModelNeurons = this.mutateModelNeurons.bind(this);
 	}
-
+	/* not binded to "this" functions */
+	ReLU(number) {
+		return Math.max(0, number);
+	}
+	mseLoss(yhat, y) {
+		return Math.pow(yhat - y, 2);
+	}
+	mult(array1, array2) {
+		return array1.map((item, i) => {
+			return item * array2[i];
+		});
+	}
+	sum(array) {
+		return array.reduce((a, b) => a + b);
+	}
 	/* 
     Name: main
     Purpose: mutate all the values seen to user by delay of this.state.controls.speed 
     @mutate: this.state.model
   */
 	async main() {
-		let count = 0;
 		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 		/* Until broken by user */
 		while (true) {
@@ -93,10 +107,10 @@ class App extends Component {
 		await this.main();
 	}
 
-	neuralNetwork(model) {
-		this.forwardModel(model);
-		this.backwardModel(model);
-		this.updateModel(model);
+	async neuralNetwork() {
+		await this.forwardModel();
+		// await this.backwardModel(model);
+		// await this.updateModel(model);
 	}
 
 	/* 
@@ -179,12 +193,79 @@ class App extends Component {
 		return this.linearData(0, numInputs - 1, 1);
 	}
 
-	forwardModel(model) {}
+	forwardModel() {
+		/* Destructure State */
+		const { data, model } = this.state;
+		const { neurons, shape } = model;
+
+		/* Add the inputs to the first input neuron */
+		this.setInputs(data.X[1], 0);
+		/* First perform one forward pass */
+		/* iterate non-input layers */
+		let io = [data.X[2]];
+		for (let layer = 1; layer < shape.length; layer++) {
+			/* Pass the values from the last neuron */
+			this.setInputs(io, layer);
+			io = [];
+			/* iterate neuron */
+			for (let neuron = 0; neuron < shape[layer]; neuron++) {
+				let { weights, inputs, bias } = neurons[layer][neuron].forward;
+				let mult = this.mult(weights, inputs);
+				let sum = this.sum(mult) + bias;
+				let relu = this.ReLU(sum);
+				this.mutateModelNeurons(
+					"forward",
+					"product",
+					mult,
+					layer,
+					neuron
+				);
+				this.mutateModelNeurons("forward", "sum", sum, layer, neuron);
+				this.mutateModelNeurons(
+					"forward",
+					"activation",
+					relu,
+					layer,
+					neuron
+				);
+				this.mutateModelNeurons(
+					"forward",
+					"output",
+					relu,
+					layer,
+					neuron
+				);
+				io.push(relu);
+			}
+		}
+		/* Calculate loss */
+		const yhat = this.state.model.neurons[shape.length - 1][0].forward
+			.output;
+		let loss = this.mseLoss(yhat, data.y[2]);
+		this.mutate("model", "yhat", yhat);
+		this.mutate("model", "loss", loss);
+	}
 	backwardModel(model) {}
 	updateModel(model) {}
-	passOutputs(outputArray, currentLayer) {
-		/*Need to pass all of the outputs to the next neurons*/
-		/* Update the state of the next neurons */
+	/* 
+    Name: setInputs
+    @param: inputs
+    @param: currentLayer
+    @mutate: this.state.model.neurons[currentLayer]
+  */
+	setInputs(inputs, currentLayer) {
+		/* Destructure the neurons */
+		const { neurons } = this.state.model;
+		/* Iterate through each neuron and set its inputs */
+		for (let i = 0; i < neurons[currentLayer].length; i++) {
+			this.mutateModelNeurons(
+				"forward",
+				"inputs",
+				inputs,
+				currentLayer,
+				i
+			);
+		}
 	}
 
 	/* 
@@ -274,7 +355,11 @@ class App extends Component {
 	}
 
 	componentDidMount() {
-		this.initializeModel([1, 4, 4, 1]);
+		this.initializeModel([1, 2, 1]);
+		this.neuralNetwork();
+		console.log(this.state.model.yhat);
+		console.log(this.state.data.y[2]);
+		console.log(this.state.model.loss);
 	}
 
 	render() {
