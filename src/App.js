@@ -26,43 +26,77 @@ class App extends Component {
 				loss: null,
 				yhat: null,
 				epoch: 0,
+				lr: 0.01,
 			},
 			/* Stores the controls */
 			controls: {
 				playing: false,
-				speed: 100,
+				speed: 50,
 			},
 		};
 
-		/* Functions Binds to This: Prototype */
-		this.mutateOutput = this.mutateOutput.bind(this);
-		this.mutatePlaying = this.mutatePlaying.bind(this);
+		/* 
+      Prototype: Functions Binds to "this" 
+    */
+		/* Main Logic */
+		this.main = this.main.bind(this);
+
+		/* Neural Network Logic */
+		this.neuralNetwork = this.neuralNetwork.bind(this);
+		/* Neural Network Implementation */
 		this.initializeModel = this.initializeModel.bind(this);
 		this.forwardModel = this.forwardModel.bind(this);
 		this.backwardModel = this.backwardModel.bind(this);
 		this.updateModel = this.updateModel.bind(this);
+		/* Mutators of State */
+		this.mutatePlaying = this.mutatePlaying.bind(this);
+		this.mutateIncrementEpoch = this.mutateIncrementEpoch.bind(this);
 	}
 
 	/* 
-    Name: mutateOutput
+    Name: main
     Purpose: mutate all the values seen to user by delay of this.state.controls.speed 
     @mutate: this.state.model
   */
-	async mutateOutput() {
+	async main() {
 		let count = 0;
 		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 		/* Until broken by user */
 		while (true) {
 			/* Destructure neccesary state */
-			const { controls } = this.state;
+			const { controls, model } = this.state;
 			const { playing, speed } = controls;
+
 			if (playing === false) {
 				break;
 			}
 			await timer(speed);
-			console.log(count++);
-			/* Where we would do all the calculations */
+			/* this.nerualNetwork(model) */
+			this.mutateIncrementEpoch(model);
 		}
+	}
+
+	neuralNetwork(model) {
+		this.forwardModel(model);
+		this.backwardModel(model);
+		this.updateModel(model);
+	}
+
+	initializeModel() {}
+	forwardModel(model) {}
+	backwardModel(model) {}
+	updateModel(model) {}
+
+	/* 
+    Name: mutateIncrementEpoch
+    Purpose: increment the current epoch
+    @mutate: this.state.model.epoch: add one to current epoch
+  */
+	mutateIncrementEpoch(model) {
+		this.setState({
+			...this.state,
+			model: { ...model, epoch: model.epoch + 1 },
+		});
 	}
 
 	/* 
@@ -79,20 +113,11 @@ class App extends Component {
 		});
 	}
 
-	initializeModel() {}
-	forwardModel() {}
-	backwardModel() {}
-	updateModel() {}
-
-	/* Create a function that initializes the values for the Nerual network */
-	/* Create a function that constructs the or perhaps put this in a component */
-	/* Create a function that performs the forward pass */
-	/* Create a function that performs the backward pass */
-	/* Create a function that performs the update sgd */
-
 	render() {
-		/* Destructuring */
+		/* Destructuring State*/
 		const { data, model, controls } = this.state;
+		/* Destructuring model */
+		const { epoch } = model;
 
 		/* Making return less complex */
 		const PlayButtonClick = (
@@ -100,7 +125,7 @@ class App extends Component {
 			<a
 				onClick={async () => {
 					await this.mutatePlaying();
-					await this.mutateOutput();
+					await this.main();
 				}}
 			>
 				<PlayButton playing={controls.playing} />
@@ -110,7 +135,7 @@ class App extends Component {
 		/* rendered to virtual DOM */
 		return (
 			<div>
-				<Typography variant="h2">Nice!</Typography>
+				<Typography variant="h3">Epoch: {epoch}</Typography>
 				{PlayButtonClick}
 			</div>
 		);
