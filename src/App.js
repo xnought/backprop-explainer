@@ -100,33 +100,37 @@ class App extends Component {
     @mutate: this.model
   */
 	initializeModel(shape) {
-		const numHiddenLayers = shape.length;
-		/* Generate Data and set this.state.data */
+		/* Generate Data and set this.state.data*/
 		this.generateData(0, 4, 1, Math.sin);
-		/* Generate Neural Network Model */
+		// let newsShape = [0, 1, 3, 3, 1];
+		// const numLayers     1  2  3  4 = 4
+		let newShape = [0, ...shape];
+		const numLayers = shape.length;
 
-		/* Define what the model is adding */
+		/* Define the model */
+		/* [[neuron], [neuron, neuron, neuron],[neuron, neuron, neuron], [neuron]] model: [1,3,3,1] shape */
 		let model = [];
+
 		/* Add input neuron to the model */
-		for (let i = 0; i < numHiddenLayers; i++) {
-			/* Initialize the dense Layer */
+		for (let i = 0; i < numLayers; i++) {
+			/* Initialize layer */
 			let layer = [];
-			let neuron = this.initDenseNeuron(3);
-			/* Intialize the object */
-
-			/* Intialize each neuron */
-			/* Add neuron the the layer */
-
-			/*push the layer to the model */
+			/* Get the number of neurons to generate */
+			let numNeurons = shape[i];
+			/* Add neurons to the to the layer */
+			for (let e = 0; e < numNeurons; e++) {
+				/* Number of inputs from the previous layer to devlay Neuron */
+				let neuron = this.initDenseNeuron(shape[i - 1]);
+				/* Push to layer */
+				layer.push(neuron);
+			}
+			/* Add to the model */
 			model.push(layer);
 		}
-		/* Add the output neuron to the model */
-
-		/* Connect the links */
-
-		/* Add Neurons dynamically based on parameters */
-		/* Initialize the weights and biases */
+		this.mutate("model", "neurons", model);
+		this.mutate("model", "shape", shape);
 	}
+
 	initDenseNeuron(numInputs) {
 		let DenseNeuronTemplate = {
 			forward: {
@@ -223,8 +227,7 @@ class App extends Component {
 	}
 
 	componentDidMount() {
-		this.generateData(0, 5, 1, Math.cos);
-		console.log(this.initDenseNeuron(3));
+		this.initializeModel([1, 3, 3, 1]);
 	}
 
 	render() {
@@ -232,10 +235,12 @@ class App extends Component {
 		const { data, model, controls } = this.state;
 
 		/* Destructuring model */
-		const { epoch, loss } = model;
+		const { epoch, loss, neurons, shape } = model;
 
 		/* Destructuring of data */
 		const { X, y } = data;
+
+		/* Destructuring of model */
 
 		/* Destructure render */
 		const PlayButtonClick = (
@@ -250,6 +255,9 @@ class App extends Component {
 				<Typography variant="h6">
 					X: [{X.toString()}], y: [{y.toString()}], Loss: {loss},
 					Epoch: {epoch},
+				</Typography>
+				<Typography variant="h6">
+					Model Shape: [{shape.toString()}]
 				</Typography>
 				{PlayButtonClick}
 			</div>
