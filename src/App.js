@@ -39,21 +39,25 @@ class App extends Component {
 		/* Main Logic */
 		this.main = this.main.bind(this);
 		this.run = this.run.bind(this);
+
 		/* Neural Network Logic */
 		this.neuralNetwork = this.neuralNetwork.bind(this);
-		/* Neural Network Implementation */
+		/* Intialization */
 		this.initDenseNeuron = this.initDenseNeuron.bind(this);
 		this.initializeModel = this.initializeModel.bind(this);
+		this.linkModel = this.linkModel.bind(this);
+		/* Epoch calculations */
 		this.forwardModel = this.forwardModel.bind(this);
 		this.backwardModel = this.backwardModel.bind(this);
 		this.updateModel = this.updateModel.bind(this);
-		this.linkModel = this.linkModel.bind(this);
+		this.passOutputs = this.passOutputs.bind(this);
 
 		/* Data Generation */
 		this.generateData = this.generateData.bind(this);
 		this.linearData = this.linearData.bind(this);
 		/* Mutators of State */
 		this.mutate = this.mutate.bind(this);
+		this.mutateModelNeurons = this.mutateModelNeurons.bind(this);
 	}
 
 	/* 
@@ -178,6 +182,10 @@ class App extends Component {
 	forwardModel(model) {}
 	backwardModel(model) {}
 	updateModel(model) {}
+	passOutputs(outputArray, currentLayer) {
+		/*Need to pass all of the outputs to the next neurons*/
+		/* Update the state of the next neurons */
+	}
 
 	/* 
     Name: generateData
@@ -235,6 +243,31 @@ class App extends Component {
 			/* Mutate the state */
 			state[key][subkey] = value;
 			this.setState({ state });
+		} else {
+			console.error("Could not be found in state");
+		}
+	}
+
+	/* 
+    Name: mutateModelNeurons
+    @param key: corresponds to this.state.key
+    @param subkey: corresponds to this.state.key.subkey
+    @param value
+    @param layer
+    @param neuron
+    @mutate: this.state.key.subkey with value
+  */
+	mutateModelNeurons(key, subkey, value, layer, neuron) {
+		/* copy of the state */
+		let neurons = { ...this.state.model.neurons };
+		/* If this.state.key.subkey exists */
+		if (neurons[layer][neuron][key][subkey] !== undefined) {
+			/* Mutate the state */
+			neurons[layer][neuron][key][subkey] = value;
+			this.setState({
+				...this.state,
+				model: { ...this.state.model, neurons: neurons },
+			});
 		} else {
 			console.error("Could not be found in state");
 		}
