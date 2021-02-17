@@ -6,8 +6,9 @@
     for the entire application
 */
 import React, { Component } from "react";
-import { Button, Typography } from "@material-ui/core";
+import { Button, Typography, Input } from "@material-ui/core";
 import PlayButton from "./components/PlayButton";
+import * as tf from "@tensorflow/tfjs";
 
 class App extends Component {
 	constructor(props) {
@@ -15,12 +16,15 @@ class App extends Component {
 		/* Treat the app state as the global state */
 		this.state = {
 			/* data: stores the input and lables to the input */
+			X: null,
+			y: null,
 			data: {
 				X: [],
 				y: [],
 			},
 			/* Stores the model and model metadata */
 			model: {
+				seq: {},
 				neurons: [],
 				shape: [],
 				loss: null,
@@ -28,12 +32,12 @@ class App extends Component {
 				yhat: null,
 				dlossdyhat: null,
 				epoch: 0,
-				lr: 0.1,
+				lr: 0.01,
 			},
 			/* Stores the controls */
 			controls: {
 				playing: false,
-				speed: 1,
+				speed: 0,
 			},
 		};
 
@@ -64,6 +68,7 @@ class App extends Component {
 		this.passBack = this.passBack.bind(this);
 
 		this.mutateAllBackward = this.mutateAllBackward.bind(this);
+		this.train = this.train.bind(this);
 	}
 	/* not binded to "this" functions */
 	ReLU(number) {
@@ -116,7 +121,8 @@ class App extends Component {
   */
 	async run() {
 		await this.mutate("controls", "playing", !this.state.controls.playing);
-		await this.main();
+		await this.train();
+		//		await this.main();
 	}
 
 	async neuralNetwork() {
@@ -550,7 +556,7 @@ class App extends Component {
 			const X = this.linearData(start, stop, increment);
 			/* Create the labels to the input data */
 			const y = X.map((input) => {
-				return equation(input);
+				return equation(input).toFixed(3);
 			});
 			/* Set State */
 			this.mutate("data", "X", X);
@@ -622,37 +628,88 @@ class App extends Component {
 		}
 	}
 	predicitons() {
-		const {data} = this.state;
-		for(let i = 0; i < data.X.length; i++) {
+		const { data } = this.state;
+		for (let i = 0; i < data.X.length; i++) {
 			this.forwardModel();
 		}
 	}
 
+	tensorToArray(tensor) {
+		return Array.from(tensor.dataSync());
+	}
+
+	async addModel(model) {
+		model.add(
+			tf.layers.dense({
+				inputShape: [1],
+				units: 64,
+				activation: "relu",
+				useBias: true,
+			})
+		);
+		model.add(
+			tf.layers.dense({ units: 64, activation: "relu", useBias: true })
+		);
+		model.add(
+			tf.layers.dense({ units: 1, activation: "linear", useBias: true })
+		);
+		return model;
+	}
+	async modelCompile() {
+		let model = tf.sequential();
+		await this.addModel(model);
+		model.compile({
+			optimizer: tf.train.sgd(0.001),
+			loss: "meanSquaredError",
+		});
+		return model;
+	}
+	async train() {
+		let { model } = this.state.model.seq;
+		//await model.fit(X, y, { epochs: 1000 });
+		//model.predict(X);
+		//console.log(yArr);
+		//console.log(XArr);
+		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+		/* Until broken by user */
+		let X = tf.linspace(0, Math.PI, 10);
+		let y = tf.sin(X);
+		let play = this.state.controls.playing;
+		while (play !== false) {
+			/* Destructure neccesary state */
+			const { playing, speed } = this.state.controls;
+			const { epoch } = this.state.model;
+			play = playing;
+			this.mutate("model", "epoch", epoch + 1);
+			const h = await model.fit(X, y, {
+				epochs: 1,
+			});
+			this.mutate("model", "loss", h.history.loss[0]);
+			await timer(speed);
+			model.predict(X).print();
+			/* this.nerualNetwork(model) */
+		}
+	}
 	async componentDidMount() {
+		//await model.fit(X, y, {
+		//epochs: 10,
+		//});
+		//console.log(this.tensorToArray(model.predict(X)));
 		//function lin(x) {
 		//return x;
 		//}
-		await this.initializeModel(
-			[1, 4, 4, 1],
-			0,
-			Math.PI,
-			Math.PI / 2,
-			Math.sin
-		);
+		//await this.initializeModel([1, 2, 2, 1], 0, 3.14, 1.57, Math.sin);
 		//console.log(this.state.model.neurons);
 		//await this.forwardModel();
 		////console.log("Foward Pass");
 		////console.log(this.state.model.neurons);
-
 		////console.log("Backward Pass and Update");
 		//await this.backwardModel();
 		//await this.updateModel();
 		//console.log(this.state.model.neurons);
-
 		//await this.forwardModel();
 		//console.log("Foward Pass");
 		//console.log(this.state.model.neurons);
-
 		//console.log("Backward Pass and Update");
 		//await this.backwardModel();
 		//await this.updateModel();
@@ -692,7 +749,23 @@ class App extends Component {
 				</Typography>
 
 				<Typography variant="h6">loss: {loss}</Typography>
+				<Typography variant="h6">lr: {this.state.model.lr}</Typography>
 				{PlayButtonClick}
+				<Input
+					value={this.state.model.lr}
+					onChange={(e) => {
+						this.mutate("model", "lr", e.target.value);
+					}}
+				></Input>
+				<Button
+					onClick={async () => {
+						const model = await this.modelCompile();
+						await this.mutate("model", "seq", model);
+						console.log("intialized");
+					}}
+				>
+					Click me
+				</Button>
 			</div>
 		);
 	}
