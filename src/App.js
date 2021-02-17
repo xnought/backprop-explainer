@@ -28,7 +28,7 @@ class App extends Component {
 				yhat: null,
 				dlossdyhat: null,
 				epoch: 0,
-				lr: 0.001,
+				lr: 0.1,
 			},
 			/* Stores the controls */
 			controls: {
@@ -120,7 +120,8 @@ class App extends Component {
 	}
 
 	async neuralNetwork() {
-		await this.forwardModel();
+		/* Add the inputs to the first input neuron */
+		await this.forwardModel(this.getRandomInt(this.state.data.X.length));
 		await this.backwardModel();
 		await this.updateModel();
 		// await this.backwardModel(model);
@@ -214,13 +215,11 @@ class App extends Component {
     Purpose: one forward pass 
     @mutate: this.model
   */
-	async forwardModel() {
+	async forwardModel(index) {
 		/* Destructure State */
 		const { data, model } = this.state;
 		const { neurons, shape } = model;
 
-		/* Add the inputs to the first input neuron */
-		const index = this.getRandomInt(data.X.length);
 		//const index = 1;
 		let X = [data.X[index]];
 		this.setInputs(X, 0);
@@ -622,20 +621,32 @@ class App extends Component {
 			console.error("Could not be found in state");
 		}
 	}
+	predicitons() {
+		const {data} = this.state;
+		for(let i = 0; i < data.X.length; i++) {
+			this.forwardModel();
+		}
+	}
 
 	async componentDidMount() {
-		function lin(x) {
-			return x;
-		}
-		await this.initializeModel([1, 1], 0, 5, 1, lin);
+		//function lin(x) {
+		//return x;
+		//}
+		await this.initializeModel(
+			[1, 4, 4, 1],
+			0,
+			Math.PI,
+			Math.PI / 2,
+			Math.sin
+		);
 		//console.log(this.state.model.neurons);
-		await this.forwardModel();
-		//console.log("Foward Pass");
-		//console.log(this.state.model.neurons);
+		//await this.forwardModel();
+		////console.log("Foward Pass");
+		////console.log(this.state.model.neurons);
 
-		//console.log("Backward Pass and Update");
-		await this.backwardModel();
-		await this.updateModel();
+		////console.log("Backward Pass and Update");
+		//await this.backwardModel();
+		//await this.updateModel();
 		//console.log(this.state.model.neurons);
 
 		//await this.forwardModel();
