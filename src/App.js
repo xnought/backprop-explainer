@@ -121,8 +121,8 @@ class App extends Component {
   */
 	async run() {
 		await this.mutate("controls", "playing", !this.state.controls.playing);
-		await this.train();
-		//		await this.main();
+		//await this.train();
+		await this.main();
 	}
 
 	async neuralNetwork() {
@@ -241,7 +241,10 @@ class App extends Component {
 				let { weights, inputs, bias } = neurons[layer][neuron].forward;
 				let mult = this.mult(weights, inputs);
 				let sum = this.sum(mult) + bias;
-				let relu = this.ReLU(sum);
+				if (layer != shape.length - 1) {
+					let relu = this.ReLU(sum);
+				}
+				let relu = sum;
 				this.mutateModelNeurons(
 					"forward",
 					"product",
@@ -356,6 +359,9 @@ class App extends Component {
 
 				let dReLU = Math.max(0, activation) * dvalue;
 				let dBias = dReLU;
+				if (layer == outputLayerIndex) {
+					dReLU = dvalue;
+				}
 				let dMult = inputs.map(() => dReLU);
 				let dWeights = this.mult(inputs, dMult);
 				let dInputs = this.mult(weights, dMult);
@@ -698,7 +704,7 @@ class App extends Component {
 		//function lin(x) {
 		//return x;
 		//}
-		//await this.initializeModel([1, 2, 2, 1], 0, 3.14, 1.57, Math.sin);
+		await this.initializeModel([1, 2, 2, 1], 0, 3.14, 1.57, Math.sin);
 		//console.log(this.state.model.neurons);
 		//await this.forwardModel();
 		////console.log("Foward Pass");
