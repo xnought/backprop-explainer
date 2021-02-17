@@ -26,6 +26,7 @@ class App extends Component {
 				loss: null,
 				y: null,
 				yhat: null,
+				dlossdyhat: null,
 				epoch: 0,
 				lr: 0.01,
 			},
@@ -60,10 +61,16 @@ class App extends Component {
 		/* Mutators of State */
 		this.mutate = this.mutate.bind(this);
 		this.mutateModelNeurons = this.mutateModelNeurons.bind(this);
+		this.passBack = this.passBack.bind(this);
+
+		this.mutateAllBackward = this.mutateAllBackward.bind(this);
 	}
 	/* not binded to "this" functions */
 	ReLU(number) {
 		return Math.max(0, number);
+	}
+	mseDerivative(yhat, y) {
+		return 2 * (yhat - y);
 	}
 	mseLoss(yhat, y) {
 		return Math.pow(yhat - y, 2);
@@ -114,6 +121,7 @@ class App extends Component {
 
 	async neuralNetwork() {
 		await this.forwardModel();
+		await this.backwardModel();
 		// await this.backwardModel(model);
 		// await this.updateModel(model);
 	}
@@ -174,13 +182,13 @@ class App extends Component {
 				output: null,
 			},
 			backward: {
-				dprevNeurondLoss: null,
-				dActdSum: null,
-				dSumdBias: null,
-				dSumdMult: [],
-				dMultdWeights: [],
-				dMultdInputs: [],
-				dthisNeurondloss: null,
+				dvalue: null,
+				dReLU: null,
+				dBias: null,
+				dMult: [],
+				dWeights: [],
+				dInputs: [],
+				dNeuron: null,
 			},
 			links: [],
 		};
@@ -263,12 +271,189 @@ class App extends Component {
 		//console.log(`y: ${this.state.data.y[index]}`);
 		//console.log(this.state.model.loss);
 	}
+
+	/* 
+		Name: mutateAllBackward
+		@mutate: this.model.neurons[layer][neuron].backward
+	*/
+	mutateAllBackward(
+		dReLU,
+		dBias,
+		dMult,
+		dWeights,
+		dInputs,
+		dNeuron,
+		layer,
+		neuron
+	) {
+		this.mutateModelNeurons("backward", "dReLU", dReLU, layer, neuron);
+		this.mutateModelNeurons("backward", "dBias", dBias, layer, neuron);
+		this.mutateModelNeurons("backward", "dMult", dMult, layer, neuron);
+		this.mutateModelNeurons(
+			"backward",
+			"dWeights",
+			dWeights,
+			layer,
+			neuron
+		);
+		this.mutateModelNeurons("backward", "dInputs", dInputs, layer, neuron);
+		this.mutateModelNeurons("backward", "dNeuron", dNeuron, layer, neuron);
+	}
+
+	passBack(dvalue, currentLayer) {
+		const { shape } = this.state.model;
+		const prevLayer = currentLayer - 1;
+		for (let neuron = 0; neuron < shape[prevLayer]; neuron++) {
+			this.mutateModelNeurons(
+				"backward",
+				"dvalue",
+				dvalue,
+				prevLayer,
+				neuron
+			);
+		}
+	}
 	/* 
     Name: backwardModel
     Purpose: compute derivative backwards
     @mutate: this.model
   */
 	backwardModel() {
+		/* Destructure the state */
+		const { model } = this.state;
+
+		/* Destructure model */
+		const { yhat, y, neurons, shape } = model;
+
+		let outputLayerIndex = shape.length - 1;
+		/* Calculate the loss derivative and pass it to the output neuron */
+		let dyhat = this.mseDerivative(yhat, y);
+		this.mutateModelNeurons(
+			"backward",
+			"dvalue",
+			dyhat,
+			outputLayerIndex,
+			0
+		);
+
+		/* calculate each layer until we hit the layer before input layer */
+		for (let layer = outputLayerIndex; layer > 0; layer--) {
+			let dNeurons = [];
+			let dNeuronsSum = 0;
+			for (let neuron = 0; neuron < shape[layer]; neuron++) {
+				/* Destructure neccesary items from model forward and backward per neuron */
+				let { backward, forward } = model.neurons[layer][neuron];
+				let { inputs, weights, activation } = forward;
+				let { dvalue } = backward;
+
+				let dReLU = Math.max(0, activation) * dvalue;
+				let dBias = dReLU;
+				let dMult = inputs.map(() => dReLU);
+				let dWeights = this.mult(inputs, dMult);
+				let dInputs = this.mult(weights, dMult);
+				let dNeuron = this.sum(dInputs);
+
+				/* Add all to the state of the neuron */
+				this.mutateAllBackward(
+					dReLU,
+					dBias,
+					dMult,
+					dWeights,
+					dInputs,
+					dNeuron,
+					layer,
+					neuron
+				);
+
+				/* Then we want to add dNeuron to an array */
+				dNeurons.push(dNeuron);
+				//console.log(`Layer: ${layer}, Neuron: ${neuron}`);
+				//console.log(backward);
+				//console.log(forward);
+			}
+			/* Sum the dNeuron array */
+			dNeuronsSum = this.sum(dNeurons);
+			/* Pass back the sum to the next layer */
+			this.passBack(dNeuronsSum, layer);
+		}
+		console.log(this.state.model.neurons);
+
+		/* Given current layer I want to pass back to previous layer */
+		//this.passBack(dvalue, layer);
+		//console.log(neurons[layer - 1]);
+
+		///* Start at last layer */
+		//for(let layer = shape.length - 1; layer >= 0; layer-- )
+		//{
+		//let dNeuronArray = [];
+		//let dvalueSumLayer = 0;
+		///* Itererate through each neuron per layer */
+		//for(let neuron = 0; neuron < shape[layer]; neuron++) {
+		///* Destructure Neuron */
+		//let { activation, weights, inputs } = neurons[layer][neuron].forward;
+		//let inputLength = inputs.length;
+
+		//}
+		//}
+
+		///* Destructure Neuron */
+		//let { activation, weights, inputs } = neurons[layer][neuron].forward;
+		//let inputLength = inputs.length;
+
+		//let lastNeuron = neurons[layer][neuron];
+		///* Calculate the loss derivative */
+		//let dyhat = this.mseDerivative(yhat, y);
+
+		///* Sum the values needed to pass back */
+		//let dNeuronArray = [];
+		//let dvalueNextLayer = 0;
+
+		///* Pass the value back*/
+		//let dvalue = dyhat;
+		//let dReLU = Math.max(0, activation) * dvalue;
+		//let dBias = dReLU;
+		//let dMult = inputs.map(() => dReLU);
+		//let dWeights = this.mult(inputs, dMult);
+		//let dInputs = this.mult(weights, dMult);
+		//let dNeuron = this.sum(dInputs);
+		///* Add dNeuron to the layers output */
+		//dNeuronArray.push(dNeuron);
+
+		///* At the end of first loop of layer iteration */
+		//dvalueNextLayer = this.sum(dNeuronArray);
+
+		//console.log(lastNeuron);
+		///* Pass the derivative input back */
+		//this.mutateAllBackward(
+		//dvalue,
+		//dReLU,
+		//dBias,
+		//dMult,
+		//dWeights,
+		//dInputs,
+		//dNeuron,
+		//layer,
+		//neuron
+		//);
+		/* Update all of the parameters */
+		//console.log(`dinput: ${dvalue}`);
+		//console.log(`Activation: ${activation}`);
+		//console.log(`dReLU: ${dReLU}`);
+		//console.log(`DBias: ${dBias}`);
+		//console.log(`DMult: [${dMult.toString()}]`);
+		//console.log(`Dweights: [${dWeights.toString()}]`);
+		//console.log(`Dinputs: [${dInputs.toString()}]`);
+		//this.mutateModelNeurons(
+		//"backward",
+		//"dprevNeurondLoss",
+		//dlossdyhat,
+		//shape.length - 1,
+		//0
+		//);
+
+		/* Pass back to neurons based on linkage */
+		/* We want to now pass it back to the last neuron */
+
 		/* Compute Derivative of loss */
 		/* Iterate backwards of neurons */
 		/* Compute derivative of a neuron */
