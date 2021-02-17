@@ -5,16 +5,16 @@
 | Big Picture TODO        | Status        |
 | ----------------------- | ------------- |
 | Design                  | Done ✅       |
-| Implementation          | In Progress 🖍 |
+| Implementation          | In Progress 🖍|
 | Testing/Trying to break |               |
 
 | Implementation TODO      | Status        |
 | ------------------------ | ------------- |
 | Create React App         | Done ✅       |
 | Implement Neural Network | Done ✅       |
-| Test Neural Network      | In Progress 🖍 |
-| Create Scatter Plot      |               |
-| Plot Best Fit            |               |
+| Test Neural Network      | Done ✅       |
+| Create Scatter Plot      |In Progress 🖍 |
+| Plot Best Fit            |In Progress 🖍 |
 | Neural Network Graph     |               |
 | On Click Graph           |               |
 | On Hover Graph           |               |
