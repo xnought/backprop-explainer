@@ -6,7 +6,7 @@
     for the entire application
 */
 import React, { Component } from "react";
-import { Typography } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 import PlayButton from "./components/PlayButton";
 
 class App extends Component {
@@ -28,12 +28,12 @@ class App extends Component {
 				yhat: null,
 				dlossdyhat: null,
 				epoch: 0,
-				lr: 0.01,
+				lr: 0.001,
 			},
 			/* Stores the controls */
 			controls: {
 				playing: false,
-				speed: 100,
+				speed: 1,
 			},
 		};
 
@@ -122,6 +122,7 @@ class App extends Component {
 	async neuralNetwork() {
 		await this.forwardModel();
 		await this.backwardModel();
+		await this.updateModel();
 		// await this.backwardModel(model);
 		// await this.updateModel(model);
 	}
@@ -131,9 +132,9 @@ class App extends Component {
     Purpose: to invoke generation of data and initializing the neural network model
     @mutate: this.model
   */
-	initializeModel(shape) {
+	async initializeModel(shape, start, stop, increment, eqn) {
 		/* Generate Data and set this.state.data*/
-		this.generateData(0, 4, 1, Math.sin);
+		this.generateData(start, stop, increment, eqn);
 		// let newsShape = [0, 1, 3, 3, 1];
 		// const numLayers     1  2  3  4 = 4
 		let newShape = [0, ...shape];
@@ -193,7 +194,8 @@ class App extends Component {
 			links: [],
 		};
 		for (let i = 0; i < numInputs; i++) {
-			let number = Math.random() < 0.5 ? -Math.random() : Math.random();
+			let number =
+				0.1 * (Math.random() < 0.5 ? -Math.random() : Math.random());
 			//let number = Math.random();
 			DenseNeuronTemplate.forward.weights.push(number);
 		}
@@ -212,13 +214,14 @@ class App extends Component {
     Purpose: one forward pass 
     @mutate: this.model
   */
-	forwardModel() {
+	async forwardModel() {
 		/* Destructure State */
 		const { data, model } = this.state;
 		const { neurons, shape } = model;
 
 		/* Add the inputs to the first input neuron */
 		const index = this.getRandomInt(data.X.length);
+		//const index = 1;
 		let X = [data.X[index]];
 		this.setInputs(X, 0);
 		/* First perform one forward pass */
@@ -318,7 +321,7 @@ class App extends Component {
     Purpose: compute derivative backwards
     @mutate: this.model
   */
-	backwardModel() {
+	async backwardModel() {
 		/* Destructure the state */
 		const { model } = this.state;
 
@@ -376,7 +379,7 @@ class App extends Component {
 			/* Pass back the sum to the next layer */
 			this.passBack(dNeuronsSum, layer);
 		}
-		console.log(this.state.model.neurons);
+		//console.log(this.state.model.neurons);
 
 		/* Given current layer I want to pass back to previous layer */
 		//this.passBack(dvalue, layer);
@@ -459,13 +462,59 @@ class App extends Component {
 		/* Compute derivative of a neuron */
 		/* print the derivatives */
 	}
+
+	gradientDescent(lr, param, dparam) {
+		return param - lr * dparam;
+	}
 	/* 
     Name: updateModel
     Purpose: to perform gradient descent and update the weights
     @mutate: this.model
   */
-	updateModel() {
+	async updateModel() {
+		/* Destructuring the state */
+		const { model } = this.state;
+
+		const { shape, lr, neurons } = model;
 		/* Use the derivatives to perform gradient descent */
+		/* Iterate through each and subtract weights by itself times the derivative of weights or biases */
+		for (let layer = 1; layer < shape.length; layer++) {
+			for (let neuron = 0; neuron < shape[layer]; neuron++) {
+				let { weights, bias } = neurons[layer][neuron].forward;
+				let { dWeights, dBias } = neurons[layer][neuron].backward;
+				//*  */console.log(`Layer ${layer}, Neuron: ${neuron}`);
+				/* Update weights */
+				let updatedWeights = [];
+				for (let weight = 0; weight < shape[layer - 1]; weight++) {
+					updatedWeights.push(
+						this.gradientDescent(
+							lr,
+							weights[weight],
+							dWeights[weight]
+						)
+					);
+				}
+				/* Update bias */
+				let updatedBias = this.gradientDescent(lr, bias, dBias);
+
+				/* Update the model weights and biases */
+				this.mutateModelNeurons(
+					"forward",
+					"weights",
+					updatedWeights,
+					layer,
+					neuron
+				);
+				this.mutateModelNeurons(
+					"forward",
+					"bias",
+					updatedBias,
+					layer,
+					neuron
+				);
+			}
+		}
+		/* We want to start from the beginning and subt */
 	}
 	/* 
     Name: setInputs
@@ -575,8 +624,28 @@ class App extends Component {
 	}
 
 	async componentDidMount() {
-		await this.initializeModel([1, 2, 2, 1]);
-		await this.neuralNetwork();
+		function lin(x) {
+			return x;
+		}
+		await this.initializeModel([1, 1], 0, 5, 1, lin);
+		//console.log(this.state.model.neurons);
+		await this.forwardModel();
+		//console.log("Foward Pass");
+		//console.log(this.state.model.neurons);
+
+		//console.log("Backward Pass and Update");
+		await this.backwardModel();
+		await this.updateModel();
+		//console.log(this.state.model.neurons);
+
+		//await this.forwardModel();
+		//console.log("Foward Pass");
+		//console.log(this.state.model.neurons);
+
+		//console.log("Backward Pass and Update");
+		//await this.backwardModel();
+		//await this.updateModel();
+		//console.log(this.state.model.neurons);
 	}
 
 	render() {
@@ -608,8 +677,10 @@ class App extends Component {
 					Model Shape: [{shape.toString()}]
 				</Typography>
 				<Typography variant="h6">
-					y:{model.y}, yhat:{yhat}, Loss: {loss}
+					y:{model.y}, yhat:{yhat},
 				</Typography>
+
+				<Typography variant="h6">loss: {loss}</Typography>
 				{PlayButtonClick}
 			</div>
 		);
