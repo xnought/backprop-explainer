@@ -8,6 +8,7 @@
 import React, { Component } from "react";
 import { Button, Typography, Input } from "@material-ui/core";
 import PlayButton from "./components/PlayButton";
+import ScatterPlot from "./components/ScatterPlot";
 import * as tf from "@tensorflow/tfjs";
 
 class App extends Component {
@@ -18,6 +19,7 @@ class App extends Component {
 			/* data: stores the input and lables to the input */
 			X: null,
 			y: null,
+			yhat: null,
 			data: {
 				X: [],
 				y: [],
@@ -29,7 +31,7 @@ class App extends Component {
 				shape: [],
 				loss: null,
 				y: null,
-				yhat: null,
+				yhat: [],
 				dlossdyhat: null,
 				epoch: 0,
 				lr: 0.01,
@@ -61,6 +63,7 @@ class App extends Component {
 		/* Loss Functions */
 		/* Data Generation */
 		this.generateData = this.generateData.bind(this);
+		this.genTensorData = this.genTensorData.bind(this);
 		this.linearData = this.linearData.bind(this);
 		/* Mutators of State */
 		this.mutate = this.mutate.bind(this);
@@ -121,8 +124,8 @@ class App extends Component {
   */
 	async run() {
 		await this.mutate("controls", "playing", !this.state.controls.playing);
-		//await this.train();
-		await this.main();
+		await this.train(this.state.X, this.state.y);
+		//await this.main();
 	}
 
 	async neuralNetwork() {
@@ -670,7 +673,7 @@ class App extends Component {
 		});
 		return model;
 	}
-	async train() {
+	async train(X, y) {
 		let { model } = this.state.model.seq;
 		//await model.fit(X, y, { epochs: 1000 });
 		//model.predict(X);
@@ -678,8 +681,6 @@ class App extends Component {
 		//console.log(XArr);
 		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 		/* Until broken by user */
-		let X = tf.linspace(0, Math.PI, 10);
-		let y = tf.sin(X);
 		let play = this.state.controls.playing;
 		while (play !== false) {
 			/* Destructure neccesary state */
@@ -692,19 +693,39 @@ class App extends Component {
 			});
 			this.mutate("model", "loss", h.history.loss[0]);
 			await timer(speed);
-			model.predict(X).print();
+			let yhat = model.predict(X);
+			this.mutate("model", "yhat", this.tensorToArray(yhat));
 			/* this.nerualNetwork(model) */
 		}
 	}
+	async genTensorData() {
+		await tf.ready();
+		let XTensor = tf.linspace(-5, 5, 40);
+		let yTensor = tf.cos(XTensor).mul(5);
+		let yhatTensor = tf.zerosLike(XTensor);
+		let X = this.tensorToArray(XTensor);
+		let y = this.tensorToArray(yTensor);
+		let yhat = this.tensorToArray(yhatTensor);
+
+		this.setState({
+			...this.state,
+			X: XTensor,
+			y: yTensor,
+			data: { X, y },
+			model: { ...this.state.model, yhat },
+		});
+	}
 	async componentDidMount() {
-		//await model.fit(X, y, {
+		await this.genTensorData();
+		let model = await this.modelCompile();
+		this.mutate("model", "seq", model);
 		//epochs: 10,
 		//});
 		//console.log(this.tensorToArray(model.predict(X)));
 		//function lin(x) {
 		//return x;
 		//}
-		await this.initializeModel([1, 2, 2, 1], 0, 3.14, 1.57, Math.sin);
+		//await this.initializeModel([1, 2, 2, 1], 0, 3.14, 1.57, Math.sin);
 		//console.log(this.state.model.neurons);
 		//await this.forwardModel();
 		////console.log("Foward Pass");
@@ -750,9 +771,7 @@ class App extends Component {
 				<Typography variant="h6">
 					Model Shape: [{shape.toString()}]
 				</Typography>
-				<Typography variant="h6">
-					y:{model.y}, yhat:{yhat},
-				</Typography>
+				<Typography variant="h6">y:{model.y},</Typography>
 
 				<Typography variant="h6">loss: {loss}</Typography>
 				<Typography variant="h6">lr: {this.state.model.lr}</Typography>
@@ -772,6 +791,16 @@ class App extends Component {
 				>
 					Click me
 				</Button>
+				<ScatterPlot
+					width={300}
+					height={300}
+					padding={0}
+					start={-5}
+					stop={5}
+					X={this.state.data.X}
+					y={this.state.data.y}
+					yhat={this.state.model.yhat}
+				/>
 			</div>
 		);
 	}
