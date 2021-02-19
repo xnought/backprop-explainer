@@ -1,38 +1,30 @@
-.App {
-  text-align: center;
+/*
+.ef {
+	stroke: green;
+	stroke-dasharray: 9 1;
+	stroke-dashoffset: 1;
+	animation: flowForward 250ms linear infinite;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.e {
+	stroke: green;
+	stroke-dasharray: 9 1;
+	stroke-dashoffset: 1;
+	animation: flowForward 0s linear infinite;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+@keyframes flowBackward {
+	from {
+		stroke-dashoffset: 0;
+	}
+	to {
+		stroke-dashoffset: 10;
+	}
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+@keyframes flowForward {
+	from {
+		stroke-dashoffset: 0;
+	}
+	to {
+		stroke-dashoffset: -10;
+	}
 }
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+*/

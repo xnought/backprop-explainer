@@ -6,7 +6,23 @@
     for the entire application
 */
 import React, { Component } from "react";
-import { Button, Typography, Input } from "@material-ui/core";
+import {
+	Typography,
+	Input,
+	Box,
+	AppBar,
+	Toolbar,
+	Card,
+	CardContent,
+	IconButton,
+	CardActions,
+	Select,
+	MenuItem,
+	InputLabel,
+	FormControl,
+} from "@material-ui/core";
+import { Replay, SlowMotionVideo } from "@material-ui/icons";
+import style from "./App.css";
 import PlayButton from "./components/PlayButton";
 import NN from "./components/NN";
 import ScatterPlot from "./components/ScatterPlot";
@@ -20,7 +36,9 @@ class App extends Component {
 			/* data: stores the input and lables to the input */
 			X: null,
 			y: null,
-			yhat: null,
+			yhat: [],
+			biasData: [],
+			weightsData: [],
 			data: {
 				X: [],
 				y: [],
@@ -29,13 +47,14 @@ class App extends Component {
 			model: {
 				seq: {},
 				neurons: [],
-				shape: [],
+				shape: [1, 8, 8, 8, 1],
 				loss: null,
 				y: null,
 				yhat: [],
 				dlossdyhat: null,
 				epoch: 0,
-				lr: 0.01,
+				lr: 0.1,
+				optimizer: "adam",
 			},
 			/* Stores the controls */
 			controls: {
@@ -73,6 +92,25 @@ class App extends Component {
 
 		this.mutateAllBackward = this.mutateAllBackward.bind(this);
 		this.train = this.train.bind(this);
+		this.printParameters = this.printParameters.bind(this);
+		this.reset = this.reset.bind(this);
+		this.asyncPause = this.asyncPause.bind(this);
+		this.resetParameters = this.resetParameters.bind(this);
+		this.changeModelLr = this.changeModelLr.bind(this);
+		this.changeModelOptimizer = this.changeModelOptimizer.bind(this);
+	}
+	async changeModelOptimizer(optimizerChange) {
+		let model = await this.modelCompile(
+			optimizerChange,
+			this.state.model.lr
+		);
+		this.mutate("model", "seq", model);
+	}
+
+	changeModelLr(lrChange) {
+		let model = this.state.model.seq;
+		model.optimizer_.learningRate = lrChange;
+		this.mutate("model", "seq", model);
 	}
 	/* not binded to "this" functions */
 	ReLU(number) {
@@ -124,7 +162,7 @@ class App extends Component {
     @mutate: this.state.controls.playing
   */
 	async run() {
-		await this.mutate("controls", "playing", !this.state.controls.playing);
+		this.mutate("controls", "playing", !this.state.controls.playing);
 		await this.train(this.state.X, this.state.y);
 		//await this.main();
 	}
@@ -649,30 +687,35 @@ class App extends Component {
 	}
 
 	async addModel(model) {
+		let shape = this.state.model.shape;
 		model.add(
 			tf.layers.dense({
 				inputShape: [1],
-				units: 8,
+				units: shape[1],
 				activation: "relu",
 				useBias: true,
 			})
 		);
-		model.add(
-			tf.layers.dense({ units: 8, activation: "relu", useBias: true })
-		);
-		model.add(
-			tf.layers.dense({ units: 8, activation: "relu", useBias: true })
-		);
+		for (let layer = 2; layer < shape.length - 1; layer++) {
+			model.add(
+				tf.layers.dense({
+					units: shape[layer],
+					activation: "relu",
+					useBias: true,
+				})
+			);
+		}
 		model.add(
 			tf.layers.dense({ units: 1, activation: "linear", useBias: true })
 		);
+
 		return model;
 	}
-	async modelCompile() {
+	async modelCompile(optimizer, lr) {
 		let model = tf.sequential();
 		await this.addModel(model);
 		model.compile({
-			optimizer: tf.train.sgd(0.01),
+			optimizer: optimizer(lr),
 			loss: "meanSquaredError",
 		});
 		return model;
@@ -691,21 +734,25 @@ class App extends Component {
 			const { playing, speed } = this.state.controls;
 			const { epoch } = this.state.model;
 			play = playing;
-			this.mutate("model", "epoch", epoch + 1);
-			const h = await model.fit(X, y, {
-				epochs: 1,
-			});
-			this.mutate("model", "loss", h.history.loss[0]);
-			await timer(speed);
-			let yhat = model.predict(X);
-			this.mutate("model", "yhat", this.tensorToArray(yhat));
+			if (play != false) {
+				this.mutate("model", "epoch", epoch + 1);
+				const h = await model.fit(X, y, {
+					epochs: 1,
+				});
+				await this.printParameters(model);
+				this.mutate("model", "loss", h.history.loss[0]);
+				await timer(speed);
+				let yhat = model.predict(X);
+				this.mutate("model", "yhat", this.tensorToArray(yhat));
+			}
 			/* this.nerualNetwork(model) */
 		}
 	}
-	async genTensorData() {
+	async genTensorData(eqn, scaled) {
 		await tf.ready();
 		let XTensor = tf.linspace(-5, 5, 40);
-		let yTensor = tf.cos(XTensor).mul(5);
+		let yTensor;
+		yTensor = tf.mul(eqn(XTensor), scaled);
 		let yhatTensor = tf.zerosLike(XTensor);
 		let X = this.tensorToArray(XTensor);
 		let y = this.tensorToArray(yTensor);
@@ -719,10 +766,60 @@ class App extends Component {
 			model: { ...this.state.model, yhat },
 		});
 	}
+	async printParameters(model) {
+		let weightSet = [];
+		let biasSet = [];
+		for (let i = 0; i < model.getWeights().length; i++) {
+			(i % 2 == 0 ? weightSet : biasSet).push(
+				Array.from(model.getWeights()[i].dataSync())
+			);
+		}
+		this.setState({
+			...this.state,
+			biasData: biasSet,
+			weightsData: weightSet,
+		});
+		//for (let layer = 1; layer < model.layers.length; layer++) {
+		//console.log(`Layer: ${layer} `);
+		//model.layers[layer].getWeights()[0].print();
+
+		//model.layers[layer].getWeights()[1].print();
+		//}
+	}
+	async asyncPause() {
+		this.mutate("controls", "playing", false);
+	}
+	async resetParameters() {
+		await this.genTensorData(tf.sin, 5);
+		let model = await this.modelCompile(tf.train.adam, this.state.model.lr);
+		await this.printParameters(model);
+		this.setState({
+			...this.state,
+			model: { ...this.state.model, seq: model, epoch: 0, loss: null },
+		});
+	}
+
+	async reset() {
+		await this.asyncPause();
+		await this.resetParameters();
+		//;this.mutate("model", "seq", model);
+		//;this.setState({ yhat: [] });
+		//;this.mutate("model", "epoch", 0);
+	}
 	async componentDidMount() {
-		await this.genTensorData();
-		let model = await this.modelCompile();
+		/* First lets choose the data */
+		await this.genTensorData(tf.sin, 5);
+		let model = await this.modelCompile(tf.train.adam, this.state.model.lr);
 		this.mutate("model", "seq", model);
+		this.printParameters(model);
+		//model.optimizer_ = tf.train.sgd(0.1);
+		//model.optimizer_.learningRate = 0.001;
+
+		//const paths = d3
+		//.select("#app")
+		//.select("#nn")
+		//.selectAll("path")
+		//.attr("class", "edge");
 		//epochs: 10,
 		//});
 		//console.log(this.tensorToArray(model.predict(X)));
@@ -762,51 +859,111 @@ class App extends Component {
 		/* Destructure render */
 		const PlayButtonClick = (
 			// eslint-disable-next-line
-			<a onClick={async () => await this.run()}>
+			<a
+				onClick={async () => {
+					await this.run();
+				}}
+			>
 				<PlayButton playing={controls.playing} />
 			</a>
 		);
 
 		return (
-			<div>
-				<Typography variant="h6">
-					X: [{X.toString()}], y: [{y.toString()}], Epoch: {epoch},
-				</Typography>
-				<Typography variant="h6">
-					Model Shape: [{shape.toString()}]
-				</Typography>
-				<Typography variant="h6">y:{model.y},</Typography>
-
-				<Typography variant="h6">loss: {loss}</Typography>
-				<Typography variant="h6">lr: {this.state.model.lr}</Typography>
-				{PlayButtonClick}
-				<Input
-					value={this.state.model.lr}
-					onChange={(e) => {
-						this.mutate("model", "lr", e.target.value);
-					}}
-				></Input>
-				<Button
-					onClick={async () => {
-						const model = await this.modelCompile();
-						await this.mutate("model", "seq", model);
-						console.log("intialized");
-					}}
+			<div id="app">
+				<AppBar
+					position="static"
+					style={{ background: "#f50257", color: "white" }}
 				>
-					Click me
-				</Button>
+					<Toolbar>
+						<Typography variant="h6">
+							Backpropagation Visualizer
+						</Typography>
+					</Toolbar>
+				</AppBar>
 
-				<NN />
-				<ScatterPlot
-					width={300}
-					height={300}
-					padding={0}
-					start={-5}
-					stop={5}
-					X={this.state.data.X}
-					y={this.state.data.y}
-					yhat={this.state.model.yhat}
-				/>
+				<Box display="flex" justifyContent="center" marginTop={10}>
+					<Box width={400}>
+						<Card>
+							<CardContent>
+								<Typography
+									variant="caption"
+									style={{
+										color: "rgb(245, 2, 87, 0.5)",
+									}}
+								>
+									Control Center
+								</Typography>
+								<Typography variant="h4">
+									Epochs: {epoch}
+								</Typography>
+								<Typography variant="h6">
+									loss: {loss == null ? "" : loss.toFixed(6)}
+								</Typography>
+								<CardActions>
+									<IconButton
+										disabled={this.state.controls.playing}
+										onClick={() => {
+											this.reset();
+										}}
+									>
+										<Replay />
+									</IconButton>
+									{PlayButtonClick}
+									<IconButton
+										style={{
+											color:
+												this.state.controls.speed == 0
+													? "grey"
+													: "#FFC006",
+										}}
+										onClick={() => {
+											this.mutate(
+												"controls",
+												"speed",
+												this.state.controls.speed == 0
+													? 100
+													: 0
+											);
+										}}
+									>
+										<SlowMotionVideo />
+									</IconButton>
+								</CardActions>
+							</CardContent>
+						</Card>
+						<Card>
+							<CardActions></CardActions>
+						</Card>
+					</Box>
+					<Box>
+						<NN
+							weights={this.state.weightsData}
+							biases={this.state.biasData}
+							shape={this.state.model.shape}
+							playing={this.state.controls.playing}
+							slowed={this.state.controls.speed != 0}
+						>
+							<Input
+								value={this.state.model.lr}
+								onChange={(e) => {
+									this.mutate("model", "lr", e.target.value);
+								}}
+							></Input>
+						</NN>
+					</Box>
+					<Box marginLeft={10}>
+						<ScatterPlot
+							width={300}
+							height={300}
+							padding={0}
+							start={-5}
+							stop={5}
+							X={this.state.data.X}
+							y={this.state.data.y}
+							yhat={this.state.model.yhat}
+						/>
+					</Box>
+				</Box>
 			</div>
 		);
 	}
