@@ -1,6 +1,4 @@
-import react, { Component } from "react";
-import { AppBar, Toolbar } from "@material-ui/core";
-import style from "./d3.css";
+import React, { Component } from "react";
 import * as d3 from "d3";
 class NN extends Component {
 	constructor(props) {
@@ -13,7 +11,6 @@ class NN extends Component {
 		const rw = 32;
 		const rh = 32;
 		const svg = node;
-
 		let xScale = d3.scaleLinear().domain([0, 100]).range([50, 750]);
 
 		let yScale = d3.scaleLinear().domain([0, 100]).range([500, 0]);
@@ -169,14 +166,7 @@ class NN extends Component {
 	}
 	render() {
 		const { children } = this.props;
-		return (
-			<div id="nn">
-				<AppBar
-					position="static"
-					style={{ background: "white", color: "white" }}
-				></AppBar>
-			</div>
-		);
+		return <div id="nn">{children}</div>;
 	}
 }
 

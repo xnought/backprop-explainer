@@ -1,7 +1,6 @@
-import react, { Component } from "react";
+import React, { Component } from "react";
 import style from "./d3.css";
 import * as d3 from "d3";
-import * as tf from "@tensorflow/tfjs";
 
 class ScatterPlot extends Component {
 	constructor(props) {
@@ -93,11 +92,11 @@ class ScatterPlot extends Component {
 				y: yScale(y[i]),
 			});
 		}
-
 		let a = [];
 		for (let i = 0; i < X.length; i++) {
 			a.push([xScale(X[i]), yScale(yhat[i])]);
 		}
+		svg.selectAll("circle").remove();
 		this.plotPoints(svg, dataSet);
 
 		svg.select("#epic")

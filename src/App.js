@@ -16,17 +16,18 @@ import {
 	CardContent,
 	IconButton,
 	CardActions,
-	Select,
-	MenuItem,
-	InputLabel,
-	FormControl,
+	Chip,
+	TextField,
+	Button,
 } from "@material-ui/core";
-import { Replay, SlowMotionVideo } from "@material-ui/icons";
+import { PlusOne, Replay, SlowMotionVideo, Add } from "@material-ui/icons";
 import style from "./App.css";
 import PlayButton from "./components/PlayButton";
 import NN from "./components/NN";
 import ScatterPlot from "./components/ScatterPlot";
 import * as tf from "@tensorflow/tfjs";
+import * as d3 from "d3";
+import { dispose, tidy } from "@tensorflow/tfjs";
 
 class App extends Component {
 	constructor(props) {
@@ -34,6 +35,7 @@ class App extends Component {
 		/* Treat the app state as the global state */
 		this.state = {
 			/* data: stores the input and lables to the input */
+			duringEpoch: false,
 			X: null,
 			y: null,
 			yhat: [],
@@ -47,14 +49,16 @@ class App extends Component {
 			model: {
 				seq: {},
 				neurons: [],
-				shape: [1, 8, 8, 8, 1],
+				shape: [1, 6, 6, 1],
 				loss: null,
 				y: null,
 				yhat: [],
 				dlossdyhat: null,
 				epoch: 0,
-				lr: 0.1,
+				lr: 0.01,
+				curve: "sin",
 				optimizer: "adam",
+				scale: 5,
 			},
 			/* Stores the controls */
 			controls: {
@@ -108,9 +112,12 @@ class App extends Component {
 	}
 
 	changeModelLr(lrChange) {
-		let model = this.state.model.seq;
-		model.optimizer_.learningRate = lrChange;
-		this.mutate("model", "seq", model);
+		tf.tidy(() => {
+			let model = this.state.model.seq;
+			model.optimizer_.learningRate = lrChange;
+			this.mutate("model", "seq", model);
+			return undefined;
+		});
 	}
 	/* not binded to "this" functions */
 	ReLU(number) {
@@ -376,7 +383,7 @@ class App extends Component {
 		const { model } = this.state;
 
 		/* Destructure model */
-		const { yhat, y, neurons, shape } = model;
+		const { yhat, y, shape } = model;
 
 		let outputLayerIndex = shape.length - 1;
 		/* Calculate the loss derivative and pass it to the output neuron */
@@ -640,15 +647,18 @@ class App extends Component {
   */
 	mutate(key, subkey, value) {
 		/* copy of the state */
-		let state = { ...this.state };
-		/* If this.state.key.subkey exists */
-		if (key in state && subkey in state[key]) {
-			/* Mutate the state */
-			state[key][subkey] = value;
-			this.setState({ state });
-		} else {
-			console.error("Could not be found in state");
-		}
+		tf.tidy(() => {
+			let state = { ...this.state };
+			/* If this.state.key.subkey exists */
+			if (key in state && subkey in state[key]) {
+				/* Mutate the state */
+				state[key][subkey] = value;
+				this.setState({ state });
+			} else {
+				console.error("Could not be found in state");
+			}
+			return undefined;
+		});
 	}
 
 	/* 
@@ -687,29 +697,35 @@ class App extends Component {
 	}
 
 	async addModel(model) {
-		let shape = this.state.model.shape;
-		model.add(
-			tf.layers.dense({
-				inputShape: [1],
-				units: shape[1],
-				activation: "relu",
-				useBias: true,
-			})
-		);
-		for (let layer = 2; layer < shape.length - 1; layer++) {
+		return tf.tidy(() => {
+			let shape = this.state.model.shape;
 			model.add(
 				tf.layers.dense({
-					units: shape[layer],
+					inputShape: [1],
+					units: shape[1],
 					activation: "relu",
 					useBias: true,
 				})
 			);
-		}
-		model.add(
-			tf.layers.dense({ units: 1, activation: "linear", useBias: true })
-		);
+			for (let layer = 2; layer < shape.length - 1; layer++) {
+				model.add(
+					tf.layers.dense({
+						units: shape[layer],
+						activation: "relu",
+						useBias: true,
+					})
+				);
+			}
+			model.add(
+				tf.layers.dense({
+					units: 1,
+					activation: "linear",
+					useBias: true,
+				})
+			);
 
-		return model;
+			return model;
+		});
 	}
 	async modelCompile(optimizer, lr) {
 		let model = tf.sequential();
@@ -734,23 +750,27 @@ class App extends Component {
 			const { playing, speed } = this.state.controls;
 			const { epoch } = this.state.model;
 			play = playing;
-			if (play != false) {
-				this.mutate("model", "epoch", epoch + 1);
-				const h = await model.fit(X, y, {
-					epochs: 1,
-				});
-				await this.printParameters(model);
-				this.mutate("model", "loss", h.history.loss[0]);
-				await timer(speed);
-				let yhat = model.predict(X);
-				this.mutate("model", "yhat", this.tensorToArray(yhat));
-			}
+			this.setState({ duringEpoch: true });
+			this.mutate("model", "epoch", epoch + 1);
+			const h = await model.fit(X, y, {
+				epochs: 1,
+			});
+			await this.printParameters(model);
+			let yhat = model.predict(X);
+			this.mutate("model", "loss", h.history.loss[0]);
+			this.mutate("model", "yhat", this.tensorToArray(yhat));
+			this.setState({ duringEpoch: false });
+			await timer(speed);
 			/* this.nerualNetwork(model) */
 		}
 	}
 	async genTensorData(eqn, scaled) {
 		await tf.ready();
-		let XTensor = tf.linspace(-5, 5, 40);
+		let XTensor = tf.linspace(
+			-this.state.model.scale,
+			this.state.model.scale,
+			60
+		);
 		let yTensor;
 		yTensor = tf.mul(eqn(XTensor), scaled);
 		let yhatTensor = tf.zerosLike(XTensor);
@@ -774,6 +794,7 @@ class App extends Component {
 				Array.from(model.getWeights()[i].dataSync())
 			);
 		}
+		//console.log(model.layers[2].getWeights()[1].dataSync());
 		this.setState({
 			...this.state,
 			biasData: biasSet,
@@ -789,9 +810,23 @@ class App extends Component {
 	async asyncPause() {
 		this.mutate("controls", "playing", false);
 	}
-	async resetParameters() {
-		await this.genTensorData(tf.sin, 5);
-		let model = await this.modelCompile(tf.train.adam, this.state.model.lr);
+	async resetParameters(scale) {
+		let eqn;
+		let optimizer;
+		if (this.state.model.curve === "sin") {
+			eqn = tf.sin;
+		} else if (this.state.model.curve === "tanh") {
+			eqn = tf.tanh;
+		} else if (this.state.model.curve === "cos") {
+			eqn = tf.cos;
+		}
+		if (this.state.model.optimizer == "adam") {
+			optimizer = tf.train.adam;
+		} else if (this.state.model.optimizer == "sgd") {
+			optimizer = tf.train.sgd;
+		}
+		await this.genTensorData(eqn, scale);
+		let model = await this.modelCompile(optimizer, this.state.model.lr);
 		await this.printParameters(model);
 		this.setState({
 			...this.state,
@@ -799,19 +834,25 @@ class App extends Component {
 		});
 	}
 
-	async reset() {
-		await this.asyncPause();
-		await this.resetParameters();
+	async reset(scale) {
+		this.asyncPause();
+		this.resetParameters(scale);
 		//;this.mutate("model", "seq", model);
 		//;this.setState({ yhat: [] });
 		//;this.mutate("model", "epoch", 0);
 	}
 	async componentDidMount() {
 		/* First lets choose the data */
-		await this.genTensorData(tf.sin, 5);
+
+		tf.tidy(() => {
+			this.genTensorData(tf.sin, this.state.model.scale);
+			return undefined;
+		});
 		let model = await this.modelCompile(tf.train.adam, this.state.model.lr);
-		this.mutate("model", "seq", model);
-		this.printParameters(model);
+		tf.tidy(() => {
+			this.mutate("model", "seq", model);
+			this.printParameters(model);
+		});
 		//model.optimizer_ = tf.train.sgd(0.1);
 		//model.optimizer_.learningRate = 0.001;
 
@@ -843,16 +884,35 @@ class App extends Component {
 		//await this.updateModel();
 		//console.log(this.state.model.neurons);
 	}
+	componentDidUpdate() {
+		//console.table(tf.memory());
+	}
+	shouldComponentUpdate() {
+		if (this.state.duringEpoch) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
 	render() {
 		/* Destructure State*/
-		const { data, model, controls } = this.state;
+		const { model, controls } = this.state;
 
 		/* Destructuring model */
-		const { epoch, loss, shape, neurons, yhat } = model;
+		const { epoch, loss, shape } = model;
 
-		/* Destructuring of data */
-		const { X, y } = data;
+		let newShape = [...shape];
+		newShape.splice(0, 1);
+		newShape.splice(newShape.length - 1, 1);
+		//console.log(newShape);
+		const lrs = [0.001, 0.01, 0.1, 0.3, (1.0).toFixed(1)];
+		const optimizers = ["adam", "sgd"];
+		const dataSets = [
+			{ label: "sin", eqn: tf.sin, scale: 5 },
+			{ label: "cos", eqn: tf.cos, scale: 5 },
+			{ label: "tanh", eqn: tf.tanh, scale: 5 },
+		];
 
 		/* Destructuring of model */
 
@@ -883,7 +943,7 @@ class App extends Component {
 
 				<Box display="flex" justifyContent="center" marginTop={10}>
 					<Box width={400}>
-						<Card>
+						<Card variant="outlined">
 							<CardContent>
 								<Typography
 									variant="caption"
@@ -903,7 +963,7 @@ class App extends Component {
 									<IconButton
 										disabled={this.state.controls.playing}
 										onClick={() => {
-											this.reset();
+											this.reset(model.scale);
 										}}
 									>
 										<Replay />
@@ -931,11 +991,128 @@ class App extends Component {
 								</CardActions>
 							</CardContent>
 						</Card>
-						<Card>
-							<CardActions></CardActions>
-						</Card>
+
+						<Box marginTop={5}>
+							<Card variant="outlined">
+								<CardContent>
+									<Typography
+										variant="caption"
+										style={{
+											color: "rgb(245, 2, 87, 0.5)",
+										}}
+									>
+										Model Initialization
+									</Typography>
+									<CardActions>
+										<Typography variant="caption">
+											Optimizer
+										</Typography>
+										{optimizers.map((optimizer, i) => (
+											<Chip
+												disabled={
+													this.state.controls.playing
+												}
+												key={i}
+												label={optimizer}
+												color={
+													this.state.model
+														.optimizer == optimizer
+														? "secondary"
+														: "default"
+												}
+												onClick={() => {
+													tf.tidy(() => {
+														this.mutate(
+															"model",
+															"optimizer",
+															optimizer
+														);
+														this.changeModelOptimizer(
+															optimizer == "sgd"
+																? tf.train.sgd
+																: tf.train.adam
+														);
+														this.reset(model.scale);
+
+														return undefined;
+													});
+												}}
+											></Chip>
+										))}
+									</CardActions>
+									<CardActions>
+										<Typography variant="caption">
+											Learning Rate
+										</Typography>
+										{lrs.map((num, i) => (
+											<Chip
+												key={i}
+												label={`${num}`}
+												color={
+													this.state.model.lr ==
+													`${num}`
+														? "secondary"
+														: "default"
+												}
+												onClick={() => {
+													tf.tidy(() => {
+														this.mutate(
+															"model",
+															"lr",
+															num
+														);
+														this.changeModelLr(num);
+														return;
+													});
+												}}
+											></Chip>
+										))}
+									</CardActions>
+									<CardActions>
+										<Typography variant="caption">
+											Data Set
+										</Typography>
+										{dataSets.map((item, i) => (
+											<Chip
+												disabled={
+													this.state.controls.playing
+												}
+												key={i}
+												label={item.label}
+												color={
+													this.state.model.curve ==
+													item.label
+														? "secondary"
+														: "default"
+												}
+												onClick={() => {
+													this.mutate(
+														"model",
+														"shape",
+														shape
+													);
+													this.reset(model.scale);
+													this.mutate(
+														"model",
+														"curve",
+														item.label
+													);
+													tf.tidy(() => {
+														this.genTensorData(
+															item.eqn,
+															item.scale
+														);
+														return undefined;
+													});
+												}}
+											></Chip>
+										))}
+									</CardActions>
+								</CardContent>
+							</Card>
+						</Box>
 					</Box>
-					<Box>
+					<Box marginLeft={10}>
 						<NN
 							weights={this.state.weightsData}
 							biases={this.state.biasData}
@@ -943,12 +1120,212 @@ class App extends Component {
 							playing={this.state.controls.playing}
 							slowed={this.state.controls.speed != 0}
 						>
-							<Input
-								value={this.state.model.lr}
-								onChange={(e) => {
-									this.mutate("model", "lr", e.target.value);
-								}}
-							></Input>
+							<Card variant="outlined" style={{ minWidth: 875 }}>
+								<Box justifyContent="start" display="flex">
+									<CardActions>
+										<Box marginRight={11.5}>
+											<Button
+												color="secondary"
+												onClick={() => {
+													let shape = model.shape;
+													if (!(shape.length > 4)) {
+														tf.tidy(() => {
+															shape.splice(
+																shape.length - 1
+															);
+															shape.push(2);
+															shape.push(1);
+															d3.select("#app")
+																.select("#nn")
+																.select("svg")
+																.selectAll(
+																	"path"
+																)
+																.remove();
+															d3.select("#app")
+																.select("#nn")
+																.select("svg")
+																.selectAll(
+																	"rect"
+																)
+																.remove();
+															this.mutate(
+																"model",
+																"shape",
+																shape
+															);
+															this.reset(
+																model.scale
+															);
+														});
+													}
+												}}
+											>
+												Add Layer
+											</Button>
+										</Box>
+										{newShape.map((num, i) => (
+											<Box marginRight={17}>
+												<Box marginBottom={1}>
+													<Chip
+														label={"–"}
+														onClick={() => {
+															let shape =
+																model.shape;
+															let e = i + 1;
+															shape[e] =
+																shape[e] == 0
+																	? shape[e]
+																	: shape[e] -
+																	  1;
+															if (
+																!shape[e] == 0
+															) {
+																tf.tidy(() => {
+																	d3.select(
+																		"#app"
+																	)
+																		.select(
+																			"#nn"
+																		)
+																		.select(
+																			"svg"
+																		)
+																		.selectAll(
+																			"path"
+																		)
+																		.remove();
+																	d3.select(
+																		"#app"
+																	)
+																		.select(
+																			"#nn"
+																		)
+																		.select(
+																			"svg"
+																		)
+																		.selectAll(
+																			"rect"
+																		)
+																		.remove();
+																	this.mutate(
+																		"model",
+																		"shape",
+																		shape
+																	);
+																	this.reset(
+																		model.scale
+																	);
+																	return undefined;
+																});
+															}
+														}}
+													></Chip>
+												</Box>
+												<Box>
+													<Chip
+														label={"+"}
+														onClick={() => {
+															let shape =
+																model.shape;
+															let e = i + 1;
+															shape[e] =
+																shape[e] >= 8
+																	? shape[e]
+																	: shape[e] +
+																	  1;
+															if (shape[i] <= 8) {
+																tf.tidy(() => {
+																	d3.select(
+																		"#app"
+																	)
+																		.select(
+																			"#nn"
+																		)
+																		.select(
+																			"svg"
+																		)
+																		.selectAll(
+																			"path"
+																		)
+																		.remove();
+																	d3.select(
+																		"#app"
+																	)
+																		.select(
+																			"#nn"
+																		)
+																		.select(
+																			"svg"
+																		)
+																		.selectAll(
+																			"rect"
+																		)
+																		.remove();
+																	this.mutate(
+																		"model",
+																		"shape",
+																		shape
+																	);
+																	this.reset(
+																		model.scale
+																	);
+																	return undefined;
+																});
+															}
+														}}
+													></Chip>
+												</Box>
+											</Box>
+										))}
+
+										<Box>
+											<Button
+												color="secondary"
+												onClick={() => {
+													tf.tidy(() => {
+														let shape = model.shape;
+														if (shape.length > 2) {
+															shape.splice(
+																shape.length - 1
+															);
+															shape.splice(
+																shape.length - 1
+															);
+															shape.push(1);
+															d3.select("#app")
+																.select("#nn")
+																.select("svg")
+																.selectAll(
+																	"path"
+																)
+																.remove();
+															d3.select("#app")
+																.select("#nn")
+																.select("svg")
+																.selectAll(
+																	"rect"
+																)
+																.remove();
+															this.mutate(
+																"model",
+																"shape",
+																shape
+															);
+															this.reset(
+																model.scale
+															);
+															return undefined;
+														}
+													});
+												}}
+											>
+												Remove Layer
+											</Button>
+										</Box>
+									</CardActions>
+								</Box>
+							</Card>
 						</NN>
 					</Box>
 					<Box marginLeft={10}>
@@ -956,8 +1333,8 @@ class App extends Component {
 							width={300}
 							height={300}
 							padding={0}
-							start={-5}
-							stop={5}
+							start={-this.state.model.scale}
+							stop={this.state.model.scale}
 							X={this.state.data.X}
 							y={this.state.data.y}
 							yhat={this.state.model.yhat}
