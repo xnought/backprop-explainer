@@ -8,6 +8,7 @@
 import React, { Component } from "react";
 import { Button, Typography, Input } from "@material-ui/core";
 import PlayButton from "./components/PlayButton";
+import NN from "./components/NN";
 import ScatterPlot from "./components/ScatterPlot";
 import * as tf from "@tensorflow/tfjs";
 
@@ -651,13 +652,16 @@ class App extends Component {
 		model.add(
 			tf.layers.dense({
 				inputShape: [1],
-				units: 64,
+				units: 8,
 				activation: "relu",
 				useBias: true,
 			})
 		);
 		model.add(
-			tf.layers.dense({ units: 64, activation: "relu", useBias: true })
+			tf.layers.dense({ units: 8, activation: "relu", useBias: true })
+		);
+		model.add(
+			tf.layers.dense({ units: 8, activation: "relu", useBias: true })
 		);
 		model.add(
 			tf.layers.dense({ units: 1, activation: "linear", useBias: true })
@@ -668,7 +672,7 @@ class App extends Component {
 		let model = tf.sequential();
 		await this.addModel(model);
 		model.compile({
-			optimizer: tf.train.sgd(0.001),
+			optimizer: tf.train.sgd(0.01),
 			loss: "meanSquaredError",
 		});
 		return model;
@@ -791,6 +795,8 @@ class App extends Component {
 				>
 					Click me
 				</Button>
+
+				<NN />
 				<ScatterPlot
 					width={300}
 					height={300}

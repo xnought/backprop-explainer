@@ -1,0 +1,44 @@
+.axis line {
+	stroke: rgba(128, 128, 128, 0.695);
+}
+.split {
+	stroke: rgba(172, 172, 172, 0.421);
+	stroke-dasharray: 20, 3;
+}
+
+.edge {
+	stroke: #f50257;
+	stroke-dasharray: 9 1;
+	stroke-dashoffset: 1;
+	animation: flowForward 250ms linear infinite;
+}
+@keyframes flowBackward {
+	from {
+		stroke-dashoffset: 0;
+	}
+	to {
+		stroke-dashoffset: 10;
+	}
+}
+@keyframes flowForward {
+	from {
+		stroke-dashoffset: 0;
+	}
+	to {
+		stroke-dashoffset: -10;
+	}
+}
+
+.axis path {
+	stroke: none;
+}
+
+.axis text {
+	fill: grey;
+}
+.node {
+	fill: rgb(219, 219, 219);
+}
+.cord {
+	fill: rgba(128, 128, 128, 0.099);
+}

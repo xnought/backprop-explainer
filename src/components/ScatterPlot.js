@@ -1,5 +1,5 @@
 import react, { Component } from "react";
-import style from "./ScatterPlot.css";
+import style from "./d3.css";
 import * as d3 from "d3";
 import * as tf from "@tensorflow/tfjs";
 
@@ -30,7 +30,10 @@ class ScatterPlot extends Component {
 			.attr("width", width)
 			.attr("height", height)
 			.style("overflow", "visible");
-		svg.append("rect").attr("width", width).attr("height", height);
+		svg.append("rect")
+			.attr("width", width)
+			.attr("height", height)
+			.attr("class", "cord");
 		let xScale = d3
 			.scaleLinear()
 			.domain([start, stop])
