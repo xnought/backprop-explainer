@@ -6,20 +6,17 @@
 	stroke-dasharray: 20, 3;
 }
 .edgePaused {
-	stroke: #f50257;
 	stroke-dasharray: 9 1;
 	stroke-dashoffset: 1;
 	animation: flowForward 0s linear infinite;
 }
 .edgeSlowed {
-	stroke: #f50257;
 	stroke-dasharray: 9 1;
 	stroke-dashoffset: 1;
 	animation: flowForward linear infinite;
 	animation-duration: 1s;
 }
 .edgeForward {
-	stroke: #f50257;
 	stroke-dasharray: 9 1;
 	stroke-dashoffset: 1;
 	animation: flowForward linear infinite;
@@ -27,7 +24,7 @@
 }
 
 .edge {
-	stroke: blue;
+	stroke: rgb(0, 255, 110);
 	animation: flowForward 1s linear infinite;
 }
 @keyframes flowBackward {

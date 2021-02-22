@@ -219,6 +219,7 @@ class App extends Component {
 		let play = this.state.controls.playing;
 		//let epoch = 0;
 		while (play !== false) {
+			console.table(tf.memory());
 			let a = performance.now();
 			/* Destructure neccesary state */
 			const { playing /* speed */ } = this.state.controls;
@@ -342,6 +343,7 @@ class App extends Component {
 	}
 	componentDidUpdate() {
 		//console.table(tf.memory());
+		console.log(this.state.shape);
 	}
 	shouldComponentUpdate() {
 		if (this.state.duringEpoch) {
@@ -509,7 +511,7 @@ class App extends Component {
 												key={i}
 												label={`${num}`}
 												color={
-													this.state.lr === `${num}`
+													this.state.lr === num
 														? "secondary"
 														: "default"
 												}
@@ -623,13 +625,11 @@ class App extends Component {
 																.state.shape;
 															let e = i + 1;
 															shape[e] =
-																shape[e] === 0
+																shape[e] === 1
 																	? shape[e]
 																	: shape[e] -
 																	  1;
-															if (
-																!shape[e] === 0
-															) {
+															if (shape[e] > 0) {
 																tf.tidy(() => {
 																	d3.select(
 																		"#app"
@@ -665,7 +665,6 @@ class App extends Component {
 																	this.reset(
 																		model.scale
 																	);
-																	return undefined;
 																});
 															}
 														}}
@@ -711,10 +710,10 @@ class App extends Component {
 																			"rect"
 																		)
 																		.remove();
-																	this.mutate(
-																		"model",
-																		"shape",
-																		shape
+																	this.setState(
+																		{
+																			shape,
+																		}
 																	);
 																	this.reset(
 																		model.scale
@@ -732,41 +731,30 @@ class App extends Component {
 											<Button
 												color="secondary"
 												onClick={() => {
-													tf.tidy(() => {
-														let shape = model.shape;
-														if (shape.length > 2) {
-															shape.splice(
-																shape.length - 1
-															);
-															shape.splice(
-																shape.length - 1
-															);
-															shape.push(1);
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"path"
-																)
-																.remove();
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"rect"
-																)
-																.remove();
-															this.mutate(
-																"model",
-																"shape",
-																shape
-															);
-															this.reset(
-																model.scale
-															);
-															return undefined;
-														}
-													});
+													let shape = model.shape;
+													if (shape.length > 2) {
+														shape.splice(
+															shape.length - 1
+														);
+														shape.splice(
+															shape.length - 1
+														);
+														shape.push(1);
+														d3.select("#app")
+															.select("#nn")
+															.select("svg")
+															.selectAll("path")
+															.remove();
+														d3.select("#app")
+															.select("#nn")
+															.select("svg")
+															.selectAll("rect")
+															.remove();
+														this.setState({
+															shape,
+														});
+														this.reset(model.scale);
+													}
 												}}
 											>
 												Remove Layer

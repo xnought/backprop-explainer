@@ -72,11 +72,14 @@ class NN extends Component {
 			.append("path")
 			.attr("fill", "none")
 			.attr("class", "edgeForward")
+			.attr("stroke", "green")
 			.attr("stroke-width", "0.5")
 			.attr("d", (d) => d);
+
 		svg.selectAll("path")
 			.data(flattenedWeights)
-			.attr("stroke-width", (d) => Math.pow(d, 2) + 0.2);
+			.attr("stroke-width", (d) => Math.pow(d, 2) + 0.2)
+			.attr("stroke", (d) => (d > 0 ? "#48b778" : "#f50257"));
 
 		svg.selectAll("rect")
 			.data(flatns)
@@ -87,6 +90,10 @@ class NN extends Component {
 			.attr("width", rw)
 			.attr("height", rh)
 			.attr("class", "node");
+		//.on("click", (e, d) => {
+		//console.log(d);
+		///* Now I need to pass in the weight set and bias for each neuron some how */
+		//});
 
 		if (!playing) {
 			svg.selectAll("path").attr("class", "edgePaused");
