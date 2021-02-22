@@ -21,7 +21,7 @@ class ScatterPlot extends Component {
 	}
 	/* This is where we initialize the Scatter Plot */
 	async componentDidMount() {
-		const { width, height, padding, start, stop, X, y } = this.props;
+		const { width, height, padding, start, stop } = this.props;
 		const container = d3.select("#nice");
 
 		const svg = container
