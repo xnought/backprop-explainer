@@ -228,7 +228,7 @@ class App extends Component {
 			//this.mutate("model", "epoch", epoch + 1);
 			//while(playing) {
 			let t0 = performance.now();
-			await model.fit(XTensor, yTensor, {
+			const h = await model.fit(XTensor, yTensor, {
 				epochs: 1,
 			});
 			let t1 = performance.now();
@@ -238,7 +238,7 @@ class App extends Component {
 			tf.tidy(() => {
 				let yhatTensor = model.predict(XTensor);
 				let yhat = this.tensorToArray(yhatTensor);
-				let loss = tf.losses.meanSquaredError(y, yhat).dataSync()[0];
+				let loss = h.history.loss[0]; //tf.losses.meanSquaredError(y, yhat).dataSync()[0];
 				this.printParameters(model, loss, yhat, this.state.epoch + 1);
 				//this.setState({
 				////model: {
@@ -342,6 +342,7 @@ class App extends Component {
 	}
 	componentDidUpdate() {
 		//console.table(tf.memory());
+		console.log(this.state.shape);
 	}
 	shouldComponentUpdate() {
 		if (this.state.duringEpoch) {
@@ -509,7 +510,7 @@ class App extends Component {
 												key={i}
 												label={`${num}`}
 												color={
-													this.state.lr === `${num}`
+													this.state.lr === num
 														? "secondary"
 														: "default"
 												}
@@ -623,13 +624,11 @@ class App extends Component {
 																.state.shape;
 															let e = i + 1;
 															shape[e] =
-																shape[e] === 0
+																shape[e] === 1
 																	? shape[e]
 																	: shape[e] -
 																	  1;
-															if (
-																!shape[e] === 0
-															) {
+															if (shape[e] > 0) {
 																tf.tidy(() => {
 																	d3.select(
 																		"#app"
@@ -675,8 +674,8 @@ class App extends Component {
 													<Chip
 														label={"+"}
 														onClick={() => {
-															let shape =
-																model.shape;
+															let shape = this
+																.state.shape;
 															let e = i + 1;
 															shape[e] =
 																shape[e] >= 8
@@ -711,15 +710,11 @@ class App extends Component {
 																			"rect"
 																		)
 																		.remove();
-																	this.mutate(
-																		"model",
-																		"shape",
-																		shape
+																	this.setState(
+																		{
+																			shape,
+																		}
 																	);
-																	this.reset(
-																		model.scale
-																	);
-																	return undefined;
 																});
 															}
 														}}
@@ -756,11 +751,9 @@ class App extends Component {
 																	"rect"
 																)
 																.remove();
-															this.mutate(
-																"model",
-																"shape",
-																shape
-															);
+															this.setState({
+																shape,
+															});
 															this.reset(
 																model.scale
 															);

@@ -66,6 +66,7 @@ class NN extends Component {
 		}
 		let flattenedWeights = this.flatten(weights);
 
+		console.log(links);
 		svg.selectAll("path")
 			.data(links)
 			.enter()
