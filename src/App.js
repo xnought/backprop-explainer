@@ -36,7 +36,7 @@ class App extends Component {
 			duringEpoch: false,
 			X: null,
 			y: null,
-			shape: [1, 4, 4, 1],
+			shape: [1, 8, 8, 1],
 			epoch: 0,
 			yhat: [],
 			biasData: [],
@@ -67,6 +67,9 @@ class App extends Component {
 				playing: false,
 				speed: 0,
 			},
+			rects: [{ x: 1, y: 2 }],
+			weights: [],
+			links: [],
 		};
 
 		/* Prototype: Functions Binds to "this" */
@@ -84,7 +87,117 @@ class App extends Component {
 		this.resetParameters = this.resetParameters.bind(this);
 		this.changeModelLr = this.changeModelLr.bind(this);
 		this.changeModelOptimizer = this.changeModelOptimizer.bind(this);
+		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
 	}
+
+	flatten(array) {
+		let flattendArray = [];
+		for (let i = 0; i < array.length; i++) {
+			for (let e = 0; e < array[i].length; e++) {
+				flattendArray.push(array[i][e]);
+			}
+		}
+		return flattendArray;
+	}
+
+	initNeuralNetwork(shape) {
+		if (!this.state.controls.playing) {
+			const rw = 32;
+			const rh = 32;
+			let xScale = d3.scaleLinear().domain([0, 100]).range([50, 750]);
+			let yScale = d3.scaleLinear().domain([0, 100]).range([500, 0]);
+			let start = { x: 50 - rw / 2, y: 250 - rh / 2 };
+			let stop = { x: 750 - rw / 2, y: 250 - rh / 2 };
+			const link = d3
+				.linkHorizontal()
+				.x((d) => d.x + rw / 2)
+				.y((d) => d.y + rh / 2);
+			/* First we figure our how to create the neurons */
+			/* GIVEN A SHAPE OF [1,2,2,1] */
+			const layerProportion = [0, 25, 50, 75, 0];
+			let ns = [];
+			let flatns = [];
+			ns.push([start]);
+			flatns.push(start);
+			for (let layer = 1; layer < shape.length - 1; layer++) {
+				let dense = [];
+				for (let neuron = 0; neuron < shape[layer]; neuron++) {
+					/* First generate neuron */
+					let aaron = {
+						x: xScale(layerProportion[layer]) - rw / 2,
+						y: yScale(92 - neuron * 12) - rh / 2,
+					};
+					dense.push(aaron);
+					flatns.push(aaron);
+				}
+				ns.push(dense);
+			}
+			flatns.push(stop);
+			ns.push([stop]);
+
+			/* We start to iterate over ns */
+			let links = [];
+			for (let layer = shape.length - 1; layer > 0; layer--) {
+				for (
+					let prevNeuron = 0;
+					prevNeuron < shape[layer - 1];
+					prevNeuron++
+				) {
+					for (let neuron = 0; neuron < shape[layer]; neuron++) {
+						links.push(
+							link({
+								source: ns[layer - 1][prevNeuron],
+								target: ns[layer][neuron],
+							})
+						);
+					}
+				}
+			}
+			this.setState({ rects: flatns });
+			this.setState({ links });
+		} else if (this.state.controls.playing) {
+			let flattenedWeights = this.flatten(this.state.weightsData);
+			this.setState({ weights: flattenedWeights });
+		}
+		//svg.selectAll("path")
+		//.data(links)
+		//.enter()
+		//.append("path")
+		//.attr("fill", "none")
+		//.attr("class", "edgeForward")
+		//.attr("stroke", "green")
+		//.attr("stroke-width", "0.5")
+		//.attr("d", (d) => d);
+
+		//svg.selectAll("path")
+		//.data(flattenedWeights)
+		//.attr("stroke-width", (d) => Math.pow(d, 2) + 0.2)
+		//.attr("stroke", (d) => (d > 0 ? "#48b778" : "#f50257"));
+
+		//svg.selectAll("rect")
+		//.data(flatns)
+		//.enter()
+		//.append("rect")
+		//.attr("x", (d) => d.x)
+		//.attr("y", (d) => d.y)
+		//.attr("width", rw)
+		//.attr("height", rh)
+		//.attr("class", "node");
+		//.on("click", (e, d) => {
+		//console.log(d);
+		///* Now I need to pass in the weight set and bias for each neuron some how */
+		//});
+
+		//if (!playing) {
+		//svg.selectAll("path").attr("class", "edgePaused");
+		//} else if (playing) {
+		//svg.selectAll("path").attr(
+		//"class",
+		//slowed ? "edgeSlowed" : "edgeForward"
+		//);
+		//}
+	}
+
 	async changeModelOptimizer(optimizerChange) {}
 
 	changeModelLr(lrChange) {
@@ -125,12 +238,8 @@ class App extends Component {
 		this.mutate("controls", "playing", playing);
 		if (playing === true) {
 			await this.train(this.state.data.X, this.state.data.y);
-			//tf.tidy(() => {
-			//tf.tensor([1, 2, 3]).print();
-			//return undefined;
-			//});
+			console.log("epic");
 		}
-		//await this.main();
 	}
 
 	/* 
@@ -208,19 +317,25 @@ class App extends Component {
 			return tf.tensor(y);
 		});
 
-		const model = this.modelCompile(tf.train.adam, this.state.lr);
-		this.setState({ epoch: 0 });
-		//await model.fit(X, y, { epochs: 1000 });
-		//model.predict(X);
-		//console.log(yArr);
-		//console.log(XArr);
-		//const timer = (ms) => new Promise((res) => setTimeout(res, ms));
-		/* Until broken by user */
+		let model = tf.sequential();
+		this.addModel(model);
+		model.compile({
+			optimizer: tf.train.sgd(0.01),
+			loss: "meanSquaredError",
+		});
+
+		//this.setState({ epoch: 0 });
+		////await model.fit(X, y, { epochs: 1000 });
+		////model.predict(X);
+		////console.log(yArr);
+		////console.log(XArr);
+		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+		///* Until broken by user */
 		let play = this.state.controls.playing;
-		//let epoch = 0;
+		////let epoch = 0;
 		while (play !== false) {
-			console.table(tf.memory());
-			let a = performance.now();
+			this.setState({ duringEpoch: true });
+			//let a = performance.now();
 			/* Destructure neccesary state */
 			const { playing /* speed */ } = this.state.controls;
 			//const { epoch } = this.state.model;
@@ -228,12 +343,12 @@ class App extends Component {
 			//this.setState({ duringEpoch: true });
 			//this.mutate("model", "epoch", epoch + 1);
 			//while(playing) {
-			let t0 = performance.now();
+			//let t0 = performance.now();
 			await model.fit(XTensor, yTensor, {
 				epochs: 1,
 			});
-			let t1 = performance.now();
-			console.log(`FIT SPEED: ${t1 - t0}`);
+			//let t1 = performance.now();
+			//console.log(`FIT SPEED: ${t1 - t0}`);
 			//}
 
 			tf.tidy(() => {
@@ -249,16 +364,18 @@ class App extends Component {
 				////epoch: this.state.model.epoch + 1,
 				////},
 				//});
-				let b = performance.now();
-				console.log(`SPEED: ${b - a}`);
-				console.log(`epoch: ${this.state.model.epoch}`);
+				//let b = performance.now();
+				//console.log(`SPEED: ${b - a}`);
+				//console.log(`epoch: ${this.state.model.epoch}`);
 				return undefined;
 			});
+			this.setState({ duringEpoch: false });
+			await timer(0);
 		}
 		tf.dispose(model);
 		tf.dispose(XTensor);
 		tf.dispose(yTensor);
-		console.table(tf.memory());
+		//console.table(tf.memory());
 	}
 	async genTensorData(eqn, scaled) {
 		await tf.ready();
@@ -279,7 +396,7 @@ class App extends Component {
 		});
 	}
 	printParameters(model, loss, yhat, epoch) {
-		let a = performance.now();
+		//let a = performance.now();
 		let weightsData = [];
 		let biasesData = [];
 		for (let i = 0; i < model.getWeights().length; i++) {
@@ -289,8 +406,9 @@ class App extends Component {
 		}
 
 		this.setState({ weightsData, loss, yhat, epoch });
-		let b = performance.now();
-		console.log(`PRINT SPEED: ${b - a}`);
+		this.initNeuralNetwork(this.state.shape);
+		//let b = performance.now();
+		//console.log(`PRINT SPEED: ${b - a}`);
 		//for (let layer = 1; layer < model.layers.length; layer++) {
 		//console.log(`Layer: ${layer} `);
 		//model.layers[layer].getWeights()[0].print();
@@ -333,17 +451,17 @@ class App extends Component {
 		//;this.mutate("model", "epoch", 0);
 	}
 	async componentDidMount() {
+		tf.setBackend("cpu");
+		console.log(tf.getBackend());
 		/* First lets choose the data */
 		//document.body.style.zoom = "75%";
 		this.genTensorData(tf.sin, this.state.model.scale);
+		this.initNeuralNetwork(this.state.shape);
 		//let model = this.modelCompile(tf.train.adam, this.state.model.lr);
 		//this.mutate("model", "seq", model);
 		//this.printParameters(model);
 		//tf.dispose(model);
-	}
-	componentDidUpdate() {
-		//console.table(tf.memory());
-		console.log(this.state.shape);
+		console.log(tf.backend());
 	}
 	shouldComponentUpdate() {
 		if (this.state.duringEpoch) {
@@ -381,9 +499,10 @@ class App extends Component {
 			<a
 				onClick={async () => {
 					await this.run();
+					console.log("nice");
 				}}
 			>
-				<PlayButton playing={controls.playing} />
+				<Button>CLick ME</Button>
 			</a>
 		);
 
@@ -416,7 +535,7 @@ class App extends Component {
 									Epoch: {this.state.epoch}
 								</Typography>
 								<Typography variant="h6">
-									loss:{" "}
+									loss:
 									{this.state.loss == null
 										? ""
 										: this.state.loss.toFixed(6)}
@@ -425,7 +544,7 @@ class App extends Component {
 									<IconButton
 										disabled={this.state.controls.playing}
 										onClick={() => {
-											this.reset(model.scale);
+											this.reset(this.state.scale);
 										}}
 									>
 										<Replay />
@@ -566,11 +685,14 @@ class App extends Component {
 					</Box>
 					<Box marginLeft={10}>
 						<NN
-							weights={this.state.weightsData}
-							biases={this.state.biasData}
-							shape={this.state.shape}
-							playing={this.state.controls.playing}
-							slowed={this.state.controls.speed !== 0}
+							weights={this.state.weights}
+							rects={this.state.rects}
+							links={this.state.links}
+							playing={
+								this.state.controls.playing
+									? "edgeForward"
+									: "edgePaused"
+							}
 						>
 							<Card variant="outlined" style={{ minWidth: 875 }}>
 								<Box justifyContent="start" display="flex">
@@ -590,14 +712,14 @@ class App extends Component {
 															shape.push(1);
 															d3.select("#app")
 																.select("#nn")
-																.select("svg")
+																.select("#ee")
 																.selectAll(
 																	"path"
 																)
 																.remove();
 															d3.select("#app")
 																.select("#nn")
-																.select("svg")
+																.select("#ee")
 																.selectAll(
 																	"rect"
 																)
@@ -606,7 +728,7 @@ class App extends Component {
 																shape,
 															});
 															this.reset(
-																model.scale
+																this.state.scale
 															);
 														});
 													}
@@ -638,7 +760,7 @@ class App extends Component {
 																			"#nn"
 																		)
 																		.select(
-																			"svg"
+																			"#ee"
 																		)
 																		.selectAll(
 																			"path"
@@ -651,7 +773,7 @@ class App extends Component {
 																			"#nn"
 																		)
 																		.select(
-																			"svg"
+																			"#ee"
 																		)
 																		.selectAll(
 																			"rect"
@@ -663,7 +785,9 @@ class App extends Component {
 																		}
 																	);
 																	this.reset(
-																		model.scale
+																		this
+																			.state
+																			.scale
 																	);
 																});
 															}
@@ -674,8 +798,8 @@ class App extends Component {
 													<Chip
 														label={"+"}
 														onClick={() => {
-															let shape =
-																model.shape;
+															let shape = this
+																.state.shape;
 															let e = i + 1;
 															shape[e] =
 																shape[e] >= 8
@@ -691,7 +815,7 @@ class App extends Component {
 																			"#nn"
 																		)
 																		.select(
-																			"svg"
+																			"#ee"
 																		)
 																		.selectAll(
 																			"path"
@@ -704,7 +828,7 @@ class App extends Component {
 																			"#nn"
 																		)
 																		.select(
-																			"svg"
+																			"#ee"
 																		)
 																		.selectAll(
 																			"rect"
@@ -716,7 +840,9 @@ class App extends Component {
 																		}
 																	);
 																	this.reset(
-																		model.scale
+																		this
+																			.state
+																			.scale
 																	);
 																	return undefined;
 																});
@@ -742,12 +868,12 @@ class App extends Component {
 														shape.push(1);
 														d3.select("#app")
 															.select("#nn")
-															.select("svg")
+															.select("#ee")
 															.selectAll("path")
 															.remove();
 														d3.select("#app")
 															.select("#nn")
-															.select("svg")
+															.select("#ee")
 															.selectAll("rect")
 															.remove();
 														this.setState({
@@ -778,6 +904,17 @@ class App extends Component {
 						/>
 					</Box>
 				</Box>
+				<Button
+					onClick={() => {
+						let a = this.state.shape;
+						a[a.length - 1] = 2;
+						a.push(1);
+						this.setState({ shape: a });
+						this.initNeuralNetwork(a);
+					}}
+				>
+					ADD LAYER
+				</Button>
 				<Button
 					onClick={() => {
 						console.table(tf.memory());
