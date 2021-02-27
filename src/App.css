@@ -26,5 +26,12 @@
 	to {
 		stroke-dashoffset: -10;
 	}
+}*/
+
+.backpropmode {
+	filter: blur(10px);
+	z-index: -1;
 }
-*/
+.regular {
+	filter: none;
+}

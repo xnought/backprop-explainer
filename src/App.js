@@ -1,6 +1,5 @@
 /* 
   Donny Bertucci: @xnought
-  Date Created: 02/15/2021
   Summary: 
     This file acts as the highest state and act as the controls 
     for the entire application
@@ -17,29 +16,27 @@ import {
 	CardActions,
 	Chip,
 	Button,
+	Fab,
 } from "@material-ui/core";
-import { Replay, SlowMotionVideo } from "@material-ui/icons";
-import style from "./App.css";
-import PlayButton from "./components/PlayButton";
-import NN from "./components/NN";
-import ScatterPlot from "./components/ScatterPlot";
+import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
 import * as tf from "@tensorflow/tfjs";
 import * as d3 from "d3";
+import { PlayGround, ScatterPlot } from "./components/exports";
+import { NeuralNetwork, tools } from "./nn/exports";
+import "./App.css";
+const { flatten, formatWeightArray, tensorToArray } = tools;
 
 class App extends Component {
 	constructor(props) {
 		super(props);
 		/* Treat the app state as the global state */
 		this.state = {
-			/* data: stores the input and lables to the input */
 			loss: null,
 			duringEpoch: false,
-			X: null,
-			y: null,
 			shape: [1, 8, 8, 1],
 			epoch: 0,
 			yhat: [],
-			biasData: [],
+			biasesData: [],
 			weightsData: [],
 			lr: 0.1,
 			data: {
@@ -47,29 +44,17 @@ class App extends Component {
 				y: [],
 			},
 			scale: 5,
-			/* Stores the model and model metadata */
-			model: {
-				seq: {},
-				neurons: [],
-				shape: [1, 4, 4, 1],
-				loss: null,
-				y: null,
-				yhat: [],
-				dlossdyhat: null,
-				epoch: 0,
-				lr: 0.01,
-				curve: "sin",
-				optimizer: "adam",
-				scale: 5,
-			},
-			/* Stores the controls */
+			curve: "sin",
 			controls: {
 				playing: false,
 				speed: 0,
 			},
-			rects: [{ x: 1, y: 2 }],
+			rects: [],
 			weights: [],
 			links: [],
+			nn: null,
+			mode: false,
+			trans: null,
 		};
 
 		/* Prototype: Functions Binds to "this" */
@@ -86,18 +71,7 @@ class App extends Component {
 		this.asyncPause = this.asyncPause.bind(this);
 		this.resetParameters = this.resetParameters.bind(this);
 		this.changeModelLr = this.changeModelLr.bind(this);
-		this.changeModelOptimizer = this.changeModelOptimizer.bind(this);
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
-	}
-
-	flatten(array) {
-		let flattendArray = [];
-		for (let i = 0; i < array.length; i++) {
-			for (let e = 0; e < array[i].length; e++) {
-				flattendArray.push(array[i][e]);
-			}
-		}
-		return flattendArray;
 	}
 
 	initNeuralNetwork(shape) {
@@ -156,49 +130,10 @@ class App extends Component {
 			this.setState({ rects: flatns });
 			this.setState({ links });
 		} else if (this.state.controls.playing) {
-			let flattenedWeights = this.flatten(this.state.weightsData);
+			let flattenedWeights = flatten(this.state.weightsData);
 			this.setState({ weights: flattenedWeights });
 		}
-		//svg.selectAll("path")
-		//.data(links)
-		//.enter()
-		//.append("path")
-		//.attr("fill", "none")
-		//.attr("class", "edgeForward")
-		//.attr("stroke", "green")
-		//.attr("stroke-width", "0.5")
-		//.attr("d", (d) => d);
-
-		//svg.selectAll("path")
-		//.data(flattenedWeights)
-		//.attr("stroke-width", (d) => Math.pow(d, 2) + 0.2)
-		//.attr("stroke", (d) => (d > 0 ? "#48b778" : "#f50257"));
-
-		//svg.selectAll("rect")
-		//.data(flatns)
-		//.enter()
-		//.append("rect")
-		//.attr("x", (d) => d.x)
-		//.attr("y", (d) => d.y)
-		//.attr("width", rw)
-		//.attr("height", rh)
-		//.attr("class", "node");
-		//.on("click", (e, d) => {
-		//console.log(d);
-		///* Now I need to pass in the weight set and bias for each neuron some how */
-		//});
-
-		//if (!playing) {
-		//svg.selectAll("path").attr("class", "edgePaused");
-		//} else if (playing) {
-		//svg.selectAll("path").attr(
-		//"class",
-		//slowed ? "edgeSlowed" : "edgeForward"
-		//);
-		//}
 	}
-
-	async changeModelOptimizer(optimizerChange) {}
 
 	changeModelLr(lrChange) {
 		tf.tidy(() => {
@@ -206,33 +141,6 @@ class App extends Component {
 			return undefined;
 		});
 	}
-	/* not binded to "this" functions */
-	ReLU(number) {
-		return Math.max(0, number);
-	}
-	mseDerivative(yhat, y) {
-		return 2 * (yhat - y);
-	}
-	mseLoss(yhat, y) {
-		return Math.pow(yhat - y, 2);
-	}
-	mult(array1, array2) {
-		return array1.map((item, i) => {
-			return item * array2[i];
-		});
-	}
-	sum(array) {
-		return array.reduce((a, b) => a + b);
-	}
-	getRandomInt(max) {
-		return Math.floor(Math.random() * Math.floor(max));
-	}
-
-	/* 
-    Name: start
-    Purpose: start the main logic and choose to stop
-    @mutate: this.state.controls.playing
-  */
 	async run() {
 		let playing = !this.state.controls.playing;
 		this.mutate("controls", "playing", playing);
@@ -242,13 +150,6 @@ class App extends Component {
 		}
 	}
 
-	/* 
-    Name: mutate
-    @param key: corresponds to this.state.key
-    @param subkey: corresponds to this.state.key.subkey
-    @param value
-    @mutate: this.state.key.subkey with value
-  */
 	mutate(key, subkey, value) {
 		/* copy of the state */
 		tf.tidy(() => {
@@ -263,10 +164,6 @@ class App extends Component {
 			}
 			return undefined;
 		});
-	}
-
-	tensorToArray(tensor) {
-		return Array.from(tensor.dataSync());
 	}
 
 	addModel(model) {
@@ -300,11 +197,11 @@ class App extends Component {
 			return model;
 		});
 	}
-	modelCompile(optimizer, lr) {
+	modelCompile(lr) {
 		let model = tf.sequential();
 		this.addModel(model);
 		model.compile({
-			optimizer: optimizer(lr),
+			optimizer: tf.train.sgd(lr),
 			loss: "meanSquaredError",
 		});
 		return model;
@@ -317,65 +214,33 @@ class App extends Component {
 			return tf.tensor(y);
 		});
 
-		let model = tf.sequential();
-		this.addModel(model);
-		model.compile({
-			optimizer: tf.train.sgd(0.01),
-			loss: "meanSquaredError",
+		const model = tf.tidy(() => {
+			return this.state.nn;
 		});
-
-		//this.setState({ epoch: 0 });
-		////await model.fit(X, y, { epochs: 1000 });
-		////model.predict(X);
-		////console.log(yArr);
-		////console.log(XArr);
 		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 		///* Until broken by user */
 		let play = this.state.controls.playing;
 		////let epoch = 0;
 		while (play !== false) {
 			this.setState({ duringEpoch: true });
-			//let a = performance.now();
-			/* Destructure neccesary state */
 			const { playing /* speed */ } = this.state.controls;
-			//const { epoch } = this.state.model;
 			play = playing;
-			//this.setState({ duringEpoch: true });
-			//this.mutate("model", "epoch", epoch + 1);
-			//while(playing) {
-			//let t0 = performance.now();
 			await model.fit(XTensor, yTensor, {
 				epochs: 1,
 			});
-			//let t1 = performance.now();
-			//console.log(`FIT SPEED: ${t1 - t0}`);
-			//}
-
 			tf.tidy(() => {
 				let yhatTensor = model.predict(XTensor);
-				let yhat = this.tensorToArray(yhatTensor);
+				let yhat = tensorToArray(yhatTensor);
 				let loss = tf.losses.meanSquaredError(y, yhat).dataSync()[0];
 				this.printParameters(model, loss, yhat, this.state.epoch + 1);
-				//this.setState({
-				////model: {
-				////...this.state.model,
-				////yhat,
-				////loss,
-				////epoch: this.state.model.epoch + 1,
-				////},
-				//});
-				//let b = performance.now();
-				//console.log(`SPEED: ${b - a}`);
-				//console.log(`epoch: ${this.state.model.epoch}`);
 				return undefined;
 			});
 			this.setState({ duringEpoch: false });
-			await timer(0);
+			await timer(this.state.controls.speed);
 		}
-		tf.dispose(model);
+		this.setState({ nn: model });
 		tf.dispose(XTensor);
 		tf.dispose(yTensor);
-		//console.table(tf.memory());
 	}
 	async genTensorData(eqn, scaled) {
 		await tf.ready();
@@ -384,9 +249,9 @@ class App extends Component {
 			let yTensor;
 			yTensor = tf.mul(eqn(XTensor), scaled);
 			let yhatTensor = tf.zerosLike(XTensor);
-			let X = this.tensorToArray(XTensor);
-			let y = this.tensorToArray(yTensor);
-			let yhat = this.tensorToArray(yhatTensor);
+			let X = tensorToArray(XTensor);
+			let y = tensorToArray(yTensor);
+			let yhat = tensorToArray(yhatTensor);
 			this.setState({
 				...this.state,
 				data: { X, y },
@@ -396,7 +261,6 @@ class App extends Component {
 		});
 	}
 	printParameters(model, loss, yhat, epoch) {
-		//let a = performance.now();
 		let weightsData = [];
 		let biasesData = [];
 		for (let i = 0; i < model.getWeights().length; i++) {
@@ -405,40 +269,38 @@ class App extends Component {
 			);
 		}
 
-		this.setState({ weightsData, loss, yhat, epoch });
+		this.setState({ biasesData, weightsData, loss, yhat, epoch });
 		this.initNeuralNetwork(this.state.shape);
-		//let b = performance.now();
-		//console.log(`PRINT SPEED: ${b - a}`);
-		//for (let layer = 1; layer < model.layers.length; layer++) {
-		//console.log(`Layer: ${layer} `);
-		//model.layers[layer].getWeights()[0].print();
-
-		//model.layers[layer].getWeights()[1].print();
-		//}
 	}
 	async asyncPause() {
-		this.mutate("controls", "playing", false);
+		this.setState({ controls: { ...this.state.controls, playing: false } });
 	}
 	async resetParameters(scale) {
+		tf.dispose(this.state.nn);
+		const { curve } = this.state;
 		let eqn;
 		let optimizer;
-		if (this.state.model.curve === "sin") {
-			eqn = tf.sin;
-		} else if (this.state.model.curve === "tanh") {
-			eqn = tf.tanh;
-		} else if (this.state.model.curve === "cos") {
-			eqn = tf.cos;
-		}
-		if (this.state.model.optimizer === "adam") {
-			optimizer = tf.train.adam;
-		} else if (this.state.model.optimizer === "sgd") {
-			optimizer = tf.train.sgd;
-		}
+		tf.tidy(() => {
+			if (curve === "sin") {
+				eqn = tf.sin;
+			} else if (curve === "tanh") {
+				eqn = tf.tanh;
+			} else if (curve === "cos") {
+				eqn = tf.cos;
+			}
+
+			return undefined;
+		});
 		await this.genTensorData(eqn, scale);
+		const model = tf.tidy(() => {
+			return this.modelCompile(this.state.lr);
+		});
 		this.setState({
 			...this.state,
 			epoch: 0,
 			loss: null,
+			weights: [],
+			nn: model,
 		});
 		tf.dispose(optimizer);
 	}
@@ -446,22 +308,15 @@ class App extends Component {
 	async reset(scale) {
 		this.asyncPause();
 		this.resetParameters(scale);
-		//;this.mutate("model", "seq", model);
-		//;this.setState({ yhat: [] });
-		//;this.mutate("model", "epoch", 0);
 	}
 	async componentDidMount() {
 		tf.setBackend("cpu");
-		console.log(tf.getBackend());
-		/* First lets choose the data */
-		//document.body.style.zoom = "75%";
-		this.genTensorData(tf.sin, this.state.model.scale);
+		this.genTensorData(tf.sin, this.state.scale);
 		this.initNeuralNetwork(this.state.shape);
-		//let model = this.modelCompile(tf.train.adam, this.state.model.lr);
-		//this.mutate("model", "seq", model);
-		//this.printParameters(model);
-		//tf.dispose(model);
-		console.log(tf.backend());
+		const model = tf.tidy(() => {
+			return this.modelCompile(0.01);
+		});
+		this.setState({ nn: model });
 	}
 	shouldComponentUpdate() {
 		if (this.state.duringEpoch) {
@@ -473,37 +328,43 @@ class App extends Component {
 
 	render() {
 		/* Destructure State*/
-		const { model, controls } = this.state;
-
-		/* Destructuring model */
-		const { epoch, loss } = model;
-		let shape = this.state.shape;
+		const {
+			shape,
+			scale,
+			trans,
+			weightsData,
+			biasesData,
+			yhat,
+			rects,
+			links,
+			weights,
+			mode,
+			epoch,
+			curve,
+			lr,
+			loss,
+			controls,
+			data,
+		} = this.state;
+		const { playing, speed } = controls;
+		const { X, y } = data;
 
 		let newShape = [...shape];
 		newShape.splice(0, 1);
 		newShape.splice(newShape.length - 1, 1);
-		//console.log(newShape);
 		const lrs = [0.001, 0.01, 0.1, 0.3, (1.0).toFixed(1)];
-		const optimizers = ["adam", "sgd"];
 		const dataSets = [
 			{ label: "sin", eqn: tf.sin, scale: 5 },
 			{ label: "cos", eqn: tf.cos, scale: 5 },
 			{ label: "tanh", eqn: tf.tanh, scale: 5 },
 		];
 
-		/* Destructuring of model */
-
 		/* Destructure render */
 		const PlayButtonClick = (
 			// eslint-disable-next-line
-			<a
-				onClick={async () => {
-					await this.run();
-					console.log("nice");
-				}}
-			>
-				<Button>CLick ME</Button>
-			</a>
+			<Fab color="secondary" onClick={() => this.run()}>
+				{!playing ? <PlayArrow /> : <Stop />}
+			</Fab>
 		);
 
 		return (
@@ -520,7 +381,10 @@ class App extends Component {
 				</AppBar>
 
 				<Box display="flex" justifyContent="center" marginTop={10}>
-					<Box width={400}>
+					<Box
+						width={400}
+						className={mode ? "backpropmode" : "regular"}
+					>
 						<Card variant="outlined">
 							<CardContent>
 								<Typography
@@ -532,19 +396,17 @@ class App extends Component {
 									Control Center
 								</Typography>
 								<Typography variant="h4">
-									Epoch: {this.state.epoch}
+									Epoch: {epoch}
 								</Typography>
 								<Typography variant="h6">
 									loss:
-									{this.state.loss == null
-										? ""
-										: this.state.loss.toFixed(6)}
+									{loss == null ? "" : loss.toFixed(6)}
 								</Typography>
 								<CardActions>
 									<IconButton
-										disabled={this.state.controls.playing}
+										disabled={playing}
 										onClick={() => {
-											this.reset(this.state.scale);
+											this.reset(scale);
 										}}
 									>
 										<Replay />
@@ -553,18 +415,18 @@ class App extends Component {
 									<IconButton
 										style={{
 											color:
-												this.state.controls.speed === 0
+												speed === 0
 													? "grey"
 													: "#FFC006",
 										}}
 										onClick={() => {
-											this.mutate(
-												"controls",
-												"speed",
-												this.state.controls.speed === 0
-													? 100
-													: 0
-											);
+											this.setState({
+												controls: {
+													...controls,
+													speed:
+														speed === 0 ? 100 : 0,
+												},
+											});
 										}}
 									>
 										<SlowMotionVideo />
@@ -586,58 +448,23 @@ class App extends Component {
 									</Typography>
 									<CardActions>
 										<Typography variant="caption">
-											Optimizer
-										</Typography>
-										{optimizers.map((optimizer, i) => (
-											<Chip
-												disabled={
-													this.state.controls.playing
-												}
-												key={i}
-												label={optimizer}
-												color={
-													this.state.model
-														.optimizer === optimizer
-														? "secondary"
-														: "default"
-												}
-												onClick={() => {
-													this.mutate(
-														"model",
-														"optimizer",
-														optimizer
-													);
-													let a = tf.train.sgd;
-													let b = tf.train.adam;
-													this.changeModelOptimizer(
-														optimizer === "sgd"
-															? a
-															: b
-													);
-													tf.dispose(a);
-													tf.dispose(b);
-													this.reset(model.scale);
-												}}
-											></Chip>
-										))}
-									</CardActions>
-									<CardActions>
-										<Typography variant="caption">
 											Learning Rate
 										</Typography>
 										{lrs.map((num, i) => (
 											<Chip
+												disabled={playing}
 												key={i}
 												label={`${num}`}
 												color={
-													this.state.lr === num
+													lr === num
 														? "secondary"
 														: "default"
 												}
 												onClick={() => {
 													tf.tidy(() => {
 														this.changeModelLr(num);
-														return;
+														this.reset(scale);
+														return undefined;
 													});
 												}}
 											></Chip>
@@ -649,25 +476,20 @@ class App extends Component {
 										</Typography>
 										{dataSets.map((item, i) => (
 											<Chip
-												disabled={
-													this.state.controls.playing
-												}
+												disabled={playing}
 												key={i}
 												label={item.label}
 												color={
-													this.state.model.curve ===
-													item.label
+													curve === item.label
 														? "secondary"
 														: "default"
 												}
 												onClick={() => {
-													this.setState({ shape });
-													this.reset(model.scale);
-													this.mutate(
-														"model",
-														"curve",
-														item.label
-													);
+													this.setState({
+														shape,
+														curve: item.label,
+													});
+													this.reset(scale);
 													tf.tidy(() => {
 														this.genTensorData(
 															item.eqn,
@@ -684,233 +506,90 @@ class App extends Component {
 						</Box>
 					</Box>
 					<Box marginLeft={10}>
-						<NN
-							weights={this.state.weights}
-							rects={this.state.rects}
-							links={this.state.links}
-							playing={
-								this.state.controls.playing
-									? "edgeForward"
-									: "edgePaused"
-							}
-						>
-							<Card variant="outlined" style={{ minWidth: 875 }}>
-								<Box justifyContent="start" display="flex">
-									<CardActions>
-										<Box marginRight={11.5}>
-											<Button
-												color="secondary"
-												onClick={() => {
-													let shape = this.state
-														.shape;
-													if (!(shape.length > 4)) {
-														tf.tidy(() => {
-															shape.splice(
-																shape.length - 1
-															);
-															shape.push(2);
-															shape.push(1);
-															d3.select("#app")
-																.select("#nn")
-																.select("#ee")
-																.selectAll(
-																	"path"
-																)
-																.remove();
-															d3.select("#app")
-																.select("#nn")
-																.select("#ee")
-																.selectAll(
-																	"rect"
-																)
-																.remove();
-															this.setState({
-																shape,
-															});
-															this.reset(
-																this.state.scale
-															);
-														});
-													}
-												}}
-											>
-												Add Layer
-											</Button>
-										</Box>
-										{newShape.map((num, i) => (
-											<Box key={i} marginRight={17}>
-												<Box marginBottom={1}>
-													<Chip
-														label={"–"}
-														onClick={() => {
-															let shape = this
-																.state.shape;
-															let e = i + 1;
-															shape[e] =
-																shape[e] === 1
-																	? shape[e]
-																	: shape[e] -
-																	  1;
-															if (shape[e] > 0) {
-																tf.tidy(() => {
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"#ee"
-																		)
-																		.selectAll(
-																			"path"
-																		)
-																		.remove();
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"#ee"
-																		)
-																		.selectAll(
-																			"rect"
-																		)
-																		.remove();
-																	this.setState(
-																		{
-																			shape,
-																		}
-																	);
-																	this.reset(
-																		this
-																			.state
-																			.scale
-																	);
-																});
-															}
-														}}
-													></Chip>
-												</Box>
-												<Box>
-													<Chip
-														label={"+"}
-														onClick={() => {
-															let shape = this
-																.state.shape;
-															let e = i + 1;
-															shape[e] =
-																shape[e] >= 8
-																	? shape[e]
-																	: shape[e] +
-																	  1;
-															if (shape[i] <= 8) {
-																tf.tidy(() => {
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"#ee"
-																		)
-																		.selectAll(
-																			"path"
-																		)
-																		.remove();
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"#ee"
-																		)
-																		.selectAll(
-																			"rect"
-																		)
-																		.remove();
-																	this.setState(
-																		{
-																			shape,
-																		}
-																	);
-																	this.reset(
-																		this
-																			.state
-																			.scale
-																	);
-																	return undefined;
-																});
-															}
-														}}
-													></Chip>
-												</Box>
+						<div className="regular">
+							<PlayGround
+								trans={trans}
+								input={X[0]}
+								label={y[0]}
+								shapedWeights={weightsData}
+								shape={shape}
+								biases={biasesData}
+								weights={weights}
+								rects={rects}
+								links={links}
+								playing={
+									playing
+										? speed === 0
+											? "edgeForward"
+											: "edgeSlowed"
+										: "edgePaused"
+								}
+								show={playing}
+								mode={mode}
+								onClick={() => {
+									this.asyncPause();
+								}}
+							>
+								<Card
+									variant="outlined"
+									style={{ minWidth: 875 }}
+								>
+									<Box justifyContent="start" display="flex">
+										<CardActions>
+											<Box marginRight={11.5}>
+												<Button color="secondary">
+													Add Layer
+												</Button>
 											</Box>
-										))}
+											{newShape.map((num, i) => (
+												<Box key={i} marginRight={17}>
+													<Box marginBottom={1}>
+														<Chip
+															label={"–"}
+														></Chip>
+													</Box>
+													<Box>
+														<Chip
+															label={"+"}
+														></Chip>
+													</Box>
+												</Box>
+											))}
 
-										<Box>
-											<Button
-												color="secondary"
-												onClick={() => {
-													let shape = model.shape;
-													if (shape.length > 2) {
-														shape.splice(
-															shape.length - 1
-														);
-														shape.splice(
-															shape.length - 1
-														);
-														shape.push(1);
-														d3.select("#app")
-															.select("#nn")
-															.select("#ee")
-															.selectAll("path")
-															.remove();
-														d3.select("#app")
-															.select("#nn")
-															.select("#ee")
-															.selectAll("rect")
-															.remove();
-														this.setState({
-															shape,
-														});
-														this.reset(model.scale);
-													}
-												}}
-											>
-												Remove Layer
-											</Button>
-										</Box>
-									</CardActions>
-								</Box>
-							</Card>
-						</NN>
+											<Box>
+												<Button color="secondary">
+													Remove Layer
+												</Button>
+											</Box>
+										</CardActions>
+									</Box>
+								</Card>
+							</PlayGround>
+						</div>
 					</Box>
 					<Box marginLeft={10}>
-						<ScatterPlot
-							width={300}
-							height={300}
-							padding={0}
-							start={-this.state.model.scale}
-							stop={this.state.model.scale}
-							X={this.state.data.X}
-							y={this.state.data.y}
-							yhat={this.state.yhat}
-						/>
+						<div className={mode ? "backpropmode" : "regular"}>
+							<ScatterPlot
+								width={300}
+								height={300}
+								padding={0}
+								start={-scale}
+								stop={scale}
+								X={X}
+								y={y}
+								yhat={yhat}
+							/>
+						</div>
 					</Box>
 				</Box>
 				<Button
 					onClick={() => {
-						let a = this.state.shape;
+						let a = shape;
 						a[a.length - 1] = 2;
 						a.push(1);
 						this.setState({ shape: a });
 						this.initNeuralNetwork(a);
+						this.reset(scale);
 					}}
 				>
 					ADD LAYER
@@ -921,6 +600,29 @@ class App extends Component {
 					}}
 				>
 					MEM
+				</Button>
+				<Button
+					onClick={() => {
+						let formattedWeights = formatWeightArray(
+							weightsData,
+							shape
+						);
+						let nn = new NeuralNetwork(
+							shape,
+							formattedWeights,
+							biasesData
+						);
+
+						nn.forward(X[0], y[0]);
+						console.log(weightsData);
+						console.log(`label: ${this.state.yhat[0]}`);
+						nn.backward();
+						this.setState({ trans: nn, mode: !mode });
+					}}
+					variant="contained"
+					color="secondary"
+				>
+					EPOCH MODE {mode ? "true" : "false"}
 				</Button>
 			</div>
 		);
