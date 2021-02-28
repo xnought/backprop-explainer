@@ -20,9 +20,9 @@ class PlayGround extends Component {
 	}
 	zoom(d3node, d3zoom, x, y, scaleZoom, duration) {
 		d3node
-			.transition()
-			.duration(duration)
-			.ease(d3zoom)
+			//.transition()
+			//.duration(duration)
+			//.ease(d3zoom)
 			.attr(
 				"transform",
 				`translate(${-x * scaleZoom}, ${
@@ -53,7 +53,7 @@ class PlayGround extends Component {
 
 		let l = this.props.weights.length;
 		const playing = (
-			<svg id="pp" width="800" height="600">
+			<svg id="p" width="800" height="600">
 				<g transform={"scale(1)"}>
 					{this.props.links.map((d, i) => (
 						<path
@@ -174,8 +174,8 @@ class PlayGround extends Component {
 		);
 
 		const notPlaying = (
-			<svg id="pp" width="1000" height="800">
-				<g>
+			<svg id="pp" width="800" height="600">
+				<g id="gpp">
 					{this.props.links.map((d, i) => (
 						<path
 							key={i}
@@ -195,7 +195,7 @@ class PlayGround extends Component {
 						></path>
 					))}
 					{this.props.rects.map((d, i) => (
-						<g key={i}>
+						<g id="ggpp" key={i}>
 							<text x={d.x + 35} y={d.y + 16}>
 								{model.length !== 0
 									? i > 0
@@ -221,7 +221,6 @@ class PlayGround extends Component {
 										this.state.zoom,
 										1500
 									);
-									this.setState({ show: true });
 								}}
 								fill="lightgrey"
 							></rect>
@@ -234,12 +233,6 @@ class PlayGround extends Component {
 								: ""}
 						</g>
 					))}
-					<g>
-						<text x={734} y={300}>
-							Loss
-						</text>
-						<rect width={32} height={32} x={734} y={300}></rect>
-					</g>
 				</g>
 			</svg>
 		);

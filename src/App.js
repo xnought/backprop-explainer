@@ -512,7 +512,7 @@ class App extends Component {
 				</AppBar>
 
 				<Box display="flex" justifyContent="center" marginTop={10}>
-					{!mode ? controlCenter : ""}
+					{controlCenter}
 					<Box marginLeft={10}>
 						<div className="regular">
 							<PlayGround
@@ -540,7 +540,7 @@ class App extends Component {
 							></PlayGround>
 						</div>
 					</Box>
-					{!mode ? scatter : ""}
+					{scatter}
 				</Box>
 				<Button
 					onClick={() => {
@@ -574,8 +574,6 @@ class App extends Component {
 						);
 
 						nn.forward(X[0], y[0]);
-						console.log(weightsData);
-						console.log(`label: ${this.state.yhat[0]}`);
 						nn.backward();
 						this.setState({ trans: nn, mode: !mode });
 					}}
