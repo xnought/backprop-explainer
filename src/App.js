@@ -225,26 +225,13 @@ class App extends Component {
 			this.setState({ duringEpoch: true });
 			const { playing /* speed */ } = this.state.controls;
 			play = playing;
-<<<<<<< HEAD
 			await model.fit(XTensor, yTensor, {
-=======
-			//this.setState({ duringEpoch: true });
-			//this.mutate("model", "epoch", epoch + 1);
-			//while(playing) {
-			let t0 = performance.now();
-			const h = await model.fit(XTensor, yTensor, {
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
 				epochs: 1,
 			});
 			tf.tidy(() => {
 				let yhatTensor = model.predict(XTensor);
-<<<<<<< HEAD
 				let yhat = tensorToArray(yhatTensor);
 				let loss = tf.losses.meanSquaredError(y, yhat).dataSync()[0];
-=======
-				let yhat = this.tensorToArray(yhatTensor);
-				let loss = h.history.loss[0]; //tf.losses.meanSquaredError(y, yhat).dataSync()[0];
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
 				this.printParameters(model, loss, yhat, this.state.epoch + 1);
 				return undefined;
 			});
@@ -323,7 +310,6 @@ class App extends Component {
 		this.resetParameters(scale);
 	}
 	async componentDidMount() {
-<<<<<<< HEAD
 		tf.setBackend("cpu");
 		this.genTensorData(tf.sin, this.state.scale);
 		this.initNeuralNetwork(this.state.shape);
@@ -331,19 +317,6 @@ class App extends Component {
 			return this.modelCompile(0.01);
 		});
 		this.setState({ nn: model });
-=======
-		/* First lets choose the data */
-		//document.body.style.zoom = "75%";
-		this.genTensorData(tf.sin, this.state.model.scale);
-		//let model = this.modelCompile(tf.train.adam, this.state.model.lr);
-		//this.mutate("model", "seq", model);
-		//this.printParameters(model);
-		//tf.dispose(model);
-	}
-	componentDidUpdate() {
-		//console.table(tf.memory());
-		console.log(this.state.shape);
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
 	}
 	shouldComponentUpdate() {
 		if (this.state.duringEpoch) {
@@ -483,11 +456,7 @@ class App extends Component {
 												key={i}
 												label={`${num}`}
 												color={
-<<<<<<< HEAD
 													lr === num
-=======
-													this.state.lr === num
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
 														? "secondary"
 														: "default"
 												}
@@ -537,7 +506,6 @@ class App extends Component {
 						</Box>
 					</Box>
 					<Box marginLeft={10}>
-<<<<<<< HEAD
 						<div className="regular">
 							<PlayGround
 								trans={trans}
@@ -572,164 +540,6 @@ class App extends Component {
 												<Button color="secondary">
 													Add Layer
 												</Button>
-=======
-						<NN
-							weights={this.state.weightsData}
-							biases={this.state.biasData}
-							shape={this.state.shape}
-							playing={this.state.controls.playing}
-							slowed={this.state.controls.speed !== 0}
-						>
-							<Card variant="outlined" style={{ minWidth: 875 }}>
-								<Box justifyContent="start" display="flex">
-									<CardActions>
-										<Box marginRight={11.5}>
-											<Button
-												color="secondary"
-												onClick={() => {
-													let shape = this.state
-														.shape;
-													if (!(shape.length > 4)) {
-														tf.tidy(() => {
-															shape.splice(
-																shape.length - 1
-															);
-															shape.push(2);
-															shape.push(1);
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"path"
-																)
-																.remove();
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"rect"
-																)
-																.remove();
-															this.setState({
-																shape,
-															});
-															this.reset(
-																model.scale
-															);
-														});
-													}
-												}}
-											>
-												Add Layer
-											</Button>
-										</Box>
-										{newShape.map((num, i) => (
-											<Box key={i} marginRight={17}>
-												<Box marginBottom={1}>
-													<Chip
-														label={"–"}
-														onClick={() => {
-															let shape = this
-																.state.shape;
-															let e = i + 1;
-															shape[e] =
-																shape[e] === 1
-																	? shape[e]
-																	: shape[e] -
-																	  1;
-															if (shape[e] > 0) {
-																tf.tidy(() => {
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"svg"
-																		)
-																		.selectAll(
-																			"path"
-																		)
-																		.remove();
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"svg"
-																		)
-																		.selectAll(
-																			"rect"
-																		)
-																		.remove();
-																	this.setState(
-																		{
-																			shape,
-																		}
-																	);
-																	this.reset(
-																		model.scale
-																	);
-																	return undefined;
-																});
-															}
-														}}
-													></Chip>
-												</Box>
-												<Box>
-													<Chip
-														label={"+"}
-														onClick={() => {
-															let shape = this
-																.state.shape;
-															let e = i + 1;
-															shape[e] =
-																shape[e] >= 8
-																	? shape[e]
-																	: shape[e] +
-																	  1;
-															if (shape[i] <= 8) {
-																tf.tidy(() => {
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"svg"
-																		)
-																		.selectAll(
-																			"path"
-																		)
-																		.remove();
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"svg"
-																		)
-																		.selectAll(
-																			"rect"
-																		)
-																		.remove();
-																	this.setState(
-																		{
-																			shape,
-																		}
-																	);
-																});
-															}
-														}}
-													></Chip>
-												</Box>
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
 											</Box>
 											{newShape.map((num, i) => (
 												<Box key={i} marginRight={17}>
@@ -746,7 +556,6 @@ class App extends Component {
 												</Box>
 											))}
 
-<<<<<<< HEAD
 											<Box>
 												<Button color="secondary">
 													Remove Layer
@@ -757,54 +566,6 @@ class App extends Component {
 								</Card>
 							</PlayGround>
 						</div>
-=======
-										<Box>
-											<Button
-												color="secondary"
-												onClick={() => {
-													tf.tidy(() => {
-														let shape = model.shape;
-														if (shape.length > 2) {
-															shape.splice(
-																shape.length - 1
-															);
-															shape.splice(
-																shape.length - 1
-															);
-															shape.push(1);
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"path"
-																)
-																.remove();
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"rect"
-																)
-																.remove();
-															this.setState({
-																shape,
-															});
-															this.reset(
-																model.scale
-															);
-															return undefined;
-														}
-													});
-												}}
-											>
-												Remove Layer
-											</Button>
-										</Box>
-									</CardActions>
-								</Box>
-							</Card>
-						</NN>
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
 					</Box>
 					<Box marginLeft={10}>
 						<div className={mode ? "backpropmode" : "regular"}>
