@@ -366,6 +366,137 @@ class App extends Component {
 				{!playing ? <PlayArrow /> : <Stop />}
 			</Fab>
 		);
+		const controlCenter = (
+			<Box width={400} className={mode ? "backpropmode" : "regular"}>
+				<Card variant="outlined">
+					<CardContent>
+						<Typography
+							variant="caption"
+							style={{
+								color: "rgb(245, 2, 87, 0.5)",
+							}}
+						>
+							Control Center
+						</Typography>
+						<Typography variant="h4">Epoch: {epoch}</Typography>
+						<Typography variant="h6">
+							loss:
+							{loss == null ? "" : loss.toFixed(6)}
+						</Typography>
+						<CardActions>
+							<IconButton
+								disabled={playing}
+								onClick={() => {
+									this.reset(scale);
+								}}
+							>
+								<Replay />
+							</IconButton>
+							{PlayButtonClick}
+							<IconButton
+								style={{
+									color: speed === 0 ? "grey" : "#FFC006",
+								}}
+								onClick={() => {
+									this.setState({
+										controls: {
+											...controls,
+											speed: speed === 0 ? 100 : 0,
+										},
+									});
+								}}
+							>
+								<SlowMotionVideo />
+							</IconButton>
+						</CardActions>
+					</CardContent>
+				</Card>
+
+				<Box marginTop={5}>
+					<Card variant="outlined">
+						<CardContent>
+							<Typography
+								variant="caption"
+								style={{
+									color: "rgb(245, 2, 87, 0.5)",
+								}}
+							>
+								Model Initialization
+							</Typography>
+							<CardActions>
+								<Typography variant="caption">
+									Learning Rate
+								</Typography>
+								{lrs.map((num, i) => (
+									<Chip
+										disabled={playing}
+										key={i}
+										label={`${num}`}
+										color={
+											lr === num ? "secondary" : "default"
+										}
+										onClick={() => {
+											tf.tidy(() => {
+												this.changeModelLr(num);
+												this.reset(scale);
+												return undefined;
+											});
+										}}
+									></Chip>
+								))}
+							</CardActions>
+							<CardActions>
+								<Typography variant="caption">
+									Data Set
+								</Typography>
+								{dataSets.map((item, i) => (
+									<Chip
+										disabled={playing}
+										key={i}
+										label={item.label}
+										color={
+											curve === item.label
+												? "secondary"
+												: "default"
+										}
+										onClick={() => {
+											this.setState({
+												shape,
+												curve: item.label,
+											});
+											this.reset(scale);
+											tf.tidy(() => {
+												this.genTensorData(
+													item.eqn,
+													item.scale
+												);
+												return undefined;
+											});
+										}}
+									></Chip>
+								))}
+							</CardActions>
+						</CardContent>
+					</Card>
+				</Box>
+			</Box>
+		);
+		const scatter = (
+			<Box marginLeft={10}>
+				<div className={mode ? "backpropmode" : "regular"}>
+					<ScatterPlot
+						width={300}
+						height={300}
+						padding={0}
+						start={-scale}
+						stop={scale}
+						X={X}
+						y={y}
+						yhat={yhat}
+					/>
+				</div>
+			</Box>
+		);
 
 		return (
 			<div id="app">
@@ -381,130 +512,7 @@ class App extends Component {
 				</AppBar>
 
 				<Box display="flex" justifyContent="center" marginTop={10}>
-					<Box
-						width={400}
-						className={mode ? "backpropmode" : "regular"}
-					>
-						<Card variant="outlined">
-							<CardContent>
-								<Typography
-									variant="caption"
-									style={{
-										color: "rgb(245, 2, 87, 0.5)",
-									}}
-								>
-									Control Center
-								</Typography>
-								<Typography variant="h4">
-									Epoch: {epoch}
-								</Typography>
-								<Typography variant="h6">
-									loss:
-									{loss == null ? "" : loss.toFixed(6)}
-								</Typography>
-								<CardActions>
-									<IconButton
-										disabled={playing}
-										onClick={() => {
-											this.reset(scale);
-										}}
-									>
-										<Replay />
-									</IconButton>
-									{PlayButtonClick}
-									<IconButton
-										style={{
-											color:
-												speed === 0
-													? "grey"
-													: "#FFC006",
-										}}
-										onClick={() => {
-											this.setState({
-												controls: {
-													...controls,
-													speed:
-														speed === 0 ? 100 : 0,
-												},
-											});
-										}}
-									>
-										<SlowMotionVideo />
-									</IconButton>
-								</CardActions>
-							</CardContent>
-						</Card>
-
-						<Box marginTop={5}>
-							<Card variant="outlined">
-								<CardContent>
-									<Typography
-										variant="caption"
-										style={{
-											color: "rgb(245, 2, 87, 0.5)",
-										}}
-									>
-										Model Initialization
-									</Typography>
-									<CardActions>
-										<Typography variant="caption">
-											Learning Rate
-										</Typography>
-										{lrs.map((num, i) => (
-											<Chip
-												disabled={playing}
-												key={i}
-												label={`${num}`}
-												color={
-													lr === num
-														? "secondary"
-														: "default"
-												}
-												onClick={() => {
-													tf.tidy(() => {
-														this.changeModelLr(num);
-														this.reset(scale);
-														return undefined;
-													});
-												}}
-											></Chip>
-										))}
-									</CardActions>
-									<CardActions>
-										<Typography variant="caption">
-											Data Set
-										</Typography>
-										{dataSets.map((item, i) => (
-											<Chip
-												disabled={playing}
-												key={i}
-												label={item.label}
-												color={
-													curve === item.label
-														? "secondary"
-														: "default"
-												}
-												onClick={() => {
-													this.setState({
-														shape,
-														curve: item.label,
-													});
-													this.reset(scale);
-													tf.tidy(() => {
-														this.genTensorData(
-															item.eqn,
-															item.scale
-														);
-														return undefined;
-													});
-												}}
-											></Chip>
-										))}
-									</CardActions>
-								</CardContent>
-							</Card>
-						</Box>
-					</Box>
+					{!mode ? controlCenter : ""}
 					<Box marginLeft={10}>
 						<div className="regular">
 							<PlayGround
@@ -529,58 +537,10 @@ class App extends Component {
 								onClick={() => {
 									this.asyncPause();
 								}}
-							>
-								<Card
-									variant="outlined"
-									style={{ minWidth: 875 }}
-								>
-									<Box justifyContent="start" display="flex">
-										<CardActions>
-											<Box marginRight={11.5}>
-												<Button color="secondary">
-													Add Layer
-												</Button>
-											</Box>
-											{newShape.map((num, i) => (
-												<Box key={i} marginRight={17}>
-													<Box marginBottom={1}>
-														<Chip
-															label={"–"}
-														></Chip>
-													</Box>
-													<Box>
-														<Chip
-															label={"+"}
-														></Chip>
-													</Box>
-												</Box>
-											))}
-
-											<Box>
-												<Button color="secondary">
-													Remove Layer
-												</Button>
-											</Box>
-										</CardActions>
-									</Box>
-								</Card>
-							</PlayGround>
+							></PlayGround>
 						</div>
 					</Box>
-					<Box marginLeft={10}>
-						<div className={mode ? "backpropmode" : "regular"}>
-							<ScatterPlot
-								width={300}
-								height={300}
-								padding={0}
-								start={-scale}
-								stop={scale}
-								X={X}
-								y={y}
-								yhat={yhat}
-							/>
-						</div>
-					</Box>
+					{!mode ? scatter : ""}
 				</Box>
 				<Button
 					onClick={() => {

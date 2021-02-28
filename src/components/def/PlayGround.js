@@ -6,7 +6,6 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
 import "./d3.css";
-import { svg } from "d3";
 
 class PlayGround extends Component {
 	constructor(props) {
@@ -14,6 +13,8 @@ class PlayGround extends Component {
 		this.state = {
 			widths: 32,
 			zoom: 15,
+			macro: false,
+			micro: false,
 		};
 		this.zoom = this.zoom.bind(this);
 	}
@@ -93,21 +94,7 @@ class PlayGround extends Component {
 
 		//Lets create the computational graph
 		let fontSize = "1px";
-		let a = [];
-		let inc = 3;
-		for (let i = 0; i < 8; i++) {
-			a.push(i * 3.5);
-		}
-
 		const lin = d3.line();
-		const p1 = [
-			[3, 0.5],
-			[8, 0.5],
-		];
-		const p2 = [
-			[3, 3],
-			[8, 3],
-		];
 
 		const mult = (x, y) => (
 			<svg x={x} y={y} width={2} height={2}>
@@ -150,23 +137,29 @@ class PlayGround extends Component {
 			</svg>
 		);
 
-		const graph = (x, y) => (
+		const graph = (x, y, neuron) => (
 			<svg width={32} height={32} x={x} y={y}>
-				{a.map((d, i) => (
-					<g key={i}>
-						<svg width={10} height={4} x={0} y={d}>
-							<text fontSize={fontSize} x={0} y={1}>
-								x
-							</text>
-							<text fontSize={fontSize} x={0} y={2.5}>
-								w
-							</text>
-							{connection([6, 1.5], [10, 1.5], "black")}
-							{inputWeightComponent(1, 1, 1, 1)}
-						</svg>
-						{connection([10, d + 1.5], [18.25, 16], "black")}
-					</g>
-				))}
+				{neuron.length == 0
+					? ""
+					: neuron.inputs.map((d, i) => (
+							<g key={i}>
+								<svg width={10} height={4} x={0} y={i * 3.5}>
+									<text fontSize={fontSize} x={0} y={1}>
+										x
+									</text>
+									<text fontSize={fontSize} x={0} y={2.5}>
+										w
+									</text>
+									{connection([6, 1.5], [10, 1.5], "black")}
+									{inputWeightComponent(1, 1, 1, 1)}
+								</svg>
+								{connection(
+									[10, i * 3.5 + 1.5],
+									[18.25, 16],
+									"black"
+								)}
+							</g>
+					  ))}
 
 				<text fontSize={fontSize} x={0} y={30}>
 					b
@@ -216,7 +209,7 @@ class PlayGround extends Component {
 								width={this.state.widths}
 								height={this.state.widths}
 								onClick={() => {
-									console.log(d);
+									console.log(model[i]);
 									const svgGroup = d3
 										.select("#pp")
 										.select("g");
@@ -226,11 +219,19 @@ class PlayGround extends Component {
 										d.x - 16,
 										d.y,
 										this.state.zoom,
-										1000
+										1500
 									);
+									this.setState({ show: true });
 								}}
 								fill="lightgrey"
 							></rect>
+							{i > 0
+								? graph(
+										d.x + 2,
+										d.y,
+										model.length > 0 ? model[i - 1] : []
+								  )
+								: ""}
 						</g>
 					))}
 					<g>
@@ -238,7 +239,6 @@ class PlayGround extends Component {
 							Loss
 						</text>
 						<rect width={32} height={32} x={734} y={300}></rect>
-						{graph(211, 24)}
 					</g>
 				</g>
 			</svg>
