@@ -128,8 +128,13 @@ class PlayGround extends Component {
 						fill="none"
 						stroke="black"
 					></rect>
-					<text fontSize="13px" x={738} y={318}>
-						Loss
+					<text
+						fontFamily="sans-serif"
+						fontSize="12px"
+						x={739}
+						y={318}
+					>
+						loss
 					</text>
 				</g>
 			</svg>
@@ -417,7 +422,12 @@ class PlayGround extends Component {
 						fill="none"
 						stroke="black"
 					></rect>
-					<text fontSize="13px" x={738} y={318}>
+					<text
+						fontFamily="sans-serif"
+						fontSize="13px"
+						x={738}
+						y={318}
+					>
 						Loss
 					</text>
 					<text x={734} y={350}>

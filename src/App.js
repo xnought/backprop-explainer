@@ -18,6 +18,7 @@ import {
 	Button,
 	Fab,
 	Slider,
+	Tooltip,
 } from "@material-ui/core";
 import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
 import * as tf from "@tensorflow/tfjs";
@@ -180,34 +181,61 @@ class App extends Component {
 			flatns.push(stop);
 			ns.push([stop]);
 
-			/* We start to iterate over ns */
-			let links = [];
-			for (let layer = shape.length - 1; layer > 0; layer--) {
-				let interval = -14.5;
-				for (
-					let prevNeuron = 0;
-					prevNeuron < shape[layer - 1];
-					prevNeuron++
-				) {
-					for (let neuron = 0; neuron < shape[layer]; neuron++) {
-						links.push(
-							link({
-								source: {
-									x: ns[layer - 1][prevNeuron].x + 15.5,
-									y: ns[layer - 1][prevNeuron].y,
-								},
-								target: {
-									x: ns[layer][neuron].x - 15,
-									y: ns[layer][neuron].y + interval,
-								},
-							})
-						);
+			if (this.state.mode || true) {
+				/* We start to iterate over ns */
+				let links = [];
+				for (let layer = shape.length - 1; layer > 0; layer--) {
+					let interval = -14.5;
+					for (
+						let prevNeuron = 0;
+						prevNeuron < shape[layer - 1];
+						prevNeuron++
+					) {
+						for (let neuron = 0; neuron < shape[layer]; neuron++) {
+							links.push(
+								link({
+									source: {
+										x: ns[layer - 1][prevNeuron].x + 15.5,
+										y: ns[layer - 1][prevNeuron].y,
+									},
+									target: {
+										x: ns[layer][neuron].x - 15,
+										y: ns[layer][neuron].y + interval,
+									},
+								})
+							);
+						}
+						interval += 3.5;
 					}
-					interval += 3.5;
 				}
+
+				this.setState({ rects: flatns });
+				this.setState({ links });
+			} else {
+				/* We start to iterate over ns */
+				let links = [];
+				for (let layer = shape.length - 1; layer > 0; layer--) {
+					let interval = -14.5;
+					for (
+						let prevNeuron = 0;
+						prevNeuron < shape[layer - 1];
+						prevNeuron++
+					) {
+						for (let neuron = 0; neuron < shape[layer]; neuron++) {
+							links.push(
+								link({
+									source: ns[layer - 1][prevNeuron],
+									target: ns[layer][neuron],
+								})
+							);
+						}
+						interval += 3.5;
+					}
+				}
+
+				this.setState({ rects: flatns });
+				this.setState({ links });
 			}
-			this.setState({ rects: flatns });
-			this.setState({ links });
 		} else if (this.state.controls.playing) {
 			let flattenedWeights = flatten(this.state.weightsData);
 			this.setState({ weights: flattenedWeights });
@@ -465,30 +493,34 @@ class App extends Component {
 		);
 		const controlsReg = (
 			<CardActions>
-				<IconButton
-					disabled={playing}
-					onClick={() => {
-						this.reset(scale);
-					}}
-				>
-					<Replay />
-				</IconButton>
+				<Tooltip title="reset" arrow>
+					<IconButton
+						disabled={playing}
+						onClick={() => {
+							this.reset(scale);
+						}}
+					>
+						<Replay />
+					</IconButton>
+				</Tooltip>
 				{PlayButtonClick}
-				<IconButton
-					style={{
-						color: speed === 0 ? "grey" : "#FFC006",
-					}}
-					onClick={() => {
-						this.setState({
-							controls: {
-								...controls,
-								speed: speed === 0 ? 100 : 0,
-							},
-						});
-					}}
-				>
-					<SlowMotionVideo />
-				</IconButton>
+				<Tooltip title="slomo" arrow>
+					<IconButton
+						style={{
+							color: speed === 0 ? "grey" : "#FFC006",
+						}}
+						onClick={() => {
+							this.setState({
+								controls: {
+									...controls,
+									speed: speed === 0 ? 100 : 0,
+								},
+							});
+						}}
+					>
+						<SlowMotionVideo />
+					</IconButton>
+				</Tooltip>
 			</CardActions>
 		);
 		const controlsBackProp = (
@@ -516,38 +548,64 @@ class App extends Component {
 							Control Center
 						</Typography>
 						<div on></div>
-						<a
-							onClick={async () => {
-								const timer = (ms) =>
-									new Promise((res) => setTimeout(res, ms));
-								let formattedWeights = formatWeightArray(
-									weightsData,
-									shape
-								);
-								let nn = new NeuralNetwork(
-									shape,
-									formattedWeights,
-									biasesData
-								);
-
-								nn.forward(X[0], y[0]);
-								nn.backward();
-								this.setState({ trans: nn, mode: !mode });
-								await timer(1000);
-								this.setState({ nshow: 1 });
-								const anim = async () => {
-									while (this.state.nshow < 19) {
-										await timer(1000);
-										this.setState({
-											nshow: (this.state.nshow += 8),
-										});
-									}
-								};
-								await this.anim();
-							}}
+						<Tooltip
+							title={
+								<Typography variant="h6">
+									{this.state.mode
+										? "Click to go back"
+										: "Click to see Backpropagation"}
+								</Typography>
+							}
+							arrow
+							placement="right-start"
+							open={this.state.loss != null}
 						>
-							<Typography variant="h4">Epoch: {epoch}</Typography>
-						</a>
+							<Button
+								disabled={this.state.loss == null}
+								onClick={async () => {
+									const timer = (ms) =>
+										new Promise((res) =>
+											setTimeout(res, ms)
+										);
+									let formattedWeights = formatWeightArray(
+										weightsData,
+										shape
+									);
+									let nn = new NeuralNetwork(
+										shape,
+										formattedWeights,
+										biasesData
+									);
+
+									nn.forward(X[0], y[0]);
+									nn.backward();
+									this.setState({
+										...this.state,
+										trans: nn,
+										mode: !mode,
+										controls: {
+											...this.state.controls,
+											playing: false,
+										},
+									});
+									await timer(1000);
+									this.setState({ nshow: 1 });
+									const anim = async () => {
+										while (this.state.nshow < 19) {
+											await timer(1000);
+											this.setState({
+												nshow: (this.state.nshow += 8),
+											});
+										}
+									};
+									await this.anim();
+								}}
+							>
+								<Typography variant="h4">
+									Epoch: {epoch}
+								</Typography>
+							</Button>
+						</Tooltip>
 						<Typography variant="h6">
 							loss:
 							{loss == null ? "" : loss.toFixed(6)}
