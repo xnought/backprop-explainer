@@ -10,6 +10,12 @@
 	stroke-dashoffset: 1;
 	animation: flowForward 0s linear infinite;
 }
+.edgeBackward {
+	stroke-dasharray: 9 1;
+	stroke-dashoffset: 1;
+	animation: flowBackward linear infinite;
+	animation-duration: 0.3s;
+}
 .edgeSlowed {
 	stroke-dasharray: 9 1;
 	stroke-dashoffset: 1;

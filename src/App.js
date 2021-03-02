@@ -49,12 +49,17 @@ class App extends Component {
 				playing: false,
 				speed: 0,
 			},
+			nshow: 0,
+			bshow: Infinity,
 			rects: [],
 			weights: [],
 			links: [],
 			nn: null,
 			mode: false,
 			trans: null,
+			macro: false,
+			direction: "edgePaused",
+			subEpoch: "forward",
 		};
 
 		/* Prototype: Functions Binds to "this" */
@@ -72,8 +77,68 @@ class App extends Component {
 		this.resetParameters = this.resetParameters.bind(this);
 		this.changeModelLr = this.changeModelLr.bind(this);
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
+		this.anim = this.anim.bind(this);
 	}
 
+	anim = async () => {
+		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+		const ms = 500;
+		const l = this.state.shape.reduce((a, b) => a + b) - 1;
+
+		this.setState({
+			...this.state,
+			subEpoch: "forward",
+			direction: "edgeForward",
+			nshow: 0,
+			bshow: Infinity,
+		});
+		await timer(ms);
+
+		this.setState({ nshow: 1 });
+		let i = 1;
+		while (this.state.nshow < l) {
+			let curr = this.state.shape[i];
+			await timer(ms);
+			this.setState({
+				nshow: (this.state.nshow += curr),
+			});
+			i++;
+		}
+		await timer(ms);
+		this.setState({
+			nshow: (this.state.nshow += 1),
+		});
+		await timer(ms);
+		this.setState({
+			nshow: (this.state.nshow += 1),
+		});
+
+		this.setState({ bshow: Infinity });
+		/* Pause! now go backward */
+		this.setState({
+			...this.state,
+			direction: "edgeBackward",
+			subEpoch: "backward",
+		});
+
+		await timer(ms);
+		this.setState({ bshow: l });
+
+		await timer(ms);
+		this.setState({ bshow: (this.state.bshow -= 1) });
+
+		let e = this.state.shape.length - 2;
+		while (this.state.bshow > 0) {
+			let curr = this.state.shape[e];
+			await timer(ms);
+			this.setState({
+				bshow: (this.state.bshow -= curr),
+			});
+			e--;
+		}
+
+		this.setState({ direction: "edgePaused" });
+	};
 	initNeuralNetwork(shape) {
 		if (!this.state.controls.playing) {
 			const rw = 32;
@@ -225,26 +290,13 @@ class App extends Component {
 			this.setState({ duringEpoch: true });
 			const { playing /* speed */ } = this.state.controls;
 			play = playing;
-<<<<<<< HEAD
 			await model.fit(XTensor, yTensor, {
-=======
-			//this.setState({ duringEpoch: true });
-			//this.mutate("model", "epoch", epoch + 1);
-			//while(playing) {
-			let t0 = performance.now();
-			const h = await model.fit(XTensor, yTensor, {
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
 				epochs: 1,
 			});
 			tf.tidy(() => {
 				let yhatTensor = model.predict(XTensor);
-<<<<<<< HEAD
 				let yhat = tensorToArray(yhatTensor);
 				let loss = tf.losses.meanSquaredError(y, yhat).dataSync()[0];
-=======
-				let yhat = this.tensorToArray(yhatTensor);
-				let loss = h.history.loss[0]; //tf.losses.meanSquaredError(y, yhat).dataSync()[0];
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
 				this.printParameters(model, loss, yhat, this.state.epoch + 1);
 				return undefined;
 			});
@@ -323,7 +375,6 @@ class App extends Component {
 		this.resetParameters(scale);
 	}
 	async componentDidMount() {
-<<<<<<< HEAD
 		tf.setBackend("cpu");
 		this.genTensorData(tf.sin, this.state.scale);
 		this.initNeuralNetwork(this.state.shape);
@@ -331,19 +382,6 @@ class App extends Component {
 			return this.modelCompile(0.01);
 		});
 		this.setState({ nn: model });
-=======
-		/* First lets choose the data */
-		//document.body.style.zoom = "75%";
-		this.genTensorData(tf.sin, this.state.model.scale);
-		//let model = this.modelCompile(tf.train.adam, this.state.model.lr);
-		//this.mutate("model", "seq", model);
-		//this.printParameters(model);
-		//tf.dispose(model);
-	}
-	componentDidUpdate() {
-		//console.table(tf.memory());
-		console.log(this.state.shape);
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
 	}
 	shouldComponentUpdate() {
 		if (this.state.duringEpoch) {
@@ -393,6 +431,137 @@ class App extends Component {
 				{!playing ? <PlayArrow /> : <Stop />}
 			</Fab>
 		);
+		const controlCenter = (
+			<Box width={400} className={mode ? "backpropmode" : "regular"}>
+				<Card variant="outlined">
+					<CardContent>
+						<Typography
+							variant="caption"
+							style={{
+								color: "rgb(245, 2, 87, 0.5)",
+							}}
+						>
+							Control Center
+						</Typography>
+						<Typography variant="h4">Epoch: {epoch}</Typography>
+						<Typography variant="h6">
+							loss:
+							{loss == null ? "" : loss.toFixed(6)}
+						</Typography>
+						<CardActions>
+							<IconButton
+								disabled={playing}
+								onClick={() => {
+									this.reset(scale);
+								}}
+							>
+								<Replay />
+							</IconButton>
+							{PlayButtonClick}
+							<IconButton
+								style={{
+									color: speed === 0 ? "grey" : "#FFC006",
+								}}
+								onClick={() => {
+									this.setState({
+										controls: {
+											...controls,
+											speed: speed === 0 ? 100 : 0,
+										},
+									});
+								}}
+							>
+								<SlowMotionVideo />
+							</IconButton>
+						</CardActions>
+					</CardContent>
+				</Card>
+
+				<Box marginTop={5}>
+					<Card variant="outlined">
+						<CardContent>
+							<Typography
+								variant="caption"
+								style={{
+									color: "rgb(245, 2, 87, 0.5)",
+								}}
+							>
+								Model Initialization
+							</Typography>
+							<CardActions>
+								<Typography variant="caption">
+									Learning Rate
+								</Typography>
+								{lrs.map((num, i) => (
+									<Chip
+										disabled={playing}
+										key={i}
+										label={`${num}`}
+										color={
+											lr === num ? "secondary" : "default"
+										}
+										onClick={() => {
+											tf.tidy(() => {
+												this.changeModelLr(num);
+												this.reset(scale);
+												return undefined;
+											});
+										}}
+									></Chip>
+								))}
+							</CardActions>
+							<CardActions>
+								<Typography variant="caption">
+									Data Set
+								</Typography>
+								{dataSets.map((item, i) => (
+									<Chip
+										disabled={playing}
+										key={i}
+										label={item.label}
+										color={
+											curve === item.label
+												? "secondary"
+												: "default"
+										}
+										onClick={() => {
+											this.setState({
+												shape,
+												curve: item.label,
+											});
+											this.reset(scale);
+											tf.tidy(() => {
+												this.genTensorData(
+													item.eqn,
+													item.scale
+												);
+												return undefined;
+											});
+										}}
+									></Chip>
+								))}
+							</CardActions>
+						</CardContent>
+					</Card>
+				</Box>
+			</Box>
+		);
+		const scatter = (
+			<Box marginLeft={10}>
+				<div className={mode ? "backpropmode" : "regular"}>
+					<ScatterPlot
+						width={300}
+						height={300}
+						padding={0}
+						start={-scale}
+						stop={scale}
+						X={X}
+						y={y}
+						yhat={yhat}
+					/>
+				</div>
+			</Box>
+		);
 
 		return (
 			<div id="app">
@@ -408,136 +577,8 @@ class App extends Component {
 				</AppBar>
 
 				<Box display="flex" justifyContent="center" marginTop={10}>
-					<Box
-						width={400}
-						className={mode ? "backpropmode" : "regular"}
-					>
-						<Card variant="outlined">
-							<CardContent>
-								<Typography
-									variant="caption"
-									style={{
-										color: "rgb(245, 2, 87, 0.5)",
-									}}
-								>
-									Control Center
-								</Typography>
-								<Typography variant="h4">
-									Epoch: {epoch}
-								</Typography>
-								<Typography variant="h6">
-									loss:
-									{loss == null ? "" : loss.toFixed(6)}
-								</Typography>
-								<CardActions>
-									<IconButton
-										disabled={playing}
-										onClick={() => {
-											this.reset(scale);
-										}}
-									>
-										<Replay />
-									</IconButton>
-									{PlayButtonClick}
-									<IconButton
-										style={{
-											color:
-												speed === 0
-													? "grey"
-													: "#FFC006",
-										}}
-										onClick={() => {
-											this.setState({
-												controls: {
-													...controls,
-													speed:
-														speed === 0 ? 100 : 0,
-												},
-											});
-										}}
-									>
-										<SlowMotionVideo />
-									</IconButton>
-								</CardActions>
-							</CardContent>
-						</Card>
-
-						<Box marginTop={5}>
-							<Card variant="outlined">
-								<CardContent>
-									<Typography
-										variant="caption"
-										style={{
-											color: "rgb(245, 2, 87, 0.5)",
-										}}
-									>
-										Model Initialization
-									</Typography>
-									<CardActions>
-										<Typography variant="caption">
-											Learning Rate
-										</Typography>
-										{lrs.map((num, i) => (
-											<Chip
-												disabled={playing}
-												key={i}
-												label={`${num}`}
-												color={
-<<<<<<< HEAD
-													lr === num
-=======
-													this.state.lr === num
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
-														? "secondary"
-														: "default"
-												}
-												onClick={() => {
-													tf.tidy(() => {
-														this.changeModelLr(num);
-														this.reset(scale);
-														return undefined;
-													});
-												}}
-											></Chip>
-										))}
-									</CardActions>
-									<CardActions>
-										<Typography variant="caption">
-											Data Set
-										</Typography>
-										{dataSets.map((item, i) => (
-											<Chip
-												disabled={playing}
-												key={i}
-												label={item.label}
-												color={
-													curve === item.label
-														? "secondary"
-														: "default"
-												}
-												onClick={() => {
-													this.setState({
-														shape,
-														curve: item.label,
-													});
-													this.reset(scale);
-													tf.tidy(() => {
-														this.genTensorData(
-															item.eqn,
-															item.scale
-														);
-														return undefined;
-													});
-												}}
-											></Chip>
-										))}
-									</CardActions>
-								</CardContent>
-							</Card>
-						</Box>
-					</Box>
+					{controlCenter}
 					<Box marginLeft={10}>
-<<<<<<< HEAD
 						<div className="regular">
 							<PlayGround
 								trans={trans}
@@ -557,269 +598,17 @@ class App extends Component {
 										: "edgePaused"
 								}
 								show={playing}
+								nshow={this.state.nshow}
+								bshow={this.state.bshow}
 								mode={mode}
+								backward={this.state.direction}
 								onClick={() => {
 									this.asyncPause();
 								}}
-							>
-								<Card
-									variant="outlined"
-									style={{ minWidth: 875 }}
-								>
-									<Box justifyContent="start" display="flex">
-										<CardActions>
-											<Box marginRight={11.5}>
-												<Button color="secondary">
-													Add Layer
-												</Button>
-=======
-						<NN
-							weights={this.state.weightsData}
-							biases={this.state.biasData}
-							shape={this.state.shape}
-							playing={this.state.controls.playing}
-							slowed={this.state.controls.speed !== 0}
-						>
-							<Card variant="outlined" style={{ minWidth: 875 }}>
-								<Box justifyContent="start" display="flex">
-									<CardActions>
-										<Box marginRight={11.5}>
-											<Button
-												color="secondary"
-												onClick={() => {
-													let shape = this.state
-														.shape;
-													if (!(shape.length > 4)) {
-														tf.tidy(() => {
-															shape.splice(
-																shape.length - 1
-															);
-															shape.push(2);
-															shape.push(1);
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"path"
-																)
-																.remove();
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"rect"
-																)
-																.remove();
-															this.setState({
-																shape,
-															});
-															this.reset(
-																model.scale
-															);
-														});
-													}
-												}}
-											>
-												Add Layer
-											</Button>
-										</Box>
-										{newShape.map((num, i) => (
-											<Box key={i} marginRight={17}>
-												<Box marginBottom={1}>
-													<Chip
-														label={"–"}
-														onClick={() => {
-															let shape = this
-																.state.shape;
-															let e = i + 1;
-															shape[e] =
-																shape[e] === 1
-																	? shape[e]
-																	: shape[e] -
-																	  1;
-															if (shape[e] > 0) {
-																tf.tidy(() => {
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"svg"
-																		)
-																		.selectAll(
-																			"path"
-																		)
-																		.remove();
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"svg"
-																		)
-																		.selectAll(
-																			"rect"
-																		)
-																		.remove();
-																	this.setState(
-																		{
-																			shape,
-																		}
-																	);
-																	this.reset(
-																		model.scale
-																	);
-																	return undefined;
-																});
-															}
-														}}
-													></Chip>
-												</Box>
-												<Box>
-													<Chip
-														label={"+"}
-														onClick={() => {
-															let shape = this
-																.state.shape;
-															let e = i + 1;
-															shape[e] =
-																shape[e] >= 8
-																	? shape[e]
-																	: shape[e] +
-																	  1;
-															if (shape[i] <= 8) {
-																tf.tidy(() => {
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"svg"
-																		)
-																		.selectAll(
-																			"path"
-																		)
-																		.remove();
-																	d3.select(
-																		"#app"
-																	)
-																		.select(
-																			"#nn"
-																		)
-																		.select(
-																			"svg"
-																		)
-																		.selectAll(
-																			"rect"
-																		)
-																		.remove();
-																	this.setState(
-																		{
-																			shape,
-																		}
-																	);
-																});
-															}
-														}}
-													></Chip>
-												</Box>
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
-											</Box>
-											{newShape.map((num, i) => (
-												<Box key={i} marginRight={17}>
-													<Box marginBottom={1}>
-														<Chip
-															label={"–"}
-														></Chip>
-													</Box>
-													<Box>
-														<Chip
-															label={"+"}
-														></Chip>
-													</Box>
-												</Box>
-											))}
-
-<<<<<<< HEAD
-											<Box>
-												<Button color="secondary">
-													Remove Layer
-												</Button>
-											</Box>
-										</CardActions>
-									</Box>
-								</Card>
-							</PlayGround>
-						</div>
-=======
-										<Box>
-											<Button
-												color="secondary"
-												onClick={() => {
-													tf.tidy(() => {
-														let shape = model.shape;
-														if (shape.length > 2) {
-															shape.splice(
-																shape.length - 1
-															);
-															shape.splice(
-																shape.length - 1
-															);
-															shape.push(1);
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"path"
-																)
-																.remove();
-															d3.select("#app")
-																.select("#nn")
-																.select("svg")
-																.selectAll(
-																	"rect"
-																)
-																.remove();
-															this.setState({
-																shape,
-															});
-															this.reset(
-																model.scale
-															);
-															return undefined;
-														}
-													});
-												}}
-											>
-												Remove Layer
-											</Button>
-										</Box>
-									</CardActions>
-								</Box>
-							</Card>
-						</NN>
->>>>>>> 24679ac9fc4ea045e036183f63d3acda6169daae
-					</Box>
-					<Box marginLeft={10}>
-						<div className={mode ? "backpropmode" : "regular"}>
-							<ScatterPlot
-								width={300}
-								height={300}
-								padding={0}
-								start={-scale}
-								stop={scale}
-								X={X}
-								y={y}
-								yhat={yhat}
-							/>
+							></PlayGround>
 						</div>
 					</Box>
+					{scatter}
 				</Box>
 				<Button
 					onClick={() => {
@@ -841,7 +630,9 @@ class App extends Component {
 					MEM
 				</Button>
 				<Button
-					onClick={() => {
+					onClick={async () => {
+						const timer = (ms) =>
+							new Promise((res) => setTimeout(res, ms));
 						let formattedWeights = formatWeightArray(
 							weightsData,
 							shape
@@ -853,15 +644,55 @@ class App extends Component {
 						);
 
 						nn.forward(X[0], y[0]);
-						console.log(weightsData);
-						console.log(`label: ${this.state.yhat[0]}`);
 						nn.backward();
 						this.setState({ trans: nn, mode: !mode });
+						await timer(1000);
+						this.setState({ nshow: 1 });
+						const anim = async () => {
+							while (this.state.nshow < 19) {
+								await timer(1000);
+								this.setState({
+									nshow: (this.state.nshow += 8),
+								});
+							}
+						};
+						await anim();
 					}}
 					variant="contained"
 					color="secondary"
 				>
 					EPOCH MODE {mode ? "true" : "false"}
+				</Button>
+				<Button
+					onClick={async () => {
+						await this.anim();
+					}}
+				>
+					REPLAY
+				</Button>
+				<Button
+					variant="outlined"
+					disabled={true}
+					style={{
+						color:
+							this.state.subEpoch != "forward"
+								? "lightgrey"
+								: "red",
+					}}
+				>
+					FORWARD
+				</Button>
+				<Button
+					variant="outlined"
+					disabled={true}
+					style={{
+						color:
+							this.state.subEpoch != "backward"
+								? "lightgrey"
+								: "red",
+					}}
+				>
+					BACKWARD
 				</Button>
 			</div>
 		);
