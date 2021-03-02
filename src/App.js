@@ -49,12 +49,17 @@ class App extends Component {
 				playing: false,
 				speed: 0,
 			},
+			nshow: 0,
+			bshow: Infinity,
 			rects: [],
 			weights: [],
 			links: [],
 			nn: null,
 			mode: false,
 			trans: null,
+			macro: false,
+			direction: "edgePaused",
+			subEpoch: "forward",
 		};
 
 		/* Prototype: Functions Binds to "this" */
@@ -72,8 +77,68 @@ class App extends Component {
 		this.resetParameters = this.resetParameters.bind(this);
 		this.changeModelLr = this.changeModelLr.bind(this);
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
+		this.anim = this.anim.bind(this);
 	}
 
+	anim = async () => {
+		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+		const ms = 500;
+		const l = this.state.shape.reduce((a, b) => a + b) - 1;
+
+		this.setState({
+			...this.state,
+			subEpoch: "forward",
+			direction: "edgeForward",
+			nshow: 0,
+			bshow: Infinity,
+		});
+		await timer(ms);
+
+		this.setState({ nshow: 1 });
+		let i = 1;
+		while (this.state.nshow < l) {
+			let curr = this.state.shape[i];
+			await timer(ms);
+			this.setState({
+				nshow: (this.state.nshow += curr),
+			});
+			i++;
+		}
+		await timer(ms);
+		this.setState({
+			nshow: (this.state.nshow += 1),
+		});
+		await timer(ms);
+		this.setState({
+			nshow: (this.state.nshow += 1),
+		});
+
+		this.setState({ bshow: Infinity });
+		/* Pause! now go backward */
+		this.setState({
+			...this.state,
+			direction: "edgeBackward",
+			subEpoch: "backward",
+		});
+
+		await timer(ms);
+		this.setState({ bshow: l });
+
+		await timer(ms);
+		this.setState({ bshow: (this.state.bshow -= 1) });
+
+		let e = this.state.shape.length - 2;
+		while (this.state.bshow > 0) {
+			let curr = this.state.shape[e];
+			await timer(ms);
+			this.setState({
+				bshow: (this.state.bshow -= curr),
+			});
+			e--;
+		}
+
+		this.setState({ direction: "edgePaused" });
+	};
 	initNeuralNetwork(shape) {
 		if (!this.state.controls.playing) {
 			const rw = 32;
@@ -533,7 +598,10 @@ class App extends Component {
 										: "edgePaused"
 								}
 								show={playing}
+								nshow={this.state.nshow}
+								bshow={this.state.bshow}
 								mode={mode}
+								backward={this.state.direction}
 								onClick={() => {
 									this.asyncPause();
 								}}
@@ -562,7 +630,9 @@ class App extends Component {
 					MEM
 				</Button>
 				<Button
-					onClick={() => {
+					onClick={async () => {
+						const timer = (ms) =>
+							new Promise((res) => setTimeout(res, ms));
 						let formattedWeights = formatWeightArray(
 							weightsData,
 							shape
@@ -576,11 +646,53 @@ class App extends Component {
 						nn.forward(X[0], y[0]);
 						nn.backward();
 						this.setState({ trans: nn, mode: !mode });
+						await timer(1000);
+						this.setState({ nshow: 1 });
+						const anim = async () => {
+							while (this.state.nshow < 19) {
+								await timer(1000);
+								this.setState({
+									nshow: (this.state.nshow += 8),
+								});
+							}
+						};
+						await anim();
 					}}
 					variant="contained"
 					color="secondary"
 				>
 					EPOCH MODE {mode ? "true" : "false"}
+				</Button>
+				<Button
+					onClick={async () => {
+						await this.anim();
+					}}
+				>
+					REPLAY
+				</Button>
+				<Button
+					variant="outlined"
+					disabled={true}
+					style={{
+						color:
+							this.state.subEpoch != "forward"
+								? "lightgrey"
+								: "red",
+					}}
+				>
+					FORWARD
+				</Button>
+				<Button
+					variant="outlined"
+					disabled={true}
+					style={{
+						color:
+							this.state.subEpoch != "backward"
+								? "lightgrey"
+								: "red",
+					}}
+				>
+					BACKWARD
 				</Button>
 			</div>
 		);

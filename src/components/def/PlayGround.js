@@ -43,7 +43,6 @@ class PlayGround extends Component {
 	render() {
 		let model = [];
 		if (this.props.mode) {
-			console.log(this.props.trans);
 			const { trans } = this.props;
 
 			model = this.flatten(trans.model);
@@ -61,9 +60,7 @@ class PlayGround extends Component {
 							d={d}
 							className={this.props.playing}
 							strokeWidth={
-								l === 0
-									? 1
-									: Math.pow(this.props.weights[i], 2) + 0.25
+								l === 0 ? 1 : Math.pow(this.props.weights[i], 2)
 							}
 							stroke={
 								l !== 0
@@ -176,13 +173,18 @@ class PlayGround extends Component {
 		const notPlaying = (
 			<svg id="pp" width="800" height="600">
 				<g id="gpp">
+					<path
+						d="M 750, 234 L 750, 300"
+						stroke="black"
+						className={this.props.backward}
+					></path>
 					{this.props.links.map((d, i) => (
 						<path
 							key={i}
 							d={d}
-							className={this.props.playing}
+							className={this.props.backward}
 							strokeWidth={
-								Math.pow(this.props.weights[i], 2) + 0.25
+								Math.pow(this.props.weights[i], 2) + 0.05
 							}
 							stroke={
 								this.props.weights.length !== 0
@@ -196,20 +198,14 @@ class PlayGround extends Component {
 					))}
 					{this.props.rects.map((d, i) => (
 						<g id="ggpp" key={i}>
-							<text x={d.x + 35} y={d.y + 16}>
-								{model.length !== 0
-									? i > 0
-										? model[i - 1].output
-										: this.props.input
-									: ""}
-							</text>
 							<rect
 								x={d.x}
 								y={d.y}
 								width={this.state.widths}
 								height={this.state.widths}
 								onClick={() => {
-									console.log(model[i]);
+									//console.log(model[i]);
+									console.log(d);
 									const svgGroup = d3
 										.select("#pp")
 										.select("g");
@@ -221,10 +217,26 @@ class PlayGround extends Component {
 										this.state.zoom,
 										1500
 									);
+									this.setState({ micro: true });
 								}}
 								fill="lightgrey"
 							></rect>
-							{i > 0
+
+							<text fill="black" x={d.x + 32} y={d.y + 16}>
+								{model.length !== 0 && i < this.props.nshow
+									? i > 0
+										? model[i - 1].output.toFixed(2)
+										: this.props.input
+									: ""}
+							</text>
+							<text fill="red" x={d.x - 40} y={d.y + 16}>
+								{model.length !== 0 && i > this.props.bshow
+									? i > 0
+										? model[i - 1].dInputsSum.toFixed(2)
+										: ""
+									: ""}
+							</text>
+							{i > 0 && this.state.micro
 								? graph(
 										d.x + 2,
 										d.y,
@@ -233,6 +245,29 @@ class PlayGround extends Component {
 								: ""}
 						</g>
 					))}
+					<rect
+						x={734}
+						y={300}
+						width={32}
+						height={32}
+						fill="none"
+						stroke="black"
+					></rect>
+					<text fontSize="13px" x={738} y={318}>
+						Loss
+					</text>
+					<text x={734} y={350}>
+						{this.props.mode && this.props.nshow > 18
+							? this.props.trans.loss.output.toFixed(2)
+							: ""}
+					</text>
+					<text x={734} y={295} fill="red">
+						{this.props.mode &&
+						this.props.bshow < Infinity &&
+						this.props.bshow > 0
+							? this.props.trans.loss.dInputs.toFixed(2)
+							: ""}
+					</text>
 				</g>
 			</svg>
 		);
