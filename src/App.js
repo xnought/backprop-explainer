@@ -17,11 +17,12 @@ import {
 	Chip,
 	Button,
 	Fab,
+	Slider,
 } from "@material-ui/core";
 import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
 import * as tf from "@tensorflow/tfjs";
 import * as d3 from "d3";
-import { PlayGround, ScatterPlot } from "./components/exports";
+import { PlayGround, ScatterPlot, Loss } from "./components/exports";
 import { NeuralNetwork, tools } from "./nn/exports";
 import "./App.css";
 const { flatten, formatWeightArray, tensorToArray } = tools;
@@ -38,7 +39,7 @@ class App extends Component {
 			yhat: [],
 			biasesData: [],
 			weightsData: [],
-			lr: 0.1,
+			lr: 0.01,
 			data: {
 				X: [],
 				y: [],
@@ -51,6 +52,7 @@ class App extends Component {
 			},
 			nshow: 0,
 			bshow: Infinity,
+			microShow: 0,
 			rects: [],
 			weights: [],
 			links: [],
@@ -60,6 +62,10 @@ class App extends Component {
 			macro: false,
 			direction: "edgePaused",
 			subEpoch: "forward",
+			sliderVal: 2,
+			vSliderVal: 2,
+			vSliderConv: 6,
+			lossArray: [],
 		};
 
 		/* Prototype: Functions Binds to "this" */
@@ -177,6 +183,7 @@ class App extends Component {
 			/* We start to iterate over ns */
 			let links = [];
 			for (let layer = shape.length - 1; layer > 0; layer--) {
+				let interval = -14.5;
 				for (
 					let prevNeuron = 0;
 					prevNeuron < shape[layer - 1];
@@ -185,11 +192,18 @@ class App extends Component {
 					for (let neuron = 0; neuron < shape[layer]; neuron++) {
 						links.push(
 							link({
-								source: ns[layer - 1][prevNeuron],
-								target: ns[layer][neuron],
+								source: {
+									x: ns[layer - 1][prevNeuron].x + 15.5,
+									y: ns[layer - 1][prevNeuron].y,
+								},
+								target: {
+									x: ns[layer][neuron].x - 15,
+									y: ns[layer][neuron].y + interval,
+								},
 							})
 						);
 					}
+					interval += 3.5;
 				}
 			}
 			this.setState({ rects: flatns });
@@ -334,7 +348,15 @@ class App extends Component {
 			);
 		}
 
-		this.setState({ biasesData, weightsData, loss, yhat, epoch });
+		let lossArray = [...this.state.lossArray, loss];
+		this.setState({
+			biasesData,
+			weightsData,
+			loss,
+			yhat,
+			epoch,
+			lossArray,
+		});
 		this.initNeuralNetwork(this.state.shape);
 	}
 	async asyncPause() {
@@ -366,6 +388,7 @@ class App extends Component {
 			loss: null,
 			weights: [],
 			nn: model,
+			lossArray: [],
 		});
 		tf.dispose(optimizer);
 	}
@@ -427,53 +450,110 @@ class App extends Component {
 		/* Destructure render */
 		const PlayButtonClick = (
 			// eslint-disable-next-line
-			<Fab color="secondary" onClick={() => this.run()}>
+			<Fab
+				style={{
+					background: !this.state.controls.playing
+						? "#175676"
+						: "#D62839",
+					color: "white",
+				}}
+				disableTouchRipple
+				onClick={() => this.run()}
+			>
 				{!playing ? <PlayArrow /> : <Stop />}
 			</Fab>
 		);
+		const controlsReg = (
+			<CardActions>
+				<IconButton
+					disabled={playing}
+					onClick={() => {
+						this.reset(scale);
+					}}
+				>
+					<Replay />
+				</IconButton>
+				{PlayButtonClick}
+				<IconButton
+					style={{
+						color: speed === 0 ? "grey" : "#FFC006",
+					}}
+					onClick={() => {
+						this.setState({
+							controls: {
+								...controls,
+								speed: speed === 0 ? 100 : 0,
+							},
+						});
+					}}
+				>
+					<SlowMotionVideo />
+				</IconButton>
+			</CardActions>
+		);
+		const controlsBackProp = (
+			<CardActions>
+				<Button
+					onClick={async () => {
+						await this.anim();
+					}}
+				>
+					REPLAY
+				</Button>
+			</CardActions>
+		);
+
 		const controlCenter = (
-			<Box width={400} className={mode ? "backpropmode" : "regular"}>
+			<Box width={400}>
 				<Card variant="outlined">
 					<CardContent>
 						<Typography
 							variant="caption"
 							style={{
-								color: "rgb(245, 2, 87, 0.5)",
+								color: "#4BA3C3",
 							}}
 						>
 							Control Center
 						</Typography>
-						<Typography variant="h4">Epoch: {epoch}</Typography>
+						<div on></div>
+						<a
+							onClick={async () => {
+								const timer = (ms) =>
+									new Promise((res) => setTimeout(res, ms));
+								let formattedWeights = formatWeightArray(
+									weightsData,
+									shape
+								);
+								let nn = new NeuralNetwork(
+									shape,
+									formattedWeights,
+									biasesData
+								);
+
+								nn.forward(X[0], y[0]);
+								nn.backward();
+								this.setState({ trans: nn, mode: !mode });
+								await timer(1000);
+								this.setState({ nshow: 1 });
+								const anim = async () => {
+									while (this.state.nshow < 19) {
+										await timer(1000);
+										this.setState({
+											nshow: (this.state.nshow += 8),
+										});
+									}
+								};
+								await this.anim();
+							}}
+						>
+							<Typography variant="h4">Epoch: {epoch}</Typography>
+						</a>
 						<Typography variant="h6">
 							loss:
 							{loss == null ? "" : loss.toFixed(6)}
 						</Typography>
-						<CardActions>
-							<IconButton
-								disabled={playing}
-								onClick={() => {
-									this.reset(scale);
-								}}
-							>
-								<Replay />
-							</IconButton>
-							{PlayButtonClick}
-							<IconButton
-								style={{
-									color: speed === 0 ? "grey" : "#FFC006",
-								}}
-								onClick={() => {
-									this.setState({
-										controls: {
-											...controls,
-											speed: speed === 0 ? 100 : 0,
-										},
-									});
-								}}
-							>
-								<SlowMotionVideo />
-							</IconButton>
-						</CardActions>
+						{this.state.mode ? controlsBackProp : controlsReg}
+						<CardActions></CardActions>
 					</CardContent>
 				</Card>
 
@@ -483,10 +563,10 @@ class App extends Component {
 							<Typography
 								variant="caption"
 								style={{
-									color: "rgb(245, 2, 87, 0.5)",
+									color: "#4BA3C3",
 								}}
 							>
-								Model Initialization
+								Customization
 							</Typography>
 							<CardActions>
 								<Typography variant="caption">
@@ -497,9 +577,14 @@ class App extends Component {
 										disabled={playing}
 										key={i}
 										label={`${num}`}
-										color={
-											lr === num ? "secondary" : "default"
-										}
+										style={{
+											color:
+												lr === num ? "white" : "grey",
+											background:
+												lr === num
+													? "#175676"
+													: "lightgrey",
+										}}
 										onClick={() => {
 											tf.tidy(() => {
 												this.changeModelLr(num);
@@ -519,11 +604,16 @@ class App extends Component {
 										disabled={playing}
 										key={i}
 										label={item.label}
-										color={
-											curve === item.label
-												? "secondary"
-												: "default"
-										}
+										style={{
+											color:
+												curve === item.label
+													? "white"
+													: "grey",
+											background:
+												curve === item.label
+													? "#175676"
+													: "lightgrey",
+										}}
 										onClick={() => {
 											this.setState({
 												shape,
@@ -541,6 +631,60 @@ class App extends Component {
 									></Chip>
 								))}
 							</CardActions>
+							<CardActions>
+								<Typography variant="caption">
+									Neurons
+								</Typography>
+
+								<Slider
+									style={{ color: "#175676" }}
+									defaultValue={4}
+									disabled={playing}
+									aria-labelledby="discrete-slider"
+									valueLabelDisplay="auto"
+									step={1}
+									marks
+									onChange={(e, n) => {
+										this.setState({ sliderVal: n });
+									}}
+									min={1}
+									max={8}
+								/>
+								<Button
+									disabled={playing}
+									onClick={() => {
+										let a = shape;
+										console.log(a.length);
+										if (a.length < 5) {
+											a[
+												a.length - 1
+											] = this.state.sliderVal;
+											a.push(1);
+											this.setState({ shape: a });
+											this.initNeuralNetwork(a);
+											this.reset(scale);
+										}
+									}}
+								>
+									+
+								</Button>
+
+								<Button
+									disabled={playing}
+									onClick={() => {
+										let a = shape;
+										console.log(a.length);
+										if (a.length > 2) {
+											a.splice(a.length - 2, 1);
+											this.setState({ shape: a });
+											this.initNeuralNetwork(a);
+											this.reset(scale);
+										}
+									}}
+								>
+									–
+								</Button>
+							</CardActions>
 						</CardContent>
 					</Card>
 				</Box>
@@ -548,7 +692,7 @@ class App extends Component {
 		);
 		const scatter = (
 			<Box marginLeft={10}>
-				<div className={mode ? "backpropmode" : "regular"}>
+				<Box>
 					<ScatterPlot
 						width={300}
 						height={300}
@@ -559,7 +703,10 @@ class App extends Component {
 						y={y}
 						yhat={yhat}
 					/>
-				</div>
+				</Box>
+				<Box marginTop={10}>
+					<Loss lossArray={this.state.lossArray} loss={loss} />
+				</Box>
 			</Box>
 		);
 
@@ -567,7 +714,7 @@ class App extends Component {
 			<div id="app">
 				<AppBar
 					position="static"
-					style={{ background: "#f50257", color: "white" }}
+					style={{ background: "#175676", color: "white" }}
 				>
 					<Toolbar>
 						<Typography variant="h6">
@@ -600,6 +747,7 @@ class App extends Component {
 								show={playing}
 								nshow={this.state.nshow}
 								bshow={this.state.bshow}
+								microShow={this.state.microShow}
 								mode={mode}
 								backward={this.state.direction}
 								onClick={() => {
@@ -610,90 +758,6 @@ class App extends Component {
 					</Box>
 					{scatter}
 				</Box>
-				<Button
-					onClick={() => {
-						let a = shape;
-						a[a.length - 1] = 2;
-						a.push(1);
-						this.setState({ shape: a });
-						this.initNeuralNetwork(a);
-						this.reset(scale);
-					}}
-				>
-					ADD LAYER
-				</Button>
-				<Button
-					onClick={() => {
-						console.table(tf.memory());
-					}}
-				>
-					MEM
-				</Button>
-				<Button
-					onClick={async () => {
-						const timer = (ms) =>
-							new Promise((res) => setTimeout(res, ms));
-						let formattedWeights = formatWeightArray(
-							weightsData,
-							shape
-						);
-						let nn = new NeuralNetwork(
-							shape,
-							formattedWeights,
-							biasesData
-						);
-
-						nn.forward(X[0], y[0]);
-						nn.backward();
-						this.setState({ trans: nn, mode: !mode });
-						await timer(1000);
-						this.setState({ nshow: 1 });
-						const anim = async () => {
-							while (this.state.nshow < 19) {
-								await timer(1000);
-								this.setState({
-									nshow: (this.state.nshow += 8),
-								});
-							}
-						};
-						await anim();
-					}}
-					variant="contained"
-					color="secondary"
-				>
-					EPOCH MODE {mode ? "true" : "false"}
-				</Button>
-				<Button
-					onClick={async () => {
-						await this.anim();
-					}}
-				>
-					REPLAY
-				</Button>
-				<Button
-					variant="outlined"
-					disabled={true}
-					style={{
-						color:
-							this.state.subEpoch != "forward"
-								? "lightgrey"
-								: "red",
-					}}
-				>
-					FORWARD
-				</Button>
-				<Button
-					variant="outlined"
-					disabled={true}
-					style={{
-						color:
-							this.state.subEpoch != "backward"
-								? "lightgrey"
-								: "red",
-					}}
-				>
-					BACKWARD
-				</Button>
 			</div>
 		);
 	}

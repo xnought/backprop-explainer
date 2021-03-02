@@ -6,26 +6,26 @@
 	stroke-dasharray: 20, 3;
 }
 .edgePaused {
-	stroke-dasharray: 9 1;
-	stroke-dashoffset: 1;
+	stroke-dasharray: 49 4;
+	stroke-dashoffset: 4;
 	animation: flowForward 0s linear infinite;
 }
 .edgeBackward {
-	stroke-dasharray: 9 1;
-	stroke-dashoffset: 1;
+	stroke-dasharray: 49 4;
+	stroke-dashoffset: 4;
 	animation: flowBackward linear infinite;
-	animation-duration: 0.3s;
+	animation-duration: 1s;
 }
 .edgeSlowed {
-	stroke-dasharray: 9 1;
-	stroke-dashoffset: 1;
+	stroke-dasharray: 49 4;
+	stroke-dashoffset: 4;
 	animation: flowForward linear infinite;
 	animation-duration: 1s;
 }
 .edgeForward {
-	stroke-dasharray: 9 1;
-	stroke-dashoffset: 1;
-	animation: flowForward linear infinite;
+	stroke-dasharray: 49 4;
+	stroke-dashoffset: 4;
+	animation: flowForward linear infinite forwards;
 	animation-duration: 0.3s;
 }
 
@@ -38,7 +38,7 @@
 		stroke-dashoffset: 0;
 	}
 	to {
-		stroke-dashoffset: 10;
+		stroke-dashoffset: 51;
 	}
 }
 @keyframes flowForward {
@@ -46,7 +46,7 @@
 		stroke-dashoffset: 0;
 	}
 	to {
-		stroke-dashoffset: -10;
+		stroke-dashoffset: -51;
 	}
 }
 
@@ -62,4 +62,13 @@
 }
 .cord {
 	fill: rgba(128, 128, 128, 0.099);
+}
+
+.grad {
+	background: linear-gradient(
+		90.03deg,
+		#d62839 0.03%,
+		rgba(232, 232, 232, 0) 50%,
+		#4ba3c3 99.97%
+	);
 }

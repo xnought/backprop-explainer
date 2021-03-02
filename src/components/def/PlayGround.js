@@ -5,6 +5,7 @@
 */
 import React, { Component } from "react";
 import * as d3 from "d3";
+import Legend from "./Legend";
 import "./d3.css";
 
 class PlayGround extends Component {
@@ -45,28 +46,61 @@ class PlayGround extends Component {
 		if (this.props.mode) {
 			const { trans } = this.props;
 
+			//console.log(trans);
 			model = this.flatten(trans.model);
 			/* Now create array of output values from each neuron */
 		}
 		const { children } = this.props;
 
 		let l = this.props.weights.length;
+		const negWeight = "#D62839";
+		const posWeight = "#4BA3C3";
+
+		const link = d3
+			.linkHorizontal()
+			.x((d) => d.x)
+			.y((d) => d.y);
 		const playing = (
-			<svg id="p" width="800" height="600">
+			<svg id="p" width="800" height="500" overflow="visible">
 				<g transform={"scale(1)"}>
+					<path
+						d="M 750, 234 L 750, 300"
+						stroke={l != 0 ? "#F50257" : "#ededed"}
+						className={this.props.playing}
+					></path>
+					<path
+						d={link({
+							source: { x: 766, y: 315 },
+							target: { x: 880, y: 430 },
+						})}
+						stroke={l != 0 ? "#F50257" : "#ededed"}
+						fill="none"
+						className={this.props.playing}
+					></path>
+					<path
+						d={link({
+							source: { x: 766, y: 250 },
+							target: { x: 880, y: 150 },
+						})}
+						stroke={l != 0 ? "#F50257" : "#ededed"}
+						fill="none"
+						className={this.props.playing}
+					></path>
 					{this.props.links.map((d, i) => (
 						<path
 							key={i}
 							d={d}
 							className={this.props.playing}
 							strokeWidth={
-								l === 0 ? 1 : Math.pow(this.props.weights[i], 2)
+								l === 0
+									? 1
+									: Math.pow(this.props.weights[i], 2) + 0.1
 							}
 							stroke={
 								l !== 0
 									? this.props.weights[i] > 0
-										? "#8b0de5"
-										: "#F50257"
+										? posWeight
+										: negWeight
 									: "#ededed"
 							}
 							fill="none"
@@ -85,6 +119,18 @@ class PlayGround extends Component {
 							fill="lightgrey"
 						></rect>
 					))}
+
+					<rect
+						x={734}
+						y={300}
+						width={32}
+						height={32}
+						fill="none"
+						stroke="black"
+					></rect>
+					<text fontSize="13px" x={738} y={318}>
+						Loss
+					</text>
 				</g>
 			</svg>
 		);
@@ -144,8 +190,14 @@ class PlayGround extends Component {
 									<text fontSize={fontSize} x={0} y={1}>
 										x
 									</text>
+									<text fontSize={"0.5px"} x={0.5} y={1.2}>
+										{i}
+									</text>
 									<text fontSize={fontSize} x={0} y={2.5}>
 										w
+									</text>
+									<text fontSize={"0.5px"} x={0.6} y={2.7}>
+										{i}
 									</text>
 									{connection([6, 1.5], [10, 1.5], "black")}
 									{inputWeightComponent(1, 1, 1, 1)}
@@ -155,6 +207,117 @@ class PlayGround extends Component {
 									[18.25, 16],
 									"black"
 								)}
+								{neuron.inputs.map((d, i) => (
+									<text
+										fontSize={"0.75px"}
+										fill="blue"
+										x={1}
+										y={0.7 + 3.5 * i}
+									>
+										{d.toFixed(4)}
+									</text>
+								))}
+								{neuron.dInputs.map((d, i) => (
+									<text
+										fontSize={"0.75px"}
+										fill="red"
+										x={1}
+										y={1.4 + 3.5 * i}
+									>
+										{d.toFixed(4)}
+									</text>
+								))}
+
+								{neuron.weights.map((d, i) => (
+									<text
+										fontSize={"0.75px"}
+										fill="blue"
+										x={1}
+										y={2.2 + 3.5 * i}
+									>
+										{d.toFixed(4)}
+									</text>
+								))}
+								{neuron.dWeights.map((d, i) => (
+									<text
+										fontSize={"0.75px"}
+										fill="red"
+										x={1}
+										y={2.9 + 3.5 * i}
+									>
+										{d.toFixed(4)}
+									</text>
+								))}
+
+								<text
+									fontSize={"0.75px"}
+									fill="blue"
+									x={1}
+									y={29.7}
+								>
+									{neuron.bias.toFixed(4)}
+								</text>
+								<text
+									fontSize={"0.75px"}
+									fill="red"
+									x={1}
+									y={30.4}
+								>
+									{neuron.dBias.toFixed(4)}
+								</text>
+								{neuron.multStep.map((d, i) => (
+									<text
+										fontSize={"0.75px"}
+										fill="blue"
+										x={7.25}
+										y={1.4 + 3.5 * i}
+									>
+										{d.toFixed(4)}
+									</text>
+								))}
+								{neuron.dSumStep.map((d, i) => (
+									<text
+										fontSize={"0.75px"}
+										fill="red"
+										x={7.25}
+										y={2.1 + 3.5 * i}
+									>
+										{d.toFixed(4)}
+									</text>
+								))}
+
+								<text
+									fontSize={"0.75px"}
+									fill="blue"
+									x={20.1}
+									y={16}
+								>
+									{neuron.sumStep.toFixed(4)}
+								</text>
+								<text
+									fontSize={"0.75px"}
+									fill="red"
+									x={20.1}
+									y={16.7}
+								>
+									{neuron.dActStep.toFixed(4)}
+								</text>
+								<text
+									fontSize={"0.75px"}
+									fill="blue"
+									x={26.2}
+									y={16}
+								>
+									{neuron.actStep.toFixed(4)}
+								</text>
+								<text
+									fontSize={"0.75px"}
+									fill="red"
+									x={26.2}
+									y={16.7}
+								>
+									{neuron.dvalue.toFixed(4)}
+								</text>
 							</g>
 					  ))}
 
@@ -171,31 +334,13 @@ class PlayGround extends Component {
 		);
 
 		const notPlaying = (
-			<svg id="pp" width="800" height="600">
+			<svg id="pp" width="800" height="500">
 				<g id="gpp">
 					<path
 						d="M 750, 234 L 750, 300"
 						stroke="black"
 						className={this.props.backward}
 					></path>
-					{this.props.links.map((d, i) => (
-						<path
-							key={i}
-							d={d}
-							className={this.props.backward}
-							strokeWidth={
-								Math.pow(this.props.weights[i], 2) + 0.05
-							}
-							stroke={
-								this.props.weights.length !== 0
-									? this.props.weights[i] > 0
-										? "#8b0de5"
-										: "#F50257"
-									: "#ededed"
-							}
-							fill="none"
-						></path>
-					))}
 					{this.props.rects.map((d, i) => (
 						<g id="ggpp" key={i}>
 							<rect
@@ -222,7 +367,7 @@ class PlayGround extends Component {
 								fill="lightgrey"
 							></rect>
 
-							<text fill="black" x={d.x + 32} y={d.y + 16}>
+							<text fill="blue" x={d.x + 32} y={d.y + 16}>
 								{model.length !== 0 && i < this.props.nshow
 									? i > 0
 										? model[i - 1].output.toFixed(2)
@@ -244,6 +389,25 @@ class PlayGround extends Component {
 								  )
 								: ""}
 						</g>
+					))}
+
+					{this.props.links.map((d, i) => (
+						<path
+							key={i}
+							d={d}
+							className={this.props.backward}
+							strokeWidth={
+								Math.pow(this.props.weights[i], 2) + 0.05
+							}
+							stroke={
+								this.props.weights.length !== 0
+									? this.props.weights[i] > 0
+										? posWeight
+										: negWeight
+									: "#ededed"
+							}
+							fill="none"
+						></path>
 					))}
 					<rect
 						x={734}
@@ -275,6 +439,7 @@ class PlayGround extends Component {
 			<div id="nn">
 				{children}
 				{!this.props.mode ? playing : notPlaying}
+				<Legend />
 			</div>
 		);
 	}
