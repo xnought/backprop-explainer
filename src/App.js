@@ -181,7 +181,7 @@ class App extends Component {
 			flatns.push(stop);
 			ns.push([stop]);
 
-			if (this.state.mode || true) {
+			if (this.state.mode && false) {
 				/* We start to iterate over ns */
 				let links = [];
 				for (let layer = shape.length - 1; layer > 0; layer--) {
@@ -772,11 +772,16 @@ class App extends Component {
 			<div id="app">
 				<AppBar
 					position="static"
-					style={{ background: "#175676", color: "white" }}
+					style={{
+						background: this.state.mode ? "#f50257" : "#175676",
+						color: "white",
+					}}
 				>
 					<Toolbar>
 						<Typography variant="h6">
-							Backpropagation Visualizer
+							{this.state.mode
+								? "Backpropagation Visualizer"
+								: "Neural Network Visualizer"}
 						</Typography>
 					</Toolbar>
 				</AppBar>

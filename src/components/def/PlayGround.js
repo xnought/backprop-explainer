@@ -346,6 +346,26 @@ class PlayGround extends Component {
 						stroke="black"
 						className={this.props.backward}
 					></path>
+
+					{this.props.links.map((d, i) => (
+						<path
+							key={i}
+							d={d}
+							className={this.props.backward}
+							strokeWidth={
+								Math.pow(this.props.weights[i], 2) + 0.05
+							}
+							stroke={
+								this.props.weights.length !== 0
+									? this.props.weights[i] > 0
+										? posWeight
+										: negWeight
+									: "#ededed"
+							}
+							fill="none"
+						></path>
+					))}
+
 					{this.props.rects.map((d, i) => (
 						<g id="ggpp" key={i}>
 							<rect
@@ -394,25 +414,6 @@ class PlayGround extends Component {
 								  )
 								: ""}
 						</g>
-					))}
-
-					{this.props.links.map((d, i) => (
-						<path
-							key={i}
-							d={d}
-							className={this.props.backward}
-							strokeWidth={
-								Math.pow(this.props.weights[i], 2) + 0.05
-							}
-							stroke={
-								this.props.weights.length !== 0
-									? this.props.weights[i] > 0
-										? posWeight
-										: negWeight
-									: "#ededed"
-							}
-							fill="none"
-						></path>
 					))}
 					<rect
 						x={734}
