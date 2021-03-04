@@ -23,7 +23,12 @@ import {
 import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
 import * as tf from "@tensorflow/tfjs";
 import * as d3 from "d3";
-import { PlayGround, ScatterPlot, Loss } from "./components/exports";
+import {
+	PlayGround,
+	ScatterPlot,
+	Loss,
+	Explanation,
+} from "./components/exports";
 import { NeuralNetwork, tools } from "./nn/exports";
 import "./App.css";
 const { flatten, formatWeightArray, tensorToArray } = tools;
@@ -468,7 +473,7 @@ class App extends Component {
 		let newShape = [...shape];
 		newShape.splice(0, 1);
 		newShape.splice(newShape.length - 1, 1);
-		const lrs = [0.001, 0.01, 0.1, 0.3, (1.0).toFixed(1)];
+		const lrs = [0.001, 0.005, 0.01, 0.05, 0.1];
 		const dataSets = [
 			{ label: "sin", eqn: tf.sin, scale: 5 },
 			{ label: "cos", eqn: tf.cos, scale: 5 },
@@ -696,7 +701,7 @@ class App extends Component {
 
 								<Slider
 									style={{ color: "#175676" }}
-									defaultValue={4}
+									defaultValue={2}
 									disabled={playing}
 									aria-labelledby="discrete-slider"
 									valueLabelDisplay="auto"
@@ -770,57 +775,74 @@ class App extends Component {
 
 		return (
 			<div id="app">
-				<AppBar
-					position="static"
-					style={{
-						background: this.state.mode ? "#f50257" : "#175676",
-						color: "white",
-					}}
-				>
-					<Toolbar>
-						<Typography variant="h6">
-							{this.state.mode
-								? "Backpropagation Visualizer"
-								: "Neural Network Visualizer"}
-						</Typography>
-					</Toolbar>
-				</AppBar>
+				<div className="regular">
+					<AppBar
+						position="fixed"
+						variant="outlined"
+						style={{
+							background: false ? "#f50257" : "#175676",
+							color: "white",
+						}}
+					>
+						<Toolbar>
+							<Typography variant="h6">
+								Backpropagation Visualizer
+							</Typography>
+						</Toolbar>
+					</AppBar>
 
-				<Box display="flex" justifyContent="center" marginTop={10}>
-					{controlCenter}
-					<Box marginLeft={10}>
-						<div className="regular">
-							<PlayGround
-								trans={trans}
-								input={X[0]}
-								label={y[0]}
-								shapedWeights={weightsData}
-								shape={shape}
-								biases={biasesData}
-								weights={weights}
-								rects={rects}
-								links={links}
-								playing={
-									playing
-										? speed === 0
-											? "edgeForward"
-											: "edgeSlowed"
-										: "edgePaused"
-								}
-								show={playing}
-								nshow={this.state.nshow}
-								bshow={this.state.bshow}
-								microShow={this.state.microShow}
-								mode={mode}
-								backward={this.state.direction}
-								onClick={() => {
-									this.asyncPause();
-								}}
-							></PlayGround>
-						</div>
-					</Box>
-					{scatter}
-				</Box>
+					<Card
+						variant="outlined"
+						style={{
+							background: "#FAFAFA",
+							outlineColor: "white",
+							paddingBottom: "1em",
+						}}
+					>
+						<CardContent>
+							<Box
+								className="regular"
+								display="flex"
+								justifyContent="center"
+								marginTop={10}
+							>
+								{controlCenter}
+								<Box marginLeft={10}>
+									<PlayGround
+										trans={trans}
+										input={X[0]}
+										label={y[0]}
+										shapedWeights={weightsData}
+										shape={shape}
+										biases={biasesData}
+										weights={weights}
+										rects={rects}
+										links={links}
+										playing={
+											playing
+												? speed === 0
+													? "edgeForward"
+													: "edgeSlowed"
+												: "edgePaused"
+										}
+										show={playing}
+										nshow={this.state.nshow}
+										bshow={this.state.bshow}
+										microShow={this.state.microShow}
+										mode={mode}
+										backward={this.state.direction}
+										onClick={() => {
+											this.asyncPause();
+										}}
+									></PlayGround>
+								</Box>
+								{scatter}
+							</Box>
+						</CardContent>
+					</Card>
+				</div>
+
+				<Explanation />
 			</div>
 		);
 	}

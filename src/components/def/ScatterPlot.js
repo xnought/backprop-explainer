@@ -17,7 +17,7 @@ class ScatterPlot extends Component {
 			.attr("cx", (d) => d.x)
 			.attr("cy", (d) => d.y)
 			.attr("r", 2)
-			.style("fill", "#175676");
+			.style("fill", "grey");
 	}
 	/* This is where we initialize the Scatter Plot */
 	async componentDidMount() {
@@ -101,7 +101,7 @@ class ScatterPlot extends Component {
 
 		svg.select("#epic")
 			.attr("d", d3.line()(a))
-			.attr("stroke", "#F50257")
+			.attr("stroke", "black")
 			.attr("fill", "none");
 	}
 	//componentDidUpdate() {

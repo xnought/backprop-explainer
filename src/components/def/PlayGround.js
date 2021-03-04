@@ -6,6 +6,7 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
 import Legend from "./Legend";
+import Arrow from "./Arrow";
 import "./d3.css";
 
 class PlayGround extends Component {
@@ -65,7 +66,7 @@ class PlayGround extends Component {
 				<g transform={"scale(1)"}>
 					<path
 						d="M 750, 234 L 750, 300"
-						stroke={l != 0 ? "#F50257" : "#ededed"}
+						stroke={l != 0 ? "black" : "#ededed"}
 						className={this.props.playing}
 					></path>
 					<path
@@ -73,7 +74,7 @@ class PlayGround extends Component {
 							source: { x: 766, y: 315 },
 							target: { x: 880, y: 430 },
 						})}
-						stroke={l != 0 ? "#F50257" : "#ededed"}
+						stroke={l != 0 ? "black" : "#ededed"}
 						fill="none"
 						className={this.props.playing}
 					></path>
@@ -82,7 +83,7 @@ class PlayGround extends Component {
 							source: { x: 766, y: 250 },
 							target: { x: 880, y: 150 },
 						})}
-						stroke={l != 0 ? "#F50257" : "#ededed"}
+						stroke={l != 0 ? "black" : "#ededed"}
 						fill="none"
 						className={this.props.playing}
 					></path>
@@ -443,6 +444,10 @@ class PlayGround extends Component {
 							? this.props.trans.loss.dInputs.toFixed(2)
 							: ""}
 					</text>
+					<Arrow
+						source={{ x: 500, y: 0 }}
+						target={{ x: 100, y: 100 }}
+					/>
 				</g>
 			</svg>
 		);

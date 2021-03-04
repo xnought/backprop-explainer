@@ -37,7 +37,7 @@ function Legend() {
 				<text fontSize="12px" fill="grey" x={width / 2 - 2} y={18}>
 					|
 				</text>
-				<text fontSize="13px" fill="grey" x={width / 2 - 3.5} y={28}>
+				<text fontSize="13px" fill="grey" x={width / 2 - 4.5} y={30}>
 					0
 				</text>
 

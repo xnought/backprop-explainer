@@ -19,7 +19,7 @@ class Loss extends Component {
 
 		let yScale = d3
 			.scaleLinear()
-			.domain([0, 1])
+			.domain([1, 1])
 			.range([height - 2 * padding, 0]);
 		const svg = container
 			.append("svg")
@@ -60,7 +60,7 @@ class Loss extends Component {
 		let xScale = d3
 			.scaleLinear()
 			.domain([start, stop])
-			.range([0, width - 2 * padding]);
+			.range([1, width - 2 * padding]);
 
 		let lossMin = d3.min(lossArray);
 		let lossMax = d3.max(lossArray);
@@ -85,7 +85,7 @@ class Loss extends Component {
 			.call(yAxis.ticks(5));
 		svg.select("#line")
 			.attr("d", d3.line()(a))
-			.attr("stroke", "#F50257")
+			.attr("stroke", "black")
 			.attr("fill", "none");
 	}
 	render() {
