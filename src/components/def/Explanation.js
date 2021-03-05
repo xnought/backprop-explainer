@@ -101,12 +101,13 @@ const Explanation = () => (
 					</Box>
 
 					<Typography variant="body1" gutterBottom>
-						In the example above there is just three neurons, but in
-						a nerual network we can add many per layer. This will
-						only contribute to increasing complexity further. The
-						more complexity we can add the more we can tune each
-						parameter to custom fit a dataset. The question then
-						becomes how do we adjust the weights in a smart way.
+						As you can see in this three neuron network, we can
+						change the output alot by adding complexity to the
+						network. This will allow us to have more control of what
+						the output can be. But the next big question becomes,
+						how do we leverage this and tune the weights and biases
+						(the added complexity) in order to get the desired
+						result?
 					</Typography>
 				</CardContent>
 				<CardContent>

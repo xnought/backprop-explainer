@@ -46,7 +46,6 @@ class PlayGround extends Component {
 		let model = [];
 		if (this.props.mode) {
 			const { trans } = this.props;
-
 			//console.log(trans);
 			model = this.flatten(trans.model);
 			/* Now create array of output values from each neuron */
@@ -62,7 +61,7 @@ class PlayGround extends Component {
 			.x((d) => d.x)
 			.y((d) => d.y);
 		const playing = (
-			<svg id="p" width="800" height="500" overflow="visible">
+			<svg id="p" width="810" height="500" overflow="visible">
 				<g transform={"scale(1)"}>
 					<path
 						d="M 750, 234 L 750, 300"
@@ -72,7 +71,7 @@ class PlayGround extends Component {
 					<path
 						d={link({
 							source: { x: 766, y: 315 },
-							target: { x: 880, y: 430 },
+							target: { x: 890, y: 430 },
 						})}
 						stroke={l != 0 ? "black" : "#ededed"}
 						fill="none"
@@ -81,7 +80,7 @@ class PlayGround extends Component {
 					<path
 						d={link({
 							source: { x: 766, y: 250 },
-							target: { x: 880, y: 150 },
+							target: { x: 890, y: 150 },
 						})}
 						stroke={l != 0 ? "black" : "#ededed"}
 						fill="none"
@@ -339,8 +338,18 @@ class PlayGround extends Component {
 			</svg>
 		);
 
+		const VerticalArrow = (xStart, yStart, length, dirIsUp, color) => {
+			const vector = dirIsUp ? -length : length;
+			return (
+				<Arrow
+					source={{ x: xStart, y: yStart }}
+					target={{ x: xStart, y: yStart + vector }}
+					color={color}
+				/>
+			);
+		};
 		const notPlaying = (
-			<svg id="pp" width="800" height="500">
+			<svg id="pp" width="810" height="500">
 				<g id="gpp">
 					<path
 						d="M 750, 234 L 750, 300"
@@ -376,34 +385,46 @@ class PlayGround extends Component {
 								height={this.state.widths}
 								onClick={() => {
 									//console.log(model[i]);
-									console.log(d);
-									const svgGroup = d3
-										.select("#pp")
-										.select("g");
-									this.zoom(
-										svgGroup,
-										d3.easeExpInOut,
-										d.x - 16,
-										d.y,
-										this.state.zoom,
-										1500
-									);
-									this.setState({ micro: true });
+									//console.log(d);
+									//const svgGroup = d3
+									//.select("#pp")
+									//.select("g");
+									//this.zoom(
+									//svgGroup,
+									//d3.easeExpInOut,
+									//d.x - 16,
+									//d.y,
+									//this.state.zoom,
+									//1500
+									//);
+									//this.setState({ micro: true });
 								}}
 								fill="lightgrey"
 							></rect>
-
-							<text fill="blue" x={d.x + 32} y={d.y + 16}>
+							{model.length !== 0 && i > this.props.bshow
+								? i > 0
+									? VerticalArrow(
+											d.x + 16,
+											d.y + 16,
+											Math.abs(
+												1.2 * model[i - 1].dActStep
+											),
+											model[i - 1].dActStep < 0,
+											"grey"
+									  )
+									: ""
+								: ""}
+							<text fill="#8db600" x={d.x + 34} y={d.y + 12}>
 								{model.length !== 0 && i < this.props.nshow
 									? i > 0
 										? model[i - 1].output.toFixed(2)
 										: this.props.input
 									: ""}
 							</text>
-							<text fill="red" x={d.x - 40} y={d.y + 16}>
+							<text fill="#F50657" x={d.x + 34} y={d.y + 28}>
 								{model.length !== 0 && i > this.props.bshow
 									? i > 0
-										? model[i - 1].dInputsSum.toFixed(2)
+										? model[i - 1].dActStep.toPrecision(3)
 										: ""
 									: ""}
 							</text>
@@ -434,20 +455,9 @@ class PlayGround extends Component {
 					</text>
 					<text x={734} y={350}>
 						{this.props.mode && this.props.nshow > 18
-							? this.props.trans.loss.output.toFixed(2)
+							? this.props.trans.loss.output.toPrecision(3)
 							: ""}
 					</text>
-					<text x={734} y={295} fill="red">
-						{this.props.mode &&
-						this.props.bshow < Infinity &&
-						this.props.bshow > 0
-							? this.props.trans.loss.dInputs.toFixed(2)
-							: ""}
-					</text>
-					<Arrow
-						source={{ x: 500, y: 0 }}
-						target={{ x: 100, y: 100 }}
-					/>
 				</g>
 			</svg>
 		);

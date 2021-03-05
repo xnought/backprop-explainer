@@ -6,6 +6,7 @@ import {
 	Card,
 	CardContent,
 	CardActions,
+	Button,
 } from "@material-ui/core";
 
 class NestedFunction extends Component {
@@ -16,24 +17,48 @@ class NestedFunction extends Component {
 			output1: 0,
 			output2: 0,
 			output3: 0,
+			weights: [],
+			biases: [],
 		};
 		this.compute = this.compute.bind(this);
+		this.initParams = this.initParams.bind(this);
 	}
 	compute(input) {
+		const { weights, biases } = this.state;
 		const linfunc = (x, w, b) => w * x + b;
 		const relu = (x) => Math.max(0, x);
 
-		const output1 = linfunc(input, 0.5, 1).toFixed(3);
-		const output2 = linfunc(output1, 2.3, 0).toFixed(3);
-		const output3 = linfunc(output2, -0.2, 0.1).toFixed(3);
+		const output1 = linfunc(input, weights[0], biases[0]).toFixed(3);
+		const output2 = linfunc(output1, weights[1], biases[1]).toFixed(3);
+		const output3 = linfunc(output2, weights[2], biases[2]).toFixed(3);
 		this.setState({ input, output1, output2, output3 });
 	}
-	componentDidMount() {
+	genRandomArray(length) {
+		let arr = new Array(length);
+		for (let i = 0; i < arr.length; i++) {
+			arr[i] = +Math.random().toFixed(2);
+		}
+		return arr;
+	}
+	async initParams() {
+		const weights = this.genRandomArray(3);
+		const biases = this.genRandomArray(3);
+		this.setState({ weights, biases });
+	}
+	async componentDidMount() {
+		await this.initParams();
 		this.compute(34);
 	}
 
 	render() {
-		const { input, output1, output2, output3 } = this.state;
+		const {
+			input,
+			output1,
+			output2,
+			output3,
+			weights,
+			biases,
+		} = this.state;
 		const fixedInput = input.toFixed(3);
 		const outputArr = [
 			{ output: output1, color: "#8db600" },
@@ -42,7 +67,7 @@ class NestedFunction extends Component {
 		];
 		return (
 			<Box display="flex">
-				<Box width={575}>
+				<Box width={580}>
 					<Card variant="outlined">
 						<CardContent>
 							<Slider
@@ -59,6 +84,8 @@ class NestedFunction extends Component {
 										<path
 											d={`M${36} 16, ${100} 16`}
 											stroke={"#f50557"}
+											strokeDasharray="25, 4"
+											strokeWidth={3 * weights[0] + 0.2}
 										></path>
 										<text x={40} y={40} fill={"#f50557"}>
 											{fixedInput}
@@ -80,6 +107,16 @@ class NestedFunction extends Component {
 														200 + 100 * i
 													} 16`}
 													stroke={d.color}
+													strokeDasharray="25, 4"
+													strokeWidth={
+														i < 2
+															? 3 *
+																	weights[
+																		i + 1
+																	] +
+															  0.2
+															: 1
+													}
 												></path>
 												<text
 													x={140 + 100 * i}
@@ -98,11 +135,11 @@ class NestedFunction extends Component {
 								<Typography color="secondary" variant="inline">
 									{fixedInput}
 								</Typography>
-								) = 0.5(
+								) = {weights[0]}(
 								<Typography color="secondary" variant="inline">
 									{fixedInput}
 								</Typography>
-								) + 1 ={" "}
+								) + {biases[0]} ={" "}
 								<Typography
 									style={{ color: "#8db600" }}
 									variant="inline"
@@ -119,14 +156,14 @@ class NestedFunction extends Component {
 								>
 									{this.state.output1}
 								</Typography>
-								) = 2.3(
+								) = {weights[1]}(
 								<Typography
 									style={{ color: "#8db600" }}
 									variant="inline"
 								>
 									{this.state.output1}
 								</Typography>
-								) + 0 ={" "}
+								) + {biases[1]} ={" "}
 								<Typography
 									style={{ color: "#FF8F00" }}
 									variant="inline"
@@ -142,14 +179,14 @@ class NestedFunction extends Component {
 								>
 									{this.state.output2}
 								</Typography>
-								) = -0.2(
+								) = {weights[2]}(
 								<Typography
 									style={{ color: "#FF8F00" }}
 									variant="inline"
 								>
 									{this.state.output2}
 								</Typography>
-								) + 0.1 ={" "}
+								) + {biases[2]}={" "}
 								<Typography
 									style={{ color: "blue" }}
 									variant="inline"
@@ -158,6 +195,17 @@ class NestedFunction extends Component {
 								</Typography>
 							</Typography>
 						</CardContent>
+						<CardActions>
+							<Button
+								size="small"
+								onClick={async () => {
+									await this.initParams();
+									//this.compute(this.state.input);
+								}}
+							>
+								new Weights and biases
+							</Button>
+						</CardActions>
 					</Card>
 				</Box>
 			</Box>

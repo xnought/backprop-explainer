@@ -92,7 +92,7 @@ class App extends Component {
 		this.anim = this.anim.bind(this);
 	}
 
-	anim = async () => {
+	anim = async (nn) => {
 		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 		const ms = 500;
 		const l = this.state.shape.reduce((a, b) => a + b) - 1;
@@ -136,19 +136,47 @@ class App extends Component {
 		await timer(ms);
 		this.setState({ bshow: l });
 
-		await timer(ms);
-		this.setState({ bshow: (this.state.bshow -= 1) });
+		//await timer(ms);
+		//this.setState({ bshow: (this.state.bshow -= 1) });
 
-		let e = this.state.shape.length - 2;
-		while (this.state.bshow > 0) {
-			let curr = this.state.shape[e];
-			await timer(ms);
-			this.setState({
-				bshow: (this.state.bshow -= curr),
-			});
-			e--;
+		//let e = this.state.shape.length - 2;
+		//while (this.state.bshow > 0) {
+		//let curr = this.state.shape[e];
+		//await timer(ms);
+		//this.setState({
+		//bshow: (this.state.bshow -= curr),
+		//});
+		//e--;
+		//}
+
+		for (let layer = nn.model.length - 1; layer >= 0; layer--) {
+			for (
+				let neuron = nn.model[layer].length - 1;
+				neuron >= 0;
+				neuron--
+			) {
+				for (let i = 0; i < 0.01; i += 0.001) {
+					nn.throttleForward(neuron, layer, i, this.state.data.y[0]);
+					this.setState({
+						trans: nn,
+					});
+					await timer(1);
+				}
+				for (let i = 0.01; i > 0; i -= 0.001) {
+					nn.throttleForward(neuron, layer, -i, this.state.data.y[0]);
+					this.setState({
+						trans: nn,
+					});
+					await timer(1);
+				}
+				await timer(1);
+				this.setState({
+					bshow: (this.state.bshow -= 1),
+				});
+			}
 		}
 
+		await timer(1000);
 		this.setState({ direction: "edgePaused" });
 	};
 	initNeuralNetwork(shape) {
@@ -532,7 +560,7 @@ class App extends Component {
 			<CardActions>
 				<Button
 					onClick={async () => {
-						await this.anim();
+						await this.anim(this.state.trans);
 					}}
 				>
 					REPLAY
@@ -595,15 +623,7 @@ class App extends Component {
 									});
 									await timer(1000);
 									this.setState({ nshow: 1 });
-									const anim = async () => {
-										while (this.state.nshow < 19) {
-											await timer(1000);
-											this.setState({
-												nshow: (this.state.nshow += 8),
-											});
-										}
-									};
-									await this.anim();
+									await this.anim(nn);
 								}}
 							>
 								<Typography variant="h4">
@@ -613,7 +633,7 @@ class App extends Component {
 						</Tooltip>
 						<Typography variant="h6">
 							loss:
-							{loss == null ? "" : loss.toFixed(6)}
+							{loss == null ? "" : loss.toPrecision(6)}
 						</Typography>
 						{this.state.mode ? controlsBackProp : controlsReg}
 						<CardActions></CardActions>
@@ -786,7 +806,7 @@ class App extends Component {
 					>
 						<Toolbar>
 							<Typography variant="h6">
-								Backpropagation Visualizer
+								Backpropagation Explainer
 							</Typography>
 						</Toolbar>
 					</AppBar>

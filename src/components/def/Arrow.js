@@ -1,5 +1,5 @@
 import React from "react";
-const Legend = ({ source, target }) => (
+const Legend = ({ source, target, color }) => (
 	<g>
 		<defs>
 			<marker
@@ -10,15 +10,15 @@ const Legend = ({ source, target }) => (
 				refX="0.1"
 				refY="2"
 			>
-				<path d="M0,0 V4 L2,2 Z" fill="blue" />
+				<path d="M0,0 V4 L2,2 Z" fill={color} />
 			</marker>
 		</defs>
 		<path
 			id="arrow-line"
-			marker-end="url(#head)"
-			stroke-width="4"
+			markerEnd="url(#head)"
+			strokeWidth="3"
 			fill="none"
-			stroke="blue"
+			stroke={color}
 			d={`M${source.x},${source.y}, ${target.x}, ${target.y}`}
 		/>
 	</g>
