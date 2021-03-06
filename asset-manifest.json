@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/Backpropagation-Visualizer/static/css/main.15abd304.chunk.css",
-    "main.js": "/Backpropagation-Visualizer/static/js/main.639443c8.chunk.js",
-    "main.js.map": "/Backpropagation-Visualizer/static/js/main.639443c8.chunk.js.map",
+    "main.js": "/Backpropagation-Visualizer/static/js/main.ba458f5f.chunk.js",
+    "main.js.map": "/Backpropagation-Visualizer/static/js/main.ba458f5f.chunk.js.map",
     "runtime-main.js": "/Backpropagation-Visualizer/static/js/runtime-main.4fc7e846.js",
     "runtime-main.js.map": "/Backpropagation-Visualizer/static/js/runtime-main.4fc7e846.js.map",
     "static/js/2.9a7c561e.chunk.js": "/Backpropagation-Visualizer/static/js/2.9a7c561e.chunk.js",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.4fc7e846.js",
     "static/js/2.9a7c561e.chunk.js",
     "static/css/main.15abd304.chunk.css",
-    "static/js/main.639443c8.chunk.js"
+    "static/js/main.ba458f5f.chunk.js"
   ]
 }
