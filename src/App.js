@@ -1,5 +1,5 @@
 /* 
-  Donny Bertucci: @xnought
+  @author: Donny Bertucci: xnought
   Summary: 
 	App.js is the main controller of all logic of the backprop explainer
 */
@@ -74,12 +74,12 @@ class App extends Component {
 
 		/* Cleaned up functions start */
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
+		this.run = this.run.bind(this);
+		this.genTensorData = this.genTensorData.bind(this);
 
 		/* Cleaned up functions end */
 
 		/* Prototype: Functions Binds to "this" */
-		this.run = this.run.bind(this);
-		this.genTensorData = this.genTensorData.bind(this);
 		this.mutate = this.mutate.bind(this);
 
 		this.train = this.train.bind(this);
@@ -149,12 +149,12 @@ class App extends Component {
 			return undefined;
 		});
 	}
+
 	async run() {
-		let playing = !this.state.controls.playing;
+		const playing = !this.state.controls.playing;
 		this.mutate("controls", "playing", playing);
 		if (playing === true) {
 			await this.train(this.state.X, this.state.y);
-			console.log("epic");
 		}
 	}
 
@@ -250,16 +250,20 @@ class App extends Component {
 		tf.dispose(XTensor);
 		tf.dispose(yTensor);
 	}
-	async genTensorData(eqn, scaled) {
+	async genTensorData(eqn, scaled, volume) {
 		await tf.ready();
 		tf.tidy(() => {
-			let XTensor = tf.linspace(-this.state.scale, this.state.scale, 50);
-			let yTensor;
-			yTensor = tf.mul(eqn(XTensor), scaled);
-			let yhatTensor = tf.zerosLike(XTensor);
-			let X = tools.tensorToArray(XTensor);
-			let y = tools.tensorToArray(yTensor);
-			let yhat = tools.tensorToArray(yhatTensor);
+			const XTensor = tf.linspace(
+				-this.state.scale,
+				this.state.scale,
+				volume
+			);
+			const yTensor = tf.mul(eqn(XTensor), scaled);
+			const yhatTensor = tf.zerosLike(XTensor);
+			const X = tools.tensorToArray(XTensor);
+			const y = tools.tensorToArray(yTensor);
+			const yhat = tools.tensorToArray(yhatTensor);
+
 			this.setState({
 				X,
 				y,
@@ -307,7 +311,7 @@ class App extends Component {
 
 			return undefined;
 		});
-		await this.genTensorData(eqn, scale);
+		await this.genTensorData(eqn, scale, 50);
 		const model = tf.tidy(() => {
 			return this.modelCompile(this.state.lr);
 		});
@@ -328,7 +332,7 @@ class App extends Component {
 	}
 	async componentDidMount() {
 		tf.setBackend("cpu");
-		this.genTensorData(tf.sin, this.state.scale);
+		this.genTensorData(tf.sin, this.state.scale, 50);
 		this.initNeuralNetwork(this.state.shape);
 		const model = tf.tidy(() => {
 			return this.modelCompile(0.01);
@@ -574,7 +578,8 @@ class App extends Component {
 											tf.tidy(() => {
 												this.genTensorData(
 													item.eqn,
-													item.scale
+													item.scale,
+													50
 												);
 												return undefined;
 											});
