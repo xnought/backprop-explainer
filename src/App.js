@@ -7,7 +7,6 @@
 /* ****** START IMPORTS ****** */
 import React, { Component } from "react";
 import * as tf from "@tensorflow/tfjs";
-import * as d3 from "d3";
 import "./App.css";
 import {
 	NeuralNetworkComponent,
@@ -15,17 +14,24 @@ import {
 	Loss,
 	Explanation,
 } from "./components/exports";
-// prettier-ignore
-import{ 
-	Typography, Box, AppBar, Toolbar,
-	Card, CardContent, IconButton,
-	CardActions, Chip, Button,
-	Fab, Slider, Tooltip,
+import {
+	Typography,
+	Box,
+	AppBar,
+	Toolbar,
+	Card,
+	CardContent,
+	IconButton,
+	CardActions,
+	Chip,
+	Button,
+	Fab,
+	Slider,
+	Tooltip,
 } from "@material-ui/core";
 import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
-/* Import Neural Network mini library and destructure utility tools */
 import { NeuralNetwork, tools } from "./nn/exports";
-const { flatten, formatWeightArray, tensorToArray } = tools;
+import { draw } from "./Utils/exports";
 /* ****** END IMPORTS ****** */
 
 class App extends Component {
@@ -37,40 +43,39 @@ class App extends Component {
 		*/
 		this.state = {
 			/* State for NN */
+			tensorFlowNN: null,
+			miniNN: null,
 			X: [],
 			y: [],
 			yhat: [],
-
 			shape: [1, 4, 4, 1],
 			lr: 0.01,
-
 			epoch: 0,
-
 			biasesData: [],
 			weightsData: [],
-
 			lossArray: [],
 			loss: null,
+			scale: 5,
+			rects: [],
+			weights: [],
+			links: [],
+			direction: "edgePaused",
+			curve: "sin",
 
 			/* State for Components */
-			sliderVal: 2,
-			scale: 5,
-			curve: "sin",
 			controls: {
 				playing: false,
 				speed: 0,
 			},
-			rects: [],
-			weights: [],
-			links: [],
-			tensorFlowNN: null,
+			sliderVal: 2,
 			mode: false,
-			miniNN: null,
-			direction: "edgePaused",
-
-			/* Utility state */
 			stopRender: false,
 		};
+
+		/* Cleaned up functions start */
+		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
+
+		/* Cleaned up functions end */
 
 		/* Prototype: Functions Binds to "this" */
 		this.run = this.run.bind(this);
@@ -83,71 +88,57 @@ class App extends Component {
 		this.asyncPause = this.asyncPause.bind(this);
 		this.resetParameters = this.resetParameters.bind(this);
 		this.changeModelLr = this.changeModelLr.bind(this);
-		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
 		this.anim = this.anim.bind(this);
 	}
 
 	async anim() {}
+
 	initNeuralNetwork(shape) {
-		if (!this.state.controls.playing) {
-			const rw = 32;
-			const rh = 32;
-			let xScale = d3.scaleLinear().domain([0, 100]).range([50, 750]);
-			let yScale = d3.scaleLinear().domain([0, 100]).range([500, 0]);
-			let start = { x: 50 - rw / 2, y: 250 - rh / 2 };
-			let stop = { x: 750 - rw / 2, y: 250 - rh / 2 };
-			const link = d3
-				.linkHorizontal()
-				.x((d) => d.x + rw / 2)
-				.y((d) => d.y + rh / 2);
-			/* First we figure our how to create the neurons */
-			/* GIVEN A SHAPE OF [1,2,2,1] */
+		const { controls } = this.state;
+		const { playing } = controls;
+
+		// If we are not training the tensorflow neural network
+		if (!playing) {
+			/* ******START SETUP****** */
+			const squareWidth = 32;
+			const xConstraints = { domain: [0, 100], range: [50, 750] };
+			const yConstraints = { domain: [0, 100], range: [500, 0] };
+			//prettier-ignore
+			const {xScale, yScale} = draw.generateLinearScale(xConstraints,yConstraints);
+			// Create the starting point and the stopping point for the neural network
+			const start = { x: 50 - squareWidth / 2, y: 250 - squareWidth / 2 };
+			const stop = { x: 750 - squareWidth / 2, y: 250 - squareWidth / 2 };
+			// generate function to create paths from (x,y) to (x,y)
+			const linksGenerator = draw.generateLink(squareWidth / 2);
+			// how the layers are proptioned compared to the linear scale
 			const layerProportion = [0, 25, 50, 75, 0];
-			let ns = [];
-			let flatns = [];
-			ns.push([start]);
-			flatns.push(start);
-			for (let layer = 1; layer < shape.length - 1; layer++) {
-				let dense = [];
-				for (let neuron = 0; neuron < shape[layer]; neuron++) {
-					/* First generate neuron */
-					let aaron = {
-						x: xScale(layerProportion[layer]) - rw / 2,
-						y: yScale(92 - neuron * 12) - rh / 2,
-					};
-					dense.push(aaron);
-					flatns.push(aaron);
-				}
-				ns.push(dense);
-			}
-			flatns.push(stop);
-			ns.push([stop]);
+			/* ******END SETUP****** */
 
-			/* We start to iterate over ns */
-			let links = [];
-			for (let layer = shape.length - 1; layer > 0; layer--) {
-				let interval = -14.5;
-				for (
-					let prevNeuron = 0;
-					prevNeuron < shape[layer - 1];
-					prevNeuron++
-				) {
-					for (let neuron = 0; neuron < shape[layer]; neuron++) {
-						links.push(
-							link({
-								source: ns[layer - 1][prevNeuron],
-								target: ns[layer][neuron],
-							})
-						);
-					}
-					interval += 3.5;
-				}
-			}
+			/* START GENERATING THE GRAPH */
+			const {
+				flattenedNeurons,
+				shapedNeurons,
+			} = draw.generateNeuronPlacement(
+				shape,
+				layerProportion,
+				squareWidth,
+				start,
+				stop,
+				xScale,
+				yScale
+			);
+			const links = draw.generateLinksPlacement(
+				shape,
+				shapedNeurons,
+				linksGenerator
+			);
+			/* END GENERATING THE GRAPH */
 
-			this.setState({ rects: flatns });
-			this.setState({ links });
-		} else if (this.state.controls.playing) {
-			let flattenedWeights = flatten(this.state.weightsData);
+			//update the state of the links and rectangles to be rendered
+			this.setState({ links, rects: flattenedNeurons });
+		} else if (playing) {
+			const flattenedWeights = tools.flatten(this.state.weightsData);
+			//update the weights to be rendered
 			this.setState({ weights: flattenedWeights });
 		}
 	}
@@ -247,7 +238,7 @@ class App extends Component {
 			});
 			tf.tidy(() => {
 				let yhatTensor = model.predict(XTensor);
-				let yhat = tensorToArray(yhatTensor);
+				let yhat = tools.tensorToArray(yhatTensor);
 				let loss = tf.losses.meanSquaredError(y, yhat).dataSync()[0];
 				this.printParameters(model, loss, yhat, this.state.epoch + 1);
 				return undefined;
@@ -266,9 +257,9 @@ class App extends Component {
 			let yTensor;
 			yTensor = tf.mul(eqn(XTensor), scaled);
 			let yhatTensor = tf.zerosLike(XTensor);
-			let X = tensorToArray(XTensor);
-			let y = tensorToArray(yTensor);
-			let yhat = tensorToArray(yhatTensor);
+			let X = tools.tensorToArray(XTensor);
+			let y = tools.tensorToArray(yTensor);
+			let yhat = tools.tensorToArray(yhatTensor);
 			this.setState({
 				X,
 				y,
@@ -477,7 +468,7 @@ class App extends Component {
 										new Promise((res) =>
 											setTimeout(res, ms)
 										);
-									let formattedWeights = formatWeightArray(
+									let formattedWeights = tools.formatWeightArray(
 										weightsData,
 										shape
 									);
