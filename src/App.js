@@ -60,8 +60,8 @@ class App extends Component {
 
 			weights: [],
 			shapedWeights: [],
+			shapedRects: [],
 
-			links: [],
 			shapedLinks: [],
 
 			direction: "edgePaused",
@@ -126,18 +126,19 @@ class App extends Component {
 				xScale,
 				yScale
 			);
-			const { links, layerLinks } = draw.generateLinksPlacement(
+			const layerLinks = draw.generateLinksPlacement(
 				shape,
 				shapedNeurons,
 				linksGenerator
 			);
 			/* END GENERATING THE GRAPH */
 
+			shapedNeurons.splice(0, 1); //in order for it to be lined up with the nn model
 			//update the state of the links and rectangles to be rendered
 			this.setState({
-				links,
 				shapedLinks: layerLinks,
 				rects: flattenedNeurons,
+				shapedRects: shapedNeurons,
 			});
 		} else if (playing) {
 			const { weightsData, shape } = this.state;
@@ -328,6 +329,7 @@ class App extends Component {
 			loss: null,
 			weights: [],
 			tensorFlowNN: model,
+			shapedWeights: [],
 			lossArray: [],
 		});
 		tf.dispose(optimizer);
@@ -365,7 +367,6 @@ class App extends Component {
 			biasesData,
 			yhat,
 			rects,
-			links,
 			weights,
 			mode,
 			epoch,
@@ -373,6 +374,9 @@ class App extends Component {
 			lr,
 			loss,
 			controls,
+			shapedWeights,
+			shapedLinks,
+			shapedRects,
 		} = this.state;
 		const { playing, speed } = controls;
 
@@ -672,12 +676,13 @@ class App extends Component {
 					miniNN={miniNN}
 					input={X[0]}
 					label={y[0]}
-					shapedWeights={weightsData}
+					shapedWeights={shapedWeights}
+					shapedLinks={shapedLinks}
+					shapedRects={shapedRects}
 					shape={shape}
 					biases={biasesData}
 					weights={weights}
 					rects={rects}
-					links={links}
 					playing={
 						playing
 							? speed === 0

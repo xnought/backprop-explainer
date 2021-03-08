@@ -18,24 +18,37 @@ class NeuralNetworkComponent extends Component {
 		}
 		return flattendArray;
 	}
+	isEmpty(array) {
+		return array.length === 0;
+	}
+	isUndefined(val) {
+		return typeof val === "undefined";
+	}
+	isUndefined3d(array3d, i, j, k) {
+		return (
+			this.isUndefined(array3d[i]) ||
+			this.isUndefined(array3d[i][j]) ||
+			this.isUndefined(array3d[i][j][k])
+		);
+	}
 
 	render() {
-		const { playing, weights, mode, links, rects } = this.props;
+		const {
+			playing,
+			mode,
+			shapedLinks,
+			shapedWeights,
+			shapedRects,
+			miniNN,
+		} = this.props;
 		const link = d3
 			.linkHorizontal()
 			.x((d) => d.x)
 			.y((d) => d.y);
 		const negWeight = "#D62839";
 		const posWeight = "#4BA3C3";
+		const graphConnectionColor = "black";
 		const squareWidth = 32;
-		let model = [];
-		if (mode) {
-			const { miniNN } = this.props;
-			//console.log(miniNN);
-			model = this.flatten(miniNN.model);
-			/* Now create array of output values from each neuron */
-		}
-		let l = weights.length;
 
 		const VerticalArrow = (xStart, yStart, length, dirIsUp, color) => {
 			const vector = dirIsUp ? -length : length;
@@ -53,7 +66,7 @@ class NeuralNetworkComponent extends Component {
 				<g>
 					<path
 						d="M 750, 234 L 750, 300"
-						stroke={l != 0 ? "black" : "#ededed"}
+						stroke={graphConnectionColor}
 						className={playing}
 					></path>
 					<path
@@ -61,7 +74,7 @@ class NeuralNetworkComponent extends Component {
 							source: { x: 766, y: 315 },
 							target: { x: 890, y: 430 },
 						})}
-						stroke={l != 0 ? "black" : "#ededed"}
+						stroke={graphConnectionColor}
 						fill="none"
 						className={playing}
 					></path>
@@ -70,53 +83,78 @@ class NeuralNetworkComponent extends Component {
 							source: { x: 766, y: 250 },
 							target: { x: 890, y: 150 },
 						})}
-						stroke={l != 0 ? "black" : "#ededed"}
+						stroke={graphConnectionColor}
 						fill="none"
 						className={playing}
 					></path>
-					{links.map((d, i) => (
-						<path
-							key={i}
-							d={d}
-							className={playing}
-							strokeWidth={
-								l === 0 ? 1 : Math.pow(weights[i], 2) + 0.1
-							}
-							stroke={
-								l !== 0
-									? weights[i] > 0
-										? posWeight
-										: negWeight
-									: "#ededed"
-							}
-							fill="none"
-						></path>
-					))}
-					{rects.map((d, i) => (
-						<g>
-							<rect
-								key={i}
-								x={d.x}
-								y={d.y}
-								width={squareWidth}
-								height={squareWidth}
-								fill="lightgrey"
-							></rect>
-							{model.length !== 0 && mode
-								? i > 0
-									? VerticalArrow(
-											d.x + 16,
-											d.y + 16,
-											Math.abs(
-												1.2 * model[i - 1].dActStep
-											),
-											model[i - 1].dActStep < 0,
-											"grey"
-									  )
-									: ""
-								: ""}
-						</g>
-					))}
+					{shapedLinks.map((layer, i) =>
+						layer.map((neuron, j) =>
+							neuron.map((d, k) => {
+								const isUndefined = this.isUndefined3d(
+									shapedWeights,
+									i,
+									j,
+									k
+								);
+								const currentWeight = isUndefined
+									? []
+									: shapedWeights[i][j][k];
+								const sw = isUndefined
+									? 1
+									: 2 * Math.abs(currentWeight) + 0.1;
+								const s = isUndefined
+									? "lightgrey"
+									: currentWeight > 0
+									? posWeight
+									: negWeight;
+								return (
+									<path
+										key={k}
+										d={d}
+										className={playing}
+										strokeWidth={sw}
+										stroke={s}
+										fill="none"
+									></path>
+								);
+							})
+						)
+					)}
+					<rect
+						x={34}
+						y={234}
+						width={squareWidth}
+						height={squareWidth}
+						fill="darkgrey"
+					></rect>
+
+					{shapedRects.map((neuron, i) =>
+						neuron.map((d, j) => {
+							const curr =
+								miniNN !== null ? miniNN.model[i][j] : null;
+							return (
+								<g>
+									<rect
+										x={d.x}
+										y={d.y}
+										width={squareWidth}
+										height={squareWidth}
+										fill="darkgrey"
+									></rect>
+
+									{miniNN !== null && mode
+										? VerticalArrow(
+												d.x + 16,
+												d.y + 16,
+												Math.abs(curr.dActStep),
+												curr.dActStep < 0,
+												"grey"
+										  )
+										: ""}
+								</g>
+							);
+						})
+					)}
 
 					<rect
 						x={734}
