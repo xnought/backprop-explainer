@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./d3.css";
+import "../d3.css";
 import * as d3 from "d3";
 
 class ScatterPlot extends Component {
@@ -17,7 +17,7 @@ class ScatterPlot extends Component {
 			.attr("cx", (d) => d.x)
 			.attr("cy", (d) => d.y)
 			.attr("r", 2)
-			.style("fill", "#F50257");
+			.style("fill", "grey");
 	}
 	/* This is where we initialize the Scatter Plot */
 	async componentDidMount() {

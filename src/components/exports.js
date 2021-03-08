@@ -1,4 +1,8 @@
-import PlayGround from "./def/PlayGround";
-import ScatterPlot from "./def/ScatterPlot";
+/* EXPORTS TO CLEAN UP IMPORT OF COMPONENTS */
 
-export { PlayGround, ScatterPlot };
+import NeuralNetworkComponent from "./implementations/graphs/NeuralNetworkComponent";
+import ScatterPlot from "./implementations/graphs/ScatterPlot";
+import Loss from "./implementations/graphs/Loss";
+import Explanation from "./implementations/article/Explanation";
+
+export { NeuralNetworkComponent, ScatterPlot, Loss, Explanation };
