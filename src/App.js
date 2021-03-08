@@ -57,8 +57,13 @@ class App extends Component {
 			loss: null,
 			scale: 5,
 			rects: [],
+
 			weights: [],
+			shapedWeights: [],
+
 			links: [],
+			shapedLinks: [],
+
 			direction: "edgePaused",
 			curve: "sin",
 
@@ -121,7 +126,7 @@ class App extends Component {
 				xScale,
 				yScale
 			);
-			const links = draw.generateLinksPlacement(
+			const { links, layerLinks } = draw.generateLinksPlacement(
 				shape,
 				shapedNeurons,
 				linksGenerator
@@ -129,11 +134,18 @@ class App extends Component {
 			/* END GENERATING THE GRAPH */
 
 			//update the state of the links and rectangles to be rendered
-			this.setState({ links, rects: flattenedNeurons });
+			this.setState({
+				links,
+				shapedLinks: layerLinks,
+				rects: flattenedNeurons,
+			});
 		} else if (playing) {
-			const flattenedWeights = tools.flatten(this.state.weightsData);
+			const { weightsData, shape } = this.state;
+			const flattenedWeights = tools.flatten(weightsData);
 			//update the weights to be rendered
-			this.setState({ weights: flattenedWeights });
+			const shapedWeights = tools.formatWeightArray(weightsData, shape);
+
+			this.setState({ weights: flattenedWeights, shapedWeights });
 		}
 	}
 

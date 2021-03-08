@@ -46,25 +46,35 @@ export function generateNeuronPlacement(
 
 	return { flattenedNeurons, shapedNeurons };
 }
+
 export function generateLinksPlacement(shape, shapedNeurons, linksGenerator) {
 	/* We start to iterate over ns */
 	let links = [];
+	let perLink = [];
+	let layerLinks = [];
+	let neuronLinks = [];
 	for (let layer = shape.length - 1; layer > 0; layer--) {
-		//prettier-ignore
-		for (
-				let prevNeuron = 0;
-				prevNeuron < shape[layer - 1];
-				prevNeuron++
-			) {
-				for (let neuron = 0; neuron < shape[layer]; neuron++) {
-					links.push(
-						linksGenerator({
-							source: shapedNeurons[layer - 1][prevNeuron],
-							target: shapedNeurons[layer][neuron],
-						})
-					);
-				}
+		neuronLinks = [];
+		for (let prevNeuron = 0; prevNeuron < shape[layer - 1]; prevNeuron++) {
+			perLink = [];
+			for (let neuron = 0; neuron < shape[layer]; neuron++) {
+				links.push(
+					linksGenerator({
+						source: shapedNeurons[layer - 1][prevNeuron],
+						target: shapedNeurons[layer][neuron],
+					})
+				);
+				perLink.push(
+					linksGenerator({
+						source: shapedNeurons[layer - 1][prevNeuron],
+						target: shapedNeurons[layer][neuron],
+					})
+				);
 			}
+			neuronLinks.push(perLink);
+		}
+		layerLinks.push(neuronLinks);
 	}
-	return links;
+
+	return { links, layerLinks };
 }
