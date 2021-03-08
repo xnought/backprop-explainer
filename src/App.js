@@ -657,7 +657,7 @@ class App extends Component {
 		const neuralNetwork = (
 			<Box marginLeft={10}>
 				<NeuralNetworkComponent
-					trans={miniNN}
+					miniNN={miniNN}
 					input={X[0]}
 					label={y[0]}
 					shapedWeights={weightsData}
