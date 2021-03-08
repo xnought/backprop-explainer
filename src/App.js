@@ -72,21 +72,15 @@ class App extends Component {
 			stopRender: false,
 		};
 
-		/* Cleaned up functions start */
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
 		this.run = this.run.bind(this);
 		this.genTensorData = this.genTensorData.bind(this);
-
-		/* Cleaned up functions end */
-
-		/* Prototype: Functions Binds to "this" */
 		this.mutate = this.mutate.bind(this);
-
 		this.train = this.train.bind(this);
 		this.printParameters = this.printParameters.bind(this);
 		this.reset = this.reset.bind(this);
-		this.asyncPause = this.asyncPause.bind(this);
 		this.resetParameters = this.resetParameters.bind(this);
+		this.asyncPause = this.asyncPause.bind(this);
 		this.changeModelLr = this.changeModelLr.bind(this);
 		this.anim = this.anim.bind(this);
 	}
@@ -215,23 +209,25 @@ class App extends Component {
 		return model;
 	}
 	async train(X, y) {
+		/* START SETUP */
 		const XTensor = tf.tidy(() => {
 			return tf.tensor(X);
 		});
 		const yTensor = tf.tidy(() => {
 			return tf.tensor(y);
 		});
-
 		const model = tf.tidy(() => {
 			return this.state.tensorFlowNN;
 		});
 		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+		/* START SETUP */
+
 		///* Until broken by user */
 		let play = this.state.controls.playing;
 		////let epoch = 0;
 		while (play !== false) {
 			this.setState({ stopRender: true });
-			const { playing /* speed */ } = this.state.controls;
+			const { playing, speed } = this.state.controls;
 			play = playing;
 			await model.fit(XTensor, yTensor, {
 				epochs: 1,
@@ -244,7 +240,7 @@ class App extends Component {
 				return undefined;
 			});
 			this.setState({ stopRender: false });
-			await timer(this.state.controls.speed);
+			await timer(speed);
 		}
 		this.setState({ tensorFlowNN: model });
 		tf.dispose(XTensor);
@@ -280,8 +276,7 @@ class App extends Component {
 				Array.from(model.getWeights()[i].dataSync())
 			);
 		}
-
-		let lossArray = [...this.state.lossArray, loss];
+		const lossArray = [...this.state.lossArray, loss];
 		this.setState({
 			biasesData,
 			weightsData,
@@ -325,7 +320,6 @@ class App extends Component {
 		});
 		tf.dispose(optimizer);
 	}
-
 	async reset(scale) {
 		this.asyncPause();
 		this.resetParameters(scale);
