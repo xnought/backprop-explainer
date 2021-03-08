@@ -1,85 +1,80 @@
 /* 
   Donny Bertucci: @xnought
   Summary: 
-    This file acts as the highest state and act as the controls 
-    for the entire application
+	App.js is the main controller of all logic of the backprop explainer
 */
+
+/* ****** START IMPORTS ****** */
 import React, { Component } from "react";
-import {
-	Typography,
-	Box,
-	AppBar,
-	Toolbar,
-	Card,
-	CardContent,
-	IconButton,
-	CardActions,
-	Chip,
-	Button,
-	Fab,
-	Slider,
-	Tooltip,
-} from "@material-ui/core";
-import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
 import * as tf from "@tensorflow/tfjs";
 import * as d3 from "d3";
+import "./App.css";
 import {
-	PlayGround,
+	NeuralNetworkComponent,
 	ScatterPlot,
 	Loss,
 	Explanation,
 } from "./components/exports";
+// prettier-ignore
+import{ 
+	Typography, Box, AppBar, Toolbar,
+	Card, CardContent, IconButton,
+	CardActions, Chip, Button,
+	Fab, Slider, Tooltip,
+} from "@material-ui/core";
+import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
+/* Import Neural Network mini library and destructure utility tools */
 import { NeuralNetwork, tools } from "./nn/exports";
-import "./App.css";
 const { flatten, formatWeightArray, tensorToArray } = tools;
+/* ****** END IMPORTS ****** */
 
 class App extends Component {
 	constructor(props) {
 		super(props);
-		/* Treat the app state as the global state */
+		/* 
+			App js state will be the main controller of logic to components
+			Note to self: Keep state as shallow as possible to avoid complexity with this.setState()
+		*/
 		this.state = {
-			loss: null,
-			duringEpoch: false,
-			shape: [1, 8, 8, 1],
-			epoch: 0,
+			/* State for NN */
+			X: [],
+			y: [],
 			yhat: [],
+
+			shape: [1, 4, 4, 1],
+			lr: 0.01,
+
+			epoch: 0,
+
 			biasesData: [],
 			weightsData: [],
-			lr: 0.01,
-			data: {
-				X: [],
-				y: [],
-			},
+
+			lossArray: [],
+			loss: null,
+
+			/* State for Components */
+			sliderVal: 2,
 			scale: 5,
 			curve: "sin",
 			controls: {
 				playing: false,
 				speed: 0,
 			},
-			nshow: 0,
-			bshow: Infinity,
-			microShow: 0,
 			rects: [],
 			weights: [],
 			links: [],
-			nn: null,
+			tensorFlowNN: null,
 			mode: false,
-			trans: null,
-			macro: false,
+			miniNN: null,
 			direction: "edgePaused",
-			subEpoch: "forward",
-			sliderVal: 2,
-			vSliderVal: 2,
-			vSliderConv: 6,
-			lossArray: [],
+
+			/* Utility state */
+			stopRender: false,
 		};
 
 		/* Prototype: Functions Binds to "this" */
-		/* Main Logic */
 		this.run = this.run.bind(this);
-		/* Neural Network Logic */
 		this.genTensorData = this.genTensorData.bind(this);
-		/* Mutators of State */
 		this.mutate = this.mutate.bind(this);
 
 		this.train = this.train.bind(this);
@@ -92,93 +87,7 @@ class App extends Component {
 		this.anim = this.anim.bind(this);
 	}
 
-	anim = async (nn) => {
-		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
-		const ms = 500;
-		const l = this.state.shape.reduce((a, b) => a + b) - 1;
-
-		this.setState({
-			...this.state,
-			subEpoch: "forward",
-			direction: "edgeForward",
-			nshow: 0,
-			bshow: Infinity,
-		});
-		await timer(ms);
-
-		this.setState({ nshow: 1 });
-		let i = 1;
-		while (this.state.nshow < l) {
-			let curr = this.state.shape[i];
-			await timer(ms);
-			this.setState({
-				nshow: (this.state.nshow += curr),
-			});
-			i++;
-		}
-		await timer(ms);
-		this.setState({
-			nshow: (this.state.nshow += 1),
-		});
-		await timer(ms);
-		this.setState({
-			nshow: (this.state.nshow += 1),
-		});
-
-		this.setState({ bshow: Infinity });
-		/* Pause! now go backward */
-		this.setState({
-			...this.state,
-			direction: "edgeBackward",
-			subEpoch: "backward",
-		});
-
-		await timer(ms);
-		this.setState({ bshow: l });
-
-		//await timer(ms);
-		//this.setState({ bshow: (this.state.bshow -= 1) });
-
-		//let e = this.state.shape.length - 2;
-		//while (this.state.bshow > 0) {
-		//let curr = this.state.shape[e];
-		//await timer(ms);
-		//this.setState({
-		//bshow: (this.state.bshow -= curr),
-		//});
-		//e--;
-		//}
-
-		for (let layer = nn.model.length - 1; layer >= 0; layer--) {
-			for (
-				let neuron = nn.model[layer].length - 1;
-				neuron >= 0;
-				neuron--
-			) {
-				for (let i = 0; i < 0.01; i += 0.001) {
-					nn.throttleForward(neuron, layer, i, this.state.data.y[0]);
-					this.setState({
-						trans: nn,
-					});
-					await timer(1);
-				}
-				for (let i = 0.01; i > 0; i -= 0.001) {
-					nn.throttleForward(neuron, layer, -i, this.state.data.y[0]);
-					this.setState({
-						trans: nn,
-					});
-					await timer(1);
-				}
-				await timer(1);
-				this.setState({
-					bshow: (this.state.bshow -= 1),
-				});
-			}
-		}
-
-		await timer(1000);
-		this.setState({ direction: "edgePaused" });
-	};
+	async anim() {}
 	initNeuralNetwork(shape) {
 		if (!this.state.controls.playing) {
 			const rw = 32;
@@ -214,61 +123,29 @@ class App extends Component {
 			flatns.push(stop);
 			ns.push([stop]);
 
-			if (this.state.mode && false) {
-				/* We start to iterate over ns */
-				let links = [];
-				for (let layer = shape.length - 1; layer > 0; layer--) {
-					let interval = -14.5;
-					for (
-						let prevNeuron = 0;
-						prevNeuron < shape[layer - 1];
-						prevNeuron++
-					) {
-						for (let neuron = 0; neuron < shape[layer]; neuron++) {
-							links.push(
-								link({
-									source: {
-										x: ns[layer - 1][prevNeuron].x + 15.5,
-										y: ns[layer - 1][prevNeuron].y,
-									},
-									target: {
-										x: ns[layer][neuron].x - 15,
-										y: ns[layer][neuron].y + interval,
-									},
-								})
-							);
-						}
-						interval += 3.5;
+			/* We start to iterate over ns */
+			let links = [];
+			for (let layer = shape.length - 1; layer > 0; layer--) {
+				let interval = -14.5;
+				for (
+					let prevNeuron = 0;
+					prevNeuron < shape[layer - 1];
+					prevNeuron++
+				) {
+					for (let neuron = 0; neuron < shape[layer]; neuron++) {
+						links.push(
+							link({
+								source: ns[layer - 1][prevNeuron],
+								target: ns[layer][neuron],
+							})
+						);
 					}
+					interval += 3.5;
 				}
-
-				this.setState({ rects: flatns });
-				this.setState({ links });
-			} else {
-				/* We start to iterate over ns */
-				let links = [];
-				for (let layer = shape.length - 1; layer > 0; layer--) {
-					let interval = -14.5;
-					for (
-						let prevNeuron = 0;
-						prevNeuron < shape[layer - 1];
-						prevNeuron++
-					) {
-						for (let neuron = 0; neuron < shape[layer]; neuron++) {
-							links.push(
-								link({
-									source: ns[layer - 1][prevNeuron],
-									target: ns[layer][neuron],
-								})
-							);
-						}
-						interval += 3.5;
-					}
-				}
-
-				this.setState({ rects: flatns });
-				this.setState({ links });
 			}
+
+			this.setState({ rects: flatns });
+			this.setState({ links });
 		} else if (this.state.controls.playing) {
 			let flattenedWeights = flatten(this.state.weightsData);
 			this.setState({ weights: flattenedWeights });
@@ -285,7 +162,7 @@ class App extends Component {
 		let playing = !this.state.controls.playing;
 		this.mutate("controls", "playing", playing);
 		if (playing === true) {
-			await this.train(this.state.data.X, this.state.data.y);
+			await this.train(this.state.X, this.state.y);
 			console.log("epic");
 		}
 	}
@@ -355,14 +232,14 @@ class App extends Component {
 		});
 
 		const model = tf.tidy(() => {
-			return this.state.nn;
+			return this.state.tensorFlowNN;
 		});
 		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 		///* Until broken by user */
 		let play = this.state.controls.playing;
 		////let epoch = 0;
 		while (play !== false) {
-			this.setState({ duringEpoch: true });
+			this.setState({ stopRender: true });
 			const { playing /* speed */ } = this.state.controls;
 			play = playing;
 			await model.fit(XTensor, yTensor, {
@@ -375,10 +252,10 @@ class App extends Component {
 				this.printParameters(model, loss, yhat, this.state.epoch + 1);
 				return undefined;
 			});
-			this.setState({ duringEpoch: false });
+			this.setState({ stopRender: false });
 			await timer(this.state.controls.speed);
 		}
-		this.setState({ nn: model });
+		this.setState({ tensorFlowNN: model });
 		tf.dispose(XTensor);
 		tf.dispose(yTensor);
 	}
@@ -393,8 +270,8 @@ class App extends Component {
 			let y = tensorToArray(yTensor);
 			let yhat = tensorToArray(yhatTensor);
 			this.setState({
-				...this.state,
-				data: { X, y },
+				X,
+				y,
 				yhat,
 			});
 			return undefined;
@@ -424,7 +301,7 @@ class App extends Component {
 		this.setState({ controls: { ...this.state.controls, playing: false } });
 	}
 	async resetParameters(scale) {
-		tf.dispose(this.state.nn);
+		tf.dispose(this.state.tensorFlowNN);
 		const { curve } = this.state;
 		let eqn;
 		let optimizer;
@@ -448,7 +325,7 @@ class App extends Component {
 			epoch: 0,
 			loss: null,
 			weights: [],
-			nn: model,
+			tensorFlowNN: model,
 			lossArray: [],
 		});
 		tf.dispose(optimizer);
@@ -465,10 +342,10 @@ class App extends Component {
 		const model = tf.tidy(() => {
 			return this.modelCompile(0.01);
 		});
-		this.setState({ nn: model });
+		this.setState({ tensorFlowNN: model });
 	}
 	shouldComponentUpdate() {
-		if (this.state.duringEpoch) {
+		if (this.state.stopRender) {
 			return false;
 		} else {
 			return true;
@@ -478,9 +355,11 @@ class App extends Component {
 	render() {
 		/* Destructure State*/
 		const {
+			X,
+			y,
 			shape,
 			scale,
-			trans,
+			miniNN,
 			weightsData,
 			biasesData,
 			yhat,
@@ -493,10 +372,8 @@ class App extends Component {
 			lr,
 			loss,
 			controls,
-			data,
 		} = this.state;
 		const { playing, speed } = controls;
-		const { X, y } = data;
 
 		let newShape = [...shape];
 		newShape.splice(0, 1);
@@ -560,7 +437,7 @@ class App extends Component {
 			<CardActions>
 				<Button
 					onClick={async () => {
-						await this.anim(this.state.trans);
+						await this.anim(this.state.miniNN);
 					}}
 				>
 					REPLAY
@@ -614,7 +491,7 @@ class App extends Component {
 									nn.backward();
 									this.setState({
 										...this.state,
-										trans: nn,
+										miniNN: nn,
 										mode: !mode,
 										controls: {
 											...this.state.controls,
@@ -828,8 +705,8 @@ class App extends Component {
 							>
 								{controlCenter}
 								<Box marginLeft={10}>
-									<PlayGround
-										trans={trans}
+									<NeuralNetworkComponent
+										trans={miniNN}
 										input={X[0]}
 										label={y[0]}
 										shapedWeights={weightsData}
@@ -848,13 +725,9 @@ class App extends Component {
 										show={playing}
 										nshow={this.state.nshow}
 										bshow={this.state.bshow}
-										microShow={this.state.microShow}
 										mode={mode}
 										backward={this.state.direction}
-										onClick={() => {
-											this.asyncPause();
-										}}
-									></PlayGround>
+									></NeuralNetworkComponent>
 								</Box>
 								{scatter}
 							</Box>

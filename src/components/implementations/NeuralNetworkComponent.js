@@ -9,14 +9,12 @@ import Legend from "./Legend";
 import Arrow from "./Arrow";
 import "./d3.css";
 
-class PlayGround extends Component {
+class NeuralNetworkComponent extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			widths: 32,
 			zoom: 15,
-			macro: false,
-			micro: false,
 		};
 		this.zoom = this.zoom.bind(this);
 	}
@@ -383,25 +381,9 @@ class PlayGround extends Component {
 								y={d.y}
 								width={this.state.widths}
 								height={this.state.widths}
-								onClick={() => {
-									//console.log(model[i]);
-									//console.log(d);
-									//const svgGroup = d3
-									//.select("#pp")
-									//.select("g");
-									//this.zoom(
-									//svgGroup,
-									//d3.easeExpInOut,
-									//d.x - 16,
-									//d.y,
-									//this.state.zoom,
-									//1500
-									//);
-									//this.setState({ micro: true });
-								}}
 								fill="lightgrey"
 							></rect>
-							{model.length !== 0 && i > this.props.bshow
+							{model.length !== 0
 								? i > 0
 									? VerticalArrow(
 											d.x + 16,
@@ -415,26 +397,19 @@ class PlayGround extends Component {
 									: ""
 								: ""}
 							<text fill="#8db600" x={d.x + 34} y={d.y + 12}>
-								{model.length !== 0 && i < this.props.nshow
+								{model.length !== 0
 									? i > 0
 										? model[i - 1].output.toFixed(2)
 										: this.props.input
 									: ""}
 							</text>
 							<text fill="#F50657" x={d.x + 34} y={d.y + 28}>
-								{model.length !== 0 && i > this.props.bshow
+								{model.length !== 0
 									? i > 0
 										? model[i - 1].dActStep.toPrecision(3)
 										: ""
 									: ""}
 							</text>
-							{i > 0 && this.state.micro
-								? graph(
-										d.x + 2,
-										d.y,
-										model.length > 0 ? model[i - 1] : []
-								  )
-								: ""}
 						</g>
 					))}
 					<rect
@@ -454,7 +429,7 @@ class PlayGround extends Component {
 						Loss
 					</text>
 					<text x={734} y={350}>
-						{this.props.mode && this.props.nshow > 18
+						{this.props.mode
 							? this.props.trans.loss.output.toPrecision(3)
 							: ""}
 					</text>
@@ -471,4 +446,4 @@ class PlayGround extends Component {
 	}
 }
 
-export default PlayGround;
+export default NeuralNetworkComponent;
