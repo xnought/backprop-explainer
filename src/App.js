@@ -364,9 +364,6 @@ class App extends Component {
 		} = this.state;
 		const { playing, speed } = controls;
 
-		let newShape = [...shape];
-		newShape.splice(0, 1);
-		newShape.splice(newShape.length - 1, 1);
 		const lrs = [0.001, 0.005, 0.01, 0.05, 0.1];
 		const dataSets = [
 			{ label: "sin", eqn: tf.sin, scale: 5 },
@@ -604,7 +601,6 @@ class App extends Component {
 									disabled={playing}
 									onClick={() => {
 										let a = shape;
-										console.log(a.length);
 										if (a.length < 5) {
 											a[
 												a.length - 1
@@ -623,7 +619,6 @@ class App extends Component {
 									disabled={playing}
 									onClick={() => {
 										let a = shape;
-										console.log(a.length);
 										if (a.length > 2) {
 											a.splice(a.length - 2, 1);
 											this.setState({ shape: a });
@@ -657,6 +652,33 @@ class App extends Component {
 				<Box marginTop={10}>
 					<Loss lossArray={this.state.lossArray} loss={loss} />
 				</Box>
+			</Box>
+		);
+		const neuralNetwork = (
+			<Box marginLeft={10}>
+				<NeuralNetworkComponent
+					trans={miniNN}
+					input={X[0]}
+					label={y[0]}
+					shapedWeights={weightsData}
+					shape={shape}
+					biases={biasesData}
+					weights={weights}
+					rects={rects}
+					links={links}
+					playing={
+						playing
+							? speed === 0
+								? "edgeForward"
+								: "edgeSlowed"
+							: "edgePaused"
+					}
+					show={playing}
+					nshow={this.state.nshow}
+					bshow={this.state.bshow}
+					mode={mode}
+					backward={this.state.direction}
+				></NeuralNetworkComponent>
 			</Box>
 		);
 
@@ -694,31 +716,7 @@ class App extends Component {
 								marginTop={10}
 							>
 								{controlCenter}
-								<Box marginLeft={10}>
-									<NeuralNetworkComponent
-										trans={miniNN}
-										input={X[0]}
-										label={y[0]}
-										shapedWeights={weightsData}
-										shape={shape}
-										biases={biasesData}
-										weights={weights}
-										rects={rects}
-										links={links}
-										playing={
-											playing
-												? speed === 0
-													? "edgeForward"
-													: "edgeSlowed"
-												: "edgePaused"
-										}
-										show={playing}
-										nshow={this.state.nshow}
-										bshow={this.state.bshow}
-										mode={mode}
-										backward={this.state.direction}
-									></NeuralNetworkComponent>
-								</Box>
+								{neuralNetwork}
 								{scatter}
 							</Box>
 						</CardContent>
