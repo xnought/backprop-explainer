@@ -1,12 +1,5 @@
 import React, { Component } from "react";
-import {
-	Typography,
-	Slider,
-	Box,
-	Card,
-	CardContent,
-	CardActions,
-} from "@material-ui/core";
+import { Typography, Slider, Box, Card, CardContent } from "@material-ui/core";
 
 class LinearFunction extends Component {
 	constructor(props) {
@@ -41,18 +34,15 @@ class LinearFunction extends Component {
 							></Slider>
 							<Typography variant="h5">
 								f(
-								<Typography color="secondary" variant="inline">
+								<Typography color="secondary">
 									{this.state.input}
 								</Typography>
 								) = 2(
-								<Typography color="secondary" variant="inline">
+								<Typography color="secondary">
 									{this.state.input}
 								</Typography>
 								) + 1 ={" "}
-								<Typography
-									style={{ color: "#8db600" }}
-									variant="inline"
-								>
+								<Typography style={{ color: "#8db600" }}>
 									{this.state.output}
 								</Typography>
 							</Typography>

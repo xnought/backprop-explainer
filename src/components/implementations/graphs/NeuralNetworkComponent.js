@@ -5,9 +5,9 @@
 */
 import React, { Component } from "react";
 import * as d3 from "d3";
-import Legend from "./Legend";
-import Arrow from "./Arrow";
-import "./d3.css";
+import Legend from "../svg/Legend";
+import Arrow from "../svg/Arrow";
+import "../d3.css";
 
 class NeuralNetworkComponent extends Component {
 	constructor(props) {

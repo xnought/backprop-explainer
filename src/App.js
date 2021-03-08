@@ -4,7 +4,7 @@
 	App.js is the main controller of all logic of the backprop explainer
 */
 
-/* ****** START IMPORTS ****** */
+/*  START IMPORTS  */
 import React, { Component } from "react";
 import * as tf from "@tensorflow/tfjs";
 import "./App.css";
@@ -32,7 +32,7 @@ import {
 import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
 import { NeuralNetwork, tools } from "./nn/exports";
 import { draw } from "./Utils/exports";
-/* ****** END IMPORTS ****** */
+/*  END IMPORTS  */
 
 class App extends Component {
 	constructor(props) {
@@ -93,7 +93,7 @@ class App extends Component {
 
 		// If we are not training the tensorflow neural network
 		if (!playing) {
-			/* ******START SETUP****** */
+			/* START SETUP */
 			const squareWidth = 32;
 			const xConstraints = { domain: [0, 100], range: [50, 750] };
 			const yConstraints = { domain: [0, 100], range: [500, 0] };
@@ -106,7 +106,7 @@ class App extends Component {
 			const linksGenerator = draw.generateLink(squareWidth / 2);
 			// how the layers are proptioned compared to the linear scale
 			const layerProportion = [0, 25, 50, 75, 0];
-			/* ******END SETUP****** */
+			/* END SETUP */
 
 			/* START GENERATING THE GRAPH */
 			const {
@@ -674,8 +674,6 @@ class App extends Component {
 							: "edgePaused"
 					}
 					show={playing}
-					nshow={this.state.nshow}
-					bshow={this.state.bshow}
 					mode={mode}
 					backward={this.state.direction}
 				></NeuralNetworkComponent>
@@ -722,7 +720,6 @@ class App extends Component {
 						</CardContent>
 					</Card>
 				</div>
-
 				<Explanation />
 			</div>
 		);

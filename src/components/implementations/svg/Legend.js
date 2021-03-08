@@ -1,5 +1,5 @@
 import React from "react";
-import "./d3.css";
+import "../d3.css";
 
 function Legend() {
 	const height = 10;

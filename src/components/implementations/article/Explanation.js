@@ -65,7 +65,7 @@ const Explanation = () => (
 						<em>adding complexity</em>.
 					</Typography>
 					<Typography variant="body1" gutterBottom>
-						<Typography variant="inline" style={{ color: "gold" }}>
+						<Typography style={{ color: "gold" }}>
 							&emsp;&emsp;&emsp;KEY IDEA
 						</Typography>
 						: The more complexity we add, the more different ways we

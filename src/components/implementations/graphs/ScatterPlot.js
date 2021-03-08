@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./d3.css";
+import "../d3.css";
 import * as d3 from "d3";
 
 class ScatterPlot extends Component {

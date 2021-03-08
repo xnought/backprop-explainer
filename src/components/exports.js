@@ -1,8 +1,8 @@
 /* EXPORTS TO CLEAN UP IMPORT OF COMPONENTS */
 
-import NeuralNetworkComponent from "./implementations/NeuralNetworkComponent";
-import ScatterPlot from "./implementations/ScatterPlot";
-import Loss from "./implementations/Loss";
-import Explanation from "./implementations/Explanation";
+import NeuralNetworkComponent from "./implementations/graphs/NeuralNetworkComponent";
+import ScatterPlot from "./implementations/graphs/ScatterPlot";
+import Loss from "./implementations/graphs/Loss";
+import Explanation from "./implementations/article/Explanation";
 
 export { NeuralNetworkComponent, ScatterPlot, Loss, Explanation };
