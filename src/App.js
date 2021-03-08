@@ -30,7 +30,7 @@ import {
 	Tooltip,
 } from "@material-ui/core";
 import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
-import { NeuralNetwork, tools } from "./nn/exports";
+import { NeuralNetwork, tools } from "./nnMiniLibrary/exports";
 import { draw } from "./Utils/exports";
 /*  END IMPORTS  */
 
