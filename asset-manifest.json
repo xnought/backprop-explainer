@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/Backpropagation-Visualizer/static/css/main.15abd304.chunk.css",
-    "main.js": "/Backpropagation-Visualizer/static/js/main.ba458f5f.chunk.js",
-    "main.js.map": "/Backpropagation-Visualizer/static/js/main.ba458f5f.chunk.js.map",
-    "runtime-main.js": "/Backpropagation-Visualizer/static/js/runtime-main.4fc7e846.js",
-    "runtime-main.js.map": "/Backpropagation-Visualizer/static/js/runtime-main.4fc7e846.js.map",
-    "static/js/2.9a7c561e.chunk.js": "/Backpropagation-Visualizer/static/js/2.9a7c561e.chunk.js",
-    "static/js/2.9a7c561e.chunk.js.map": "/Backpropagation-Visualizer/static/js/2.9a7c561e.chunk.js.map",
-    "static/js/3.3c6f88aa.chunk.js": "/Backpropagation-Visualizer/static/js/3.3c6f88aa.chunk.js",
-    "static/js/3.3c6f88aa.chunk.js.map": "/Backpropagation-Visualizer/static/js/3.3c6f88aa.chunk.js.map",
+    "main.css": "/Backpropagation-Visualizer/static/css/main.8f8d0a97.chunk.css",
+    "main.js": "/Backpropagation-Visualizer/static/js/main.78853af9.chunk.js",
+    "main.js.map": "/Backpropagation-Visualizer/static/js/main.78853af9.chunk.js.map",
+    "runtime-main.js": "/Backpropagation-Visualizer/static/js/runtime-main.5997d8c5.js",
+    "runtime-main.js.map": "/Backpropagation-Visualizer/static/js/runtime-main.5997d8c5.js.map",
+    "static/js/2.20cbc07c.chunk.js": "/Backpropagation-Visualizer/static/js/2.20cbc07c.chunk.js",
+    "static/js/2.20cbc07c.chunk.js.map": "/Backpropagation-Visualizer/static/js/2.20cbc07c.chunk.js.map",
+    "static/js/3.954aba97.chunk.js": "/Backpropagation-Visualizer/static/js/3.954aba97.chunk.js",
+    "static/js/3.954aba97.chunk.js.map": "/Backpropagation-Visualizer/static/js/3.954aba97.chunk.js.map",
     "index.html": "/Backpropagation-Visualizer/index.html",
-    "static/css/main.15abd304.chunk.css.map": "/Backpropagation-Visualizer/static/css/main.15abd304.chunk.css.map",
-    "static/js/2.9a7c561e.chunk.js.LICENSE.txt": "/Backpropagation-Visualizer/static/js/2.9a7c561e.chunk.js.LICENSE.txt"
+    "static/css/main.8f8d0a97.chunk.css.map": "/Backpropagation-Visualizer/static/css/main.8f8d0a97.chunk.css.map",
+    "static/js/2.20cbc07c.chunk.js.LICENSE.txt": "/Backpropagation-Visualizer/static/js/2.20cbc07c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.4fc7e846.js",
-    "static/js/2.9a7c561e.chunk.js",
-    "static/css/main.15abd304.chunk.css",
-    "static/js/main.ba458f5f.chunk.js"
+    "static/js/runtime-main.5997d8c5.js",
+    "static/js/2.20cbc07c.chunk.js",
+    "static/css/main.8f8d0a97.chunk.css",
+    "static/js/main.78853af9.chunk.js"
   ]
 }
