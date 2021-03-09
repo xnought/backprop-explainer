@@ -4,5 +4,14 @@ import NeuralNetworkComponent from "./implementations/graphs/NeuralNetworkCompon
 import ScatterPlot from "./implementations/graphs/ScatterPlot";
 import Loss from "./implementations/graphs/Loss";
 import Explanation from "./implementations/article/Explanation";
+import Bar from "./implementations/app/Bar";
+import MainTool from "./implementations/app/MainTool";
 
-export { NeuralNetworkComponent, ScatterPlot, Loss, Explanation };
+export {
+	NeuralNetworkComponent,
+	ScatterPlot,
+	Loss,
+	MainTool,
+	Explanation,
+	Bar,
+};
