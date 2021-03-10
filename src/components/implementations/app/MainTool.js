@@ -21,7 +21,13 @@ import {
 	Slider,
 	Tooltip,
 } from "@material-ui/core";
-import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
+import {
+	Replay,
+	SlowMotionVideo,
+	PlayArrow,
+	Stop,
+	SingleBedTwoTone,
+} from "@material-ui/icons";
 import { NeuralNetwork, tools } from "../../../nnMiniLibrary/exports";
 import { draw } from "../../../Utils/exports";
 /*  END IMPORTS  */
@@ -40,7 +46,7 @@ class MainTool extends Component {
 			X: [],
 			y: [],
 			yhat: [],
-			shape: [1, 4, 4, 1],
+			shape: [1, 8, 8, 1],
 			lr: 0.01,
 			epoch: 0,
 			biasesData: [],
@@ -67,6 +73,14 @@ class MainTool extends Component {
 			sliderVal: 2,
 			mode: false,
 			stopRender: false,
+			keyFrameLayer: 0,
+			keyFrameLoss: 0,
+			subEpoch: "",
+			isAnimating: false,
+			lossSavings: 0,
+			singleInputExample: 0,
+			singleLabelExample: 0,
+			newOutput: 0,
 		};
 
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
@@ -82,7 +96,55 @@ class MainTool extends Component {
 		this.anim = this.anim.bind(this);
 	}
 
-	async anim() {}
+	async anim() {
+		const { shape } = this.state;
+		const speed = 600;
+		/* All anim needs to know is the shape */
+		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+
+		/* animate the forward pass */
+		this.setState({ subEpoch: "forward", isAnimating: true });
+		for (let i = 0; i < shape.length - 1; i++) {
+			this.setState({ keyFrameLayer: i });
+			await timer(speed);
+		}
+
+		//await timer(speed);
+		//let lossKey = 0;
+		//lossKey++;
+		//this.setState({ keyFrameLoss: lossKey });
+
+		//await timer(speed);
+
+		//lossKey++;
+		//this.setState({ keyFrameLoss: lossKey });
+
+		//await timer(speed);
+
+		//lossKey++;
+		//this.setState({ keyFrameLoss: lossKey });
+
+		//await timer(speed);
+
+		/* animate the backward pass */
+		/* animate the forward pass */
+		this.setState({ subEpoch: "backward" });
+
+		for (let i = shape.length - 1; i >= 0; i--) {
+			this.setState({ keyFrameLayer: i });
+			await timer(speed);
+		}
+		this.setState({ keyFrameLayer: -1 });
+
+		await timer(speed);
+		this.setState({ subEpoch: "transition" });
+
+		await timer(1000);
+		this.setState({ subEpoch: "update" });
+
+		/* animate update */
+		this.setState({ isAnimating: false });
+	}
 
 	initNeuralNetwork(shape) {
 		const { controls } = this.state;
@@ -316,10 +378,10 @@ class MainTool extends Component {
 			return this.modelCompile(this.state.lr);
 		});
 		this.setState({
-			...this.state,
 			epoch: 0,
 			loss: null,
 			weights: [],
+			miniNN: null,
 			tensorFlowNN: model,
 			shapedWeights: [],
 			lossArray: [],
@@ -369,6 +431,13 @@ class MainTool extends Component {
 			shapedWeights,
 			shapedLinks,
 			shapedRects,
+			keyFrameLayer,
+			keyFrameLoss,
+			subEpoch,
+			isAnimating,
+			singleInputExample,
+			singleLabelExample,
+			lossSavings,
 		} = this.state;
 		const { playing, speed } = controls;
 
@@ -451,50 +520,86 @@ class MainTool extends Component {
 						>
 							Control Center
 						</Typography>
-						<div on></div>
+						<div></div>
 						<Tooltip
 							title={
 								<Typography variant="h6">
-									{this.state.mode
+									{mode
 										? "Click to go back"
 										: "Click to see Backpropagation"}
 								</Typography>
 							}
 							arrow
 							placement="right-start"
-							open={this.state.loss != null}
+							open={loss != null && !isAnimating}
 						>
 							<Button
-								disabled={this.state.loss == null}
+								disabled={loss == null || isAnimating}
 								onClick={async () => {
-									const timer = (ms) =>
-										new Promise((res) =>
-											setTimeout(res, ms)
+									if (mode) {
+										this.setState({ subEpoch: "" });
+										this.setState({ mode: !mode });
+									} else {
+										const randomInput = tools.getRandomInt(
+											50
 										);
-									let formattedWeights = tools.formatWeightArray(
-										weightsData,
-										shape
-									);
-									let nn = new NeuralNetwork(
-										shape,
-										formattedWeights,
-										biasesData
-									);
+										const singleInputExample =
+											X[randomInput];
+										const singleLabelExample =
+											y[randomInput];
 
-									nn.forward(X[0], y[0]);
-									nn.backward();
-									this.setState({
-										...this.state,
-										miniNN: nn,
-										mode: !mode,
-										controls: {
-											...this.state.controls,
-											playing: false,
-										},
-									});
-									await timer(1000);
-									this.setState({ nshow: 1 });
-									await this.anim(nn);
+										let formattedWeights = tools.formatWeightArray(
+											weightsData,
+											shape
+										);
+										let nn = new NeuralNetwork(
+											shape,
+											formattedWeights,
+											biasesData
+										);
+										let clone = new NeuralNetwork(
+											shape,
+											formattedWeights,
+											biasesData
+										);
+
+										nn.forward(
+											singleInputExample,
+											singleLabelExample
+										);
+										nn.backward();
+
+										clone.forward(
+											singleInputExample,
+											singleLabelExample
+										);
+										clone.backward();
+										clone.update(lr);
+										clone.forward(
+											singleInputExample,
+											singleLabelExample
+										);
+
+										const newOutput = clone.yhat;
+										const updatedLoss = clone.loss.output;
+										const lossSavings =
+											updatedLoss - nn.loss.output;
+
+										this.setState({
+											...this.state,
+											miniNN: nn,
+											mode: !mode,
+											lossSavings,
+											singleInputExample,
+											singleLabelExample,
+											newOutput,
+											controls: {
+												...this.state.controls,
+												playing: false,
+											},
+										});
+										await this.anim();
+									}
 								}}
 							>
 								<Typography variant="h4">
@@ -503,10 +608,18 @@ class MainTool extends Component {
 							</Button>
 						</Tooltip>
 						<Typography variant="h6">
-							loss:
-							{loss == null ? "" : loss.toPrecision(6)}
+							{loss == null || mode
+								? ""
+								: `Loss: ${loss.toPrecision(6)}`}
 						</Typography>
-						{this.state.mode ? controlsBackProp : controlsReg}
+
+						<Typography variant="h6">
+							{mode
+								? `X: ${singleInputExample} y: ${singleLabelExample}`
+								: ""}
+						</Typography>
+						{mode ? controlsBackProp : controlsReg}
+
 						<CardActions></CardActions>
 					</CardContent>
 				</Card>
@@ -528,7 +641,7 @@ class MainTool extends Component {
 								</Typography>
 								{lrs.map((num, i) => (
 									<Chip
-										disabled={playing}
+										disabled={playing || mode}
 										key={i}
 										label={`${num}`}
 										style={{
@@ -555,7 +668,7 @@ class MainTool extends Component {
 								</Typography>
 								{dataSets.map((item, i) => (
 									<Chip
-										disabled={playing}
+										disabled={playing || mode}
 										key={i}
 										label={item.label}
 										style={{
@@ -594,7 +707,7 @@ class MainTool extends Component {
 								<Slider
 									style={{ color: "#175676" }}
 									defaultValue={2}
-									disabled={playing}
+									disabled={playing || mode}
 									aria-labelledby="discrete-slider"
 									valueLabelDisplay="auto"
 									step={1}
@@ -606,7 +719,7 @@ class MainTool extends Component {
 									max={8}
 								/>
 								<Button
-									disabled={playing}
+									disabled={playing || mode}
 									onClick={() => {
 										let a = shape;
 										if (a.length < 5) {
@@ -624,7 +737,7 @@ class MainTool extends Component {
 								</Button>
 
 								<Button
-									disabled={playing}
+									disabled={playing || mode}
 									onClick={() => {
 										let a = shape;
 										if (a.length > 2) {
@@ -666,8 +779,8 @@ class MainTool extends Component {
 			<Box marginLeft={10}>
 				<NeuralNetworkComponent
 					miniNN={miniNN}
-					input={X[0]}
-					label={y[0]}
+					input={singleInputExample}
+					label={singleLabelExample}
 					shapedWeights={shapedWeights}
 					shapedLinks={shapedLinks}
 					shapedRects={shapedRects}
@@ -685,6 +798,10 @@ class MainTool extends Component {
 					show={playing}
 					mode={mode}
 					backward={this.state.direction}
+					keyFrameLayer={keyFrameLayer}
+					keyFrameLoss={keyFrameLoss}
+					subEpoch={subEpoch}
+					lossSavings={lossSavings}
 				></NeuralNetworkComponent>
 			</Box>
 		);

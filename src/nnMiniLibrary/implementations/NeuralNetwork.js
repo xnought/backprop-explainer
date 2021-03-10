@@ -108,22 +108,6 @@ export class NeuralNetwork {
 			this.dLinear
 		);
 		dValues = this.model[lastLayer - 1][outputNeuron].dInputs;
-		//dValues = [this.model[lastLayer - 1][0].dInputsSum];
-		/* Iterate backwards */
-		//for (let layer = lastLayer - 2; layer >= 0; layer--) {
-		///* First sum the dvalues */
-		//dValue = sum(dValues);
-		//dValues = [];
-		////dValues = zeros(this.model[layer].length);
-		//for (let neuron = 0; neuron < this.model[layer].length; neuron++) {
-		//this.model[layer][neuron].backward(dValue, this.dReLU);
-		////this.model[layer][neuron].backward(dValues[], this.dReLU);
-		//dValues.push(this.model[layer][neuron].dInputsSum);
-		////dValues = add(dValues, this.model[layer][neuron].dInputs)
-		//}
-		//}
-
-		/* We are given the dInputs from the previous output neuron in the form [neurons] called dValues */
 
 		/* We want to start the second to last layer */
 		for (let layer = lastLayer - 2; layer >= 0; layer--) {
@@ -163,7 +147,7 @@ export class NeuralNetwork {
 
 					/* Formally update the model weights */
 					this.model[layer][neuron].weights[i] = newWeights;
-					this.model[layer][neuron].bias[i] = newBias;
+					this.model[layer][neuron].bias = newBias;
 				}
 			}
 		}

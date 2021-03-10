@@ -6,7 +6,12 @@ function Legend() {
 	const width = 100;
 	return (
 		<div>
-			<svg width={width} height={height} class="grad" overflow="visible">
+			<svg
+				width={width}
+				height={height}
+				className="grad"
+				overflow="visible"
+			>
 				<text
 					fill="grey"
 					fontFamily="sans-serif"

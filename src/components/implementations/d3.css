@@ -14,7 +14,7 @@
 	stroke-dasharray: 49 4;
 	stroke-dashoffset: 4;
 	animation: flowBackward linear infinite;
-	animation-duration: 1s;
+	animation-duration: 0.3s;
 }
 .edgeSlowed {
 	stroke-dasharray: 49 4;
@@ -71,4 +71,30 @@
 		rgba(232, 232, 232, 0) 50%,
 		#4ba3c3 99.97%
 	);
+}
+
+.bar {
+}
+
+.bar:hover {
+	transition: fill 1s ease;
+	fill: #d62839 !important;
+}
+
+@keyframes invertArrow {
+	from {
+		stroke-width: 4;
+	}
+	to {
+		stroke-width: 0;
+	}
+}
+
+.absorb {
+	stroke-width: 4;
+	animation: invertArrow 1s linear forwards;
+}
+
+.arrow {
+	stroke-width: 4;
 }

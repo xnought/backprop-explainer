@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { Bar, MainTool } from "./components/exports";
+import "katex/dist/katex.min.css";
+import { InlineMath, BlockMath } from "react-katex";
 
 class App extends Component {
 	constructor(props) {
