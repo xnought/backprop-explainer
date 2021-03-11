@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
+import { Help } from "@material-ui/icons";
+import { IconButton } from "@material-ui/core";
 import Legend from "../svg/Legend";
 import Arrow from "../svg/Arrow";
 import "../d3.css";
@@ -43,6 +45,9 @@ class NeuralNetworkComponent extends Component {
 			subEpoch,
 			keyFrameLoss,
 			keyFrameLayer,
+			input,
+			label,
+			children,
 		} = this.props;
 		const link = d3
 			.linkHorizontal()
@@ -80,7 +85,9 @@ class NeuralNetworkComponent extends Component {
 					<path
 						d="M 750, 234 L 750, 300"
 						stroke={
-							keyFrameLoss === 2 ? "orange" : graphConnectionColor
+							keyFrameLoss === 2 || keyFrameLoss === 1
+								? "orange"
+								: graphConnectionColor
 						}
 						className={
 							mode && keyFrameLoss > 0
@@ -119,7 +126,7 @@ class NeuralNetworkComponent extends Component {
 							) {
 								moving = "edgeForward";
 								colorChange = true;
-								color = "black";
+								color = "orange";
 							} else if (
 								mode &&
 								subEpoch === "backward" &&
@@ -147,7 +154,11 @@ class NeuralNetworkComponent extends Component {
 									? posWeight
 									: negWeight;
 
-								if (mode && subEpoch === "update") {
+								if (
+									mode &&
+									subEpoch === "update" &&
+									this.props.isAnimating === true
+								) {
 									let gradient =
 										2 * miniNN.model[i][j].dWeights[k];
 									let gradientWithLr = gradient * 0.01;
@@ -197,8 +208,6 @@ class NeuralNetworkComponent extends Component {
 							const beforeUpdate =
 								subEpoch === "backward" ||
 								subEpoch === "transition";
-							const curr =
-								miniNN !== null ? miniNN.model[i][j] : null;
 							if (
 								(mode && i <= keyFrameLayer) ||
 								beforeUpdate ||
@@ -219,7 +228,8 @@ class NeuralNetworkComponent extends Component {
 											.brighter(
 												actColor
 													? miniNN.model[i][j]
-															.actStep + 0.1
+															.actStep +
+															this.props.lr
 													: 1
 											)}
 										stroke={"black"}
@@ -234,8 +244,10 @@ class NeuralNetworkComponent extends Component {
 										? VerticalArrow(
 												d.x + 16,
 												d.y + 16,
-												Math.abs(curr.dActStep),
-												curr.dActStep < 0,
+												Math.abs(
+													miniNN.model[i][j].dActStep
+												),
+												miniNN.model[i][j].dActStep < 0,
 												"orange"
 										  )
 										: ""}
@@ -259,17 +271,6 @@ class NeuralNetworkComponent extends Component {
 						y={318}
 					>
 						loss
-					</text>
-
-					<text
-						fontFamily="sans-serif"
-						fontSize="20px"
-						x={720}
-						y={400}
-					>
-						{miniNN !== null
-							? `${miniNN.loss.output.toFixed(4)}`
-							: ""}
 					</text>
 				</g>
 			</svg>
