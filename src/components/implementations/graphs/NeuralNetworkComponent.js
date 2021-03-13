@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
+import { Help } from "@material-ui/icons";
+import { IconButton } from "@material-ui/core";
 import Legend from "../svg/Legend";
 import Arrow from "../svg/Arrow";
 import "../d3.css";
@@ -40,6 +42,12 @@ class NeuralNetworkComponent extends Component {
 			shapedWeights,
 			shapedRects,
 			miniNN,
+			subEpoch,
+			keyFrameLoss,
+			keyFrameLayer,
+			input,
+			label,
+			children,
 		} = this.props;
 		const link = d3
 			.linkHorizontal()
@@ -57,18 +65,37 @@ class NeuralNetworkComponent extends Component {
 					source={{ x: xStart, y: yStart }}
 					target={{ x: xStart, y: yStart + vector }}
 					color={color}
+					isAnimating={subEpoch === "transition"}
 				/>
 			);
+		};
+		const keyFrameLossCalc = () => {
+			if (keyFrameLoss === 1) {
+				return "edgeForward";
+			} else if (keyFrameLoss === 2) {
+				return "edgeBackward";
+			} else {
+				return "edgePaused";
+			}
 		};
 
 		const nn = (
 			<svg id="p" width="810" height="500" overflow="visible">
-				<g>
+				<g id="ee">
 					<path
 						d="M 750, 234 L 750, 300"
-						stroke={graphConnectionColor}
-						className={playing}
+						stroke={
+							keyFrameLoss === 2 || keyFrameLoss === 1
+								? "orange"
+								: graphConnectionColor
+						}
+						className={
+							mode && keyFrameLoss > 0
+								? keyFrameLossCalc()
+								: playing
+						}
 					></path>
+
 					<path
 						d={link({
 							source: { x: 766, y: 315 },
@@ -87,9 +114,28 @@ class NeuralNetworkComponent extends Component {
 						fill="none"
 						className={playing}
 					></path>
-					{shapedLinks.map((layer, i) =>
-						layer.map((neuron, j) =>
-							neuron.map((d, k) => {
+					{shapedLinks.map((layer, i) => {
+						return layer.map((neuron, j) => {
+							let moving = "edgePaused";
+							let color = "orange";
+							let colorChange = false;
+							if (
+								mode &&
+								subEpoch === "forward" &&
+								i === keyFrameLayer
+							) {
+								moving = "edgeForward";
+								colorChange = true;
+								color = "orange";
+							} else if (
+								mode &&
+								subEpoch === "backward" &&
+								i === keyFrameLayer
+							) {
+								moving = "edgeBackward";
+								colorChange = true;
+							}
+							return neuron.map((d, k) => {
 								const isUndefined = this.isUndefined3d(
 									shapedWeights,
 									i,
@@ -107,19 +153,47 @@ class NeuralNetworkComponent extends Component {
 									: currentWeight > 0
 									? posWeight
 									: negWeight;
+
+								if (
+									mode &&
+									subEpoch === "update" &&
+									this.props.isAnimating === true
+								) {
+									let gradient =
+										2 * miniNN.model[i][j].dWeights[k];
+									let gradientWithLr = gradient * 0.01;
+
+									d3.select("#nn")
+										.select("#p")
+										.select("#ee")
+										.select(`#cpath${i}${j}${k}`)
+										.transition()
+										.duration(750)
+										.ease(d3.easeExpIn)
+										.attr("stroke-width", sw - gradient)
+										.transition()
+										.duration(750)
+										.ease(d3.easeExpOut)
+										.attr(
+											"stroke-width",
+											sw - gradientWithLr
+										);
+								}
+
 								return (
 									<path
+										id={`cpath${i}${j}${k}`}
 										key={k}
 										d={d}
-										className={playing}
+										className={mode ? moving : playing}
 										strokeWidth={sw}
-										stroke={s}
+										stroke={colorChange ? color : s}
 										fill="none"
 									></path>
 								);
-							})
-						)
-					)}
+							});
+						});
+					})}
 					<rect
 						x={34}
 						y={234}
@@ -130,8 +204,18 @@ class NeuralNetworkComponent extends Component {
 
 					{shapedRects.map((neuron, i) =>
 						neuron.map((d, j) => {
-							const curr =
-								miniNN !== null ? miniNN.model[i][j] : null;
+							let actColor = false;
+							const beforeUpdate =
+								subEpoch === "backward" ||
+								subEpoch === "transition";
+							if (
+								(mode && i <= keyFrameLayer) ||
+								beforeUpdate ||
+								subEpoch === "update"
+							) {
+								actColor = true;
+							}
+
 							return (
 								<g>
 									<rect
@@ -139,16 +223,32 @@ class NeuralNetworkComponent extends Component {
 										y={d.y}
 										width={squareWidth}
 										height={squareWidth}
-										fill="darkgrey"
+										fill={d3
+											.rgb(104, 104, 104)
+											.brighter(
+												actColor
+													? miniNN.model[i][j]
+															.actStep +
+															this.props.lr
+													: 1
+											)}
+										stroke={"black"}
+										strokeWidth={2}
+										className="bar"
 									></rect>
 
-									{miniNN !== null && mode
+									{miniNN !== null &&
+									mode &&
+									beforeUpdate &&
+									i >= keyFrameLayer - 1
 										? VerticalArrow(
 												d.x + 16,
 												d.y + 16,
-												Math.abs(curr.dActStep),
-												curr.dActStep < 0,
-												"grey"
+												Math.abs(
+													miniNN.model[i][j].dActStep
+												),
+												miniNN.model[i][j].dActStep < 0,
+												"orange"
 										  )
 										: ""}
 								</g>

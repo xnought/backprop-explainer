@@ -1,5 +1,6 @@
 import React from "react";
-const Legend = ({ source, target, color }) => (
+import "../d3.css";
+const Legend = ({ source, target, color, isAnimating }) => (
 	<g>
 		<defs>
 			<marker
@@ -14,9 +15,9 @@ const Legend = ({ source, target, color }) => (
 			</marker>
 		</defs>
 		<path
+			className={!isAnimating ? "arrow" : "absorb"}
 			id="arrow-line"
 			markerEnd="url(#head)"
-			strokeWidth="3"
 			fill="none"
 			stroke={color}
 			d={`M${source.x},${source.y}, ${target.x}, ${target.y}`}

@@ -7,7 +7,13 @@
 /*  START IMPORTS  */
 import React, { Component } from "react";
 import * as tf from "@tensorflow/tfjs";
-import { NeuralNetworkComponent, ScatterPlot, Loss } from "../../exports";
+import AnimatedNumber from "animated-number-react";
+import {
+	NeuralNetworkComponent,
+	ScatterPlot,
+	Loss,
+	AnimatedScatterPlot,
+} from "../../exports";
 import {
 	Typography,
 	Box,
@@ -20,8 +26,22 @@ import {
 	Fab,
 	Slider,
 	Tooltip,
+	Dialog,
+	DialogContent,
+	DialogActions,
 } from "@material-ui/core";
-import { Replay, SlowMotionVideo, PlayArrow, Stop } from "@material-ui/icons";
+import {
+	Replay,
+	SlowMotionVideo,
+	PlayArrow,
+	Stop,
+	Help,
+	Close,
+} from "@material-ui/icons";
+import controlGif from "./assets/controlcenter.gif";
+import customGif from "./assets/customization.gif";
+import nnDiagram from "./assets/nn.png";
+import scatterGif from "./assets/scatter.gif";
 import { NeuralNetwork, tools } from "../../../nnMiniLibrary/exports";
 import { draw } from "../../../Utils/exports";
 /*  END IMPORTS  */
@@ -40,9 +60,11 @@ class MainTool extends Component {
 			X: [],
 			y: [],
 			yhat: [],
-			shape: [1, 4, 4, 1],
+			shape: [1, 8, 8, 1],
 			lr: 0.01,
 			epoch: 0,
+			cpyEpoch: 0,
+
 			biasesData: [],
 			weightsData: [],
 			lossArray: [],
@@ -67,6 +89,26 @@ class MainTool extends Component {
 			sliderVal: 2,
 			mode: false,
 			stopRender: false,
+			keyFrameLayer: 0,
+			keyFrameLoss: 0,
+			keyFrameScatter: 0,
+			subEpoch: "",
+			isAnimating: false,
+			lossSavings: 0,
+			lossDifference: 0,
+			singleInputExample: 0,
+			singleLabelExample: 0,
+			newOutput: 0,
+
+			/* Dialog showing */
+			controlCenterHelp: false,
+			customizationHelp: false,
+			neuralNetworkHelp: false,
+			scatterHelp: false,
+			lossHelp: false,
+			lossChange: 0,
+			potentialYhat: [],
+			singleInputIndex: -1,
 		};
 
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
@@ -80,9 +122,119 @@ class MainTool extends Component {
 		this.asyncPause = this.asyncPause.bind(this);
 		this.changeModelLr = this.changeModelLr.bind(this);
 		this.anim = this.anim.bind(this);
+		this.randomInputGeneration = this.randomInputGeneration.bind(this);
+	}
+	randomInputGeneration(X, y, weightsData, biasesData, shape, lr, mode) {
+		const randomInput = tools.getRandomInt(50);
+		const singleInputExample = X[randomInput];
+		const singleLabelExample = y[randomInput];
+
+		let formattedWeights = tools.formatWeightArray(weightsData, shape);
+		let nn = new NeuralNetwork(shape, formattedWeights, biasesData);
+		let clone = new NeuralNetwork(shape, formattedWeights, biasesData);
+
+		nn.forward(singleInputExample, singleLabelExample);
+		nn.backward();
+
+		clone.forward(singleInputExample, singleLabelExample);
+		clone.backward();
+		clone.update(lr);
+		clone.forward(singleInputExample, singleLabelExample);
+
+		const newOutput = clone.yhat;
+		const updatedLoss = clone.loss.output;
+		const lossSavings = updatedLoss;
+		const lossDifference = nn.loss.output - updatedLoss;
+
+		const forwardAll = (inputArray) => {
+			/* Here we return an array of all the inputs fed forward */
+			const inputArrayLength = inputArray.length;
+			let outputArray = new Array(inputArrayLength);
+
+			for (let i = 0; i < inputArrayLength; i++) {
+				clone.forward(inputArray[i], 0); //we dont care about loss here so the input label doesnt matter
+				outputArray[i] = clone.yhat; //store all outputs to the outputArray
+			}
+
+			return outputArray; //return the output array to be used elsewhere
+		};
+		let a = forwardAll(X);
+
+		this.setState({
+			...this.state,
+			miniNN: nn,
+			potentialYhat: a,
+			mode: true,
+			lossSavings,
+			lossDifference,
+			singleInputIndex: randomInput,
+			singleInputExample,
+			singleLabelExample,
+			newOutput,
+			controls: {
+				...this.state.controls,
+				playing: false,
+			},
+		});
 	}
 
-	async anim() {}
+	async anim() {
+		const { shape } = this.state;
+		const speed = 750;
+		/* All anim needs to know is the shape */
+		const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+
+		/* animate the forward pass */
+		this.setState({
+			subEpoch: "forward",
+			isAnimating: true,
+			lossChange: 0,
+			cpyEpoch: this.state.epoch,
+			keyFrameScatter: 0,
+		});
+		for (let i = 0; i < shape.length; i++) {
+			this.setState({ keyFrameLayer: i });
+			if (i === shape.length - 1) {
+				continue;
+			}
+			await timer(speed);
+		}
+
+		this.setState({ keyFrameLoss: 1 });
+		await timer(speed);
+		this.setState({ keyFrameLoss: 2 });
+		await timer(speed);
+		this.setState({ keyFrameLoss: 3 });
+
+		//we update the losschange
+		this.setState({
+			lossChange: this.state.miniNN.loss.output,
+			keyFrameScatter: 1,
+		});
+		this.setState({ subEpoch: "backward", keyFrameScatter: 2 });
+
+		for (let i = shape.length - 1; i >= 0; i--) {
+			this.setState({ keyFrameLayer: i });
+			await timer(speed);
+		}
+		this.setState({ keyFrameLayer: -1 });
+
+		await timer(speed);
+		this.setState({ subEpoch: "transition" });
+
+		await timer(1000);
+		this.setState({ subEpoch: "update" });
+		await timer(1000);
+		//we update the new loss
+		this.setState({
+			isAnimating: false,
+			lossChange: this.state.lossSavings,
+			keyFrameScatter: 4,
+			cpyEpoch: this.state.cpyEpoch + 1,
+		});
+
+		/* animate update */
+	}
 
 	initNeuralNetwork(shape) {
 		const { controls } = this.state;
@@ -316,10 +468,10 @@ class MainTool extends Component {
 			return this.modelCompile(this.state.lr);
 		});
 		this.setState({
-			...this.state,
 			epoch: 0,
 			loss: null,
 			weights: [],
+			miniNN: null,
 			tensorFlowNN: model,
 			shapedWeights: [],
 			lossArray: [],
@@ -369,6 +521,19 @@ class MainTool extends Component {
 			shapedWeights,
 			shapedLinks,
 			shapedRects,
+			keyFrameLayer,
+			keyFrameLoss,
+			subEpoch,
+			isAnimating,
+			singleInputExample,
+			singleLabelExample,
+			lossSavings,
+			controlCenterHelp,
+			customizationHelp,
+			neuralNetworkHelp,
+			lossChange,
+			scatterHelp,
+			keyFrameScatter,
 		} = this.state;
 		const { playing, speed } = controls;
 
@@ -428,19 +593,43 @@ class MainTool extends Component {
 			</CardActions>
 		);
 		const controlsBackProp = (
-			<CardActions>
-				<Button
-					onClick={async () => {
-						await this.anim(this.state.miniNN);
-					}}
-				>
-					REPLAY
-				</Button>
-			</CardActions>
-		);
+			<Box marginTop={2}>
+				<CardActions>
+					<Button
+						onClick={async () => {
+							await this.anim();
+						}}
+						disabled={isAnimating}
+						style={{ color: isAnimating ? "lightgrey" : "black" }}
+						variant="outlined"
+					>
+						<Replay /> {"  "}REPLAY
+					</Button>
 
+					<Button
+						onClick={async () => {
+							this.randomInputGeneration(
+								X,
+								y,
+								weightsData,
+								biasesData,
+								shape,
+								0.001,
+								mode
+							);
+							await this.anim();
+						}}
+						style={{ color: isAnimating ? "lightgrey" : "#4BA3C3" }}
+						disabled={isAnimating}
+						variant="outlined"
+					>
+						New Training Example
+					</Button>
+				</CardActions>
+			</Box>
+		);
 		const controlCenter = (
-			<Box width={400}>
+			<Box width={400} marginLeft={10}>
 				<Card variant="outlined">
 					<CardContent>
 						<Typography
@@ -449,64 +638,162 @@ class MainTool extends Component {
 								color: "#4BA3C3",
 							}}
 						>
-							Control Center
+							{"Control Center"}
+							<IconButton
+								size="small"
+								style={{ color: "orange" }}
+								onClick={() => {
+									this.setState({ controlCenterHelp: true });
+								}}
+							>
+								<Help />
+							</IconButton>
 						</Typography>
-						<div on></div>
+						<div></div>
+
 						<Tooltip
 							title={
 								<Typography variant="h6">
-									{this.state.mode
+									{mode
 										? "Click to go back"
-										: "Click to see Backpropagation"}
+										: "Click to see single epoch"}
 								</Typography>
 							}
 							arrow
 							placement="right-start"
-							open={this.state.loss != null}
+							open={loss !== null || (mode && !isAnimating)}
 						>
 							<Button
-								disabled={this.state.loss == null}
+								disabled={loss == null || isAnimating}
 								onClick={async () => {
-									const timer = (ms) =>
-										new Promise((res) =>
-											setTimeout(res, ms)
+									if (mode) {
+										this.setState({ subEpoch: "" });
+										this.setState({ mode: !mode });
+									} else {
+										this.randomInputGeneration(
+											X,
+											y,
+											weightsData,
+											biasesData,
+											shape,
+											0.0001,
+											mode
 										);
-									let formattedWeights = tools.formatWeightArray(
-										weightsData,
-										shape
-									);
-									let nn = new NeuralNetwork(
-										shape,
-										formattedWeights,
-										biasesData
-									);
-
-									nn.forward(X[0], y[0]);
-									nn.backward();
-									this.setState({
-										...this.state,
-										miniNN: nn,
-										mode: !mode,
-										controls: {
-											...this.state.controls,
-											playing: false,
-										},
-									});
-									await timer(1000);
-									this.setState({ nshow: 1 });
-									await this.anim(nn);
+										await this.anim();
+									}
 								}}
 							>
 								<Typography variant="h4">
-									Epoch: {epoch}
+									Epoch: {mode ? this.state.cpyEpoch : epoch}
 								</Typography>
 							</Button>
 						</Tooltip>
+
+						{mode ? (
+							<CardActions>
+								<Typography
+									style={{
+										color: "orange",
+									}}
+									variant="h6"
+								>
+									Phase:
+								</Typography>
+								<Button
+									disabled={true}
+									style={{
+										color:
+											subEpoch === "forward"
+												? "orange"
+												: "grey",
+									}}
+								>
+									Forward
+								</Button>
+								<Button
+									disabled={true}
+									style={{
+										color:
+											subEpoch === "backward"
+												? "orange"
+												: "grey",
+									}}
+								>
+									Backward
+								</Button>
+								<Button
+									disabled={true}
+									style={{
+										color:
+											subEpoch === "update"
+												? "orange"
+												: "grey",
+									}}
+								>
+									Update
+								</Button>
+							</CardActions>
+						) : (
+							""
+						)}
+
 						<Typography variant="h6">
-							loss:
-							{loss == null ? "" : loss.toPrecision(6)}
+							{loss == null || mode
+								? ""
+								: `Loss: ${loss.toPrecision(6)}`}
 						</Typography>
-						{this.state.mode ? controlsBackProp : controlsReg}
+
+						<Typography variant="h6" style={{ color: "#4BA3C3" }}>
+							{mode
+								? `Training Example: (${singleInputExample.toPrecision(
+										3
+								  )}, ${singleLabelExample.toPrecision(3)})`
+								: ""}
+						</Typography>
+
+						<Typography
+							variant="h5"
+							style={{
+								color:
+									keyFrameScatter < 3 ? "black" : "orangered",
+							}}
+						>
+							{mode && lossChange != 0
+								? keyFrameScatter < 3
+									? "loss: "
+									: "new loss: "
+								: ""}
+							{mode && lossChange != 0 ? (
+								<AnimatedNumber
+									value={lossChange}
+									formatValue={(value) =>
+										value.toPrecision(6)
+									}
+									duration={750}
+								/>
+							) : (
+								""
+							)}
+						</Typography>
+						<Typography style={{ color: "grey" }} variant="caption">
+							{keyFrameScatter > 3 && mode
+								? "loss decrease: "
+								: ""}
+							{keyFrameScatter > 3 && mode ? (
+								<AnimatedNumber
+									value={this.state.lossDifference}
+									formatValue={(value) =>
+										value.toPrecision(6)
+									}
+									duration={750}
+								/>
+							) : (
+								""
+							)}
+						</Typography>
+
+						{mode ? controlsBackProp : controlsReg}
+
 						<CardActions></CardActions>
 					</CardContent>
 				</Card>
@@ -520,7 +807,18 @@ class MainTool extends Component {
 									color: "#4BA3C3",
 								}}
 							>
-								Customization
+								{"Customization "}
+								<IconButton
+									size="small"
+									style={{ color: "orange" }}
+									onClick={() => {
+										this.setState({
+											customizationHelp: true,
+										});
+									}}
+								>
+									<Help />
+								</IconButton>
 							</Typography>
 							<CardActions>
 								<Typography variant="caption">
@@ -528,7 +826,7 @@ class MainTool extends Component {
 								</Typography>
 								{lrs.map((num, i) => (
 									<Chip
-										disabled={playing}
+										disabled={playing || mode}
 										key={i}
 										label={`${num}`}
 										style={{
@@ -555,7 +853,7 @@ class MainTool extends Component {
 								</Typography>
 								{dataSets.map((item, i) => (
 									<Chip
-										disabled={playing}
+										disabled={playing || mode}
 										key={i}
 										label={item.label}
 										style={{
@@ -594,7 +892,7 @@ class MainTool extends Component {
 								<Slider
 									style={{ color: "#175676" }}
 									defaultValue={2}
-									disabled={playing}
+									disabled={playing || mode}
 									aria-labelledby="discrete-slider"
 									valueLabelDisplay="auto"
 									step={1}
@@ -606,7 +904,7 @@ class MainTool extends Component {
 									max={8}
 								/>
 								<Button
-									disabled={playing}
+									disabled={playing || mode}
 									onClick={() => {
 										let a = shape;
 										if (a.length < 5) {
@@ -624,7 +922,7 @@ class MainTool extends Component {
 								</Button>
 
 								<Button
-									disabled={playing}
+									disabled={playing || mode}
 									onClick={() => {
 										let a = shape;
 										if (a.length > 2) {
@@ -646,16 +944,52 @@ class MainTool extends Component {
 		const scatter = (
 			<Box marginLeft={10}>
 				<Box>
-					<ScatterPlot
-						width={300}
-						height={300}
-						padding={0}
-						start={-scale}
-						stop={scale}
-						X={X}
-						y={y}
-						yhat={yhat}
-					/>
+					{mode ? (
+						<AnimatedScatterPlot
+							width={300}
+							height={300}
+							padding={0}
+							start={-scale}
+							stop={scale}
+							X={X}
+							y={y}
+							yhat={yhat}
+							potential={this.state.potentialYhat}
+							id={2}
+							select={this.state.singleInputIndex}
+							times={this.state.keyFrameScatter}
+						/>
+					) : (
+						<ScatterPlot
+							width={300}
+							height={300}
+							padding={0}
+							start={-scale}
+							stop={scale}
+							X={X}
+							y={y}
+							yhat={yhat}
+							id={1}
+							select={-1}
+						/>
+					)}
+
+					<IconButton
+						size="small"
+						style={{
+							color: "orange",
+							position: "relative",
+							bottom: "300px",
+							right: "40px",
+						}}
+						onClick={() => {
+							this.setState({
+								scatterHelp: true,
+							});
+						}}
+					>
+						<Help />
+					</IconButton>
 				</Box>
 				<Box marginTop={10}>
 					<Loss lossArray={this.state.lossArray} loss={loss} />
@@ -663,11 +997,11 @@ class MainTool extends Component {
 			</Box>
 		);
 		const neuralNetwork = (
-			<Box marginLeft={10}>
+			<Box>
 				<NeuralNetworkComponent
 					miniNN={miniNN}
-					input={X[0]}
-					label={y[0]}
+					input={singleInputExample}
+					label={singleLabelExample}
 					shapedWeights={shapedWeights}
 					shapedLinks={shapedLinks}
 					shapedRects={shapedRects}
@@ -685,7 +1019,29 @@ class MainTool extends Component {
 					show={playing}
 					mode={mode}
 					backward={this.state.direction}
+					keyFrameLayer={keyFrameLayer}
+					keyFrameLoss={keyFrameLoss}
+					subEpoch={subEpoch}
+					lossSavings={lossSavings}
+					isAnimating={isAnimating}
+					lr={lr}
 				></NeuralNetworkComponent>
+				<IconButton
+					size="small"
+					style={{
+						color: "orange",
+						position: "relative",
+						bottom: "500px",
+						left: "100px",
+					}}
+					onClick={() => {
+						this.setState({
+							neuralNetworkHelp: true,
+						});
+					}}
+				>
+					<Help />
+				</IconButton>
 			</Box>
 		);
 
@@ -706,12 +1062,219 @@ class MainTool extends Component {
 							justifyContent="center"
 							marginTop={10}
 						>
-							{controlCenter}
 							{neuralNetwork}
 							{scatter}
+							{controlCenter}
 						</Box>
 					</CardContent>
 				</Card>
+
+				<Dialog
+					PaperProps={{
+						style: {
+							backgroundColor: "#F7F7F7",
+						},
+					}}
+					open={controlCenterHelp}
+				>
+					<DialogActions>
+						<IconButton
+							onClick={() => {
+								this.setState({ controlCenterHelp: false });
+							}}
+						>
+							<Close />
+						</IconButton>
+					</DialogActions>
+
+					<DialogContent>
+						<img
+							src={controlGif}
+							alt="how to use control center"
+							width="100%"
+						/>
+
+						<Typography variant="caption">
+							The <em>control</em> center is where you{" "}
+							<em>control</em> the flow of the program. You can
+							play, pause, slow down and reset.
+						</Typography>
+						<Box display="flex" justifyContent="center">
+							<Box marginBottom={5}>
+								<Typography variant="h6">
+									What is an Epoch?
+								</Typography>
+
+								<Typography variant="body2">
+									An epoch is single iteration of training.
+								</Typography>
+
+								<Typography variant="h6">
+									What is Loss?
+								</Typography>
+								<Typography variant="body2">
+									Loss tells you the error of the current
+									predicitions. Lower is better.
+								</Typography>
+
+								<Typography variant="h6">
+									How Do I go into Backpropogation Mode?
+								</Typography>
+								<Typography variant="body2">
+									Click on the EPOCH
+								</Typography>
+							</Box>
+						</Box>
+					</DialogContent>
+				</Dialog>
+				<Dialog
+					PaperProps={{
+						style: {
+							backgroundColor: "#F7F7F7",
+						},
+					}}
+					open={customizationHelp}
+				>
+					<DialogActions>
+						<IconButton
+							onClick={() => {
+								this.setState({ customizationHelp: false });
+							}}
+						>
+							<Close />
+						</IconButton>
+					</DialogActions>
+
+					<DialogContent>
+						<img
+							src={customGif}
+							alt="how to use control center"
+							width="100%"
+						/>
+
+						<Typography variant="caption">
+							The <em>customization</em> is where you{" "}
+							<em>customize</em> data, learning rate, and model
+							shape.
+						</Typography>
+						<Box display="flex" justifyContent="center">
+							<Box marginBottom={5}>
+								<Typography variant="h6">
+									What is an Learning Rate?
+								</Typography>
+
+								<Typography variant="body2">
+									Learning rate roughly translates to the
+									magnitiude of change each time parameters
+									are updated. You could think of it as how
+									big your steps are down a gradient.
+								</Typography>
+
+								<Typography variant="body2">
+									The learning rate is applied to the opposite
+									gradient after backpropogation.
+								</Typography>
+
+								<Typography variant="h6">
+									Why would I change learning rate?
+								</Typography>
+
+								<Typography variant="body2">
+									Depending on the shape of the model and the
+									amount of data,a higher learning rate could
+									allow your model to take less epochs to
+									reach the target loss. But if the learning
+									rate is too large, you will never reach the
+									minimum of loss that you want.
+								</Typography>
+							</Box>
+						</Box>
+					</DialogContent>
+				</Dialog>
+
+				<Dialog
+					PaperProps={{
+						style: {
+							backgroundColor: "#FAFAFA",
+						},
+					}}
+					open={neuralNetworkHelp}
+				>
+					<DialogActions>
+						<IconButton
+							onClick={() => {
+								this.setState({ neuralNetworkHelp: false });
+							}}
+						>
+							<Close />
+						</IconButton>
+					</DialogActions>
+
+					<DialogContent>
+						<img
+							src={nnDiagram}
+							alt="how to use control center"
+							width="100%"
+						/>
+
+						<Box display="flex" justifyContent="center">
+							<Box marginBottom={5}>
+								<Typography variant="h6">Summary</Typography>
+
+								<Typography variant="body2">
+									Each grey square with a black outline is a
+									neuron. Each connection indicates where the
+									inputs travel. The thikness and the color of
+									each connection also indicate the weight
+									associated.
+								</Typography>
+								<Typography variant="body2">
+									As the weights change, there will be a
+									visible change in stroke size.
+								</Typography>
+							</Box>
+						</Box>
+					</DialogContent>
+				</Dialog>
+
+				<Dialog
+					PaperProps={{
+						style: {
+							backgroundColor: "#F7F7F7",
+						},
+					}}
+					open={scatterHelp}
+				>
+					<DialogActions>
+						<IconButton
+							onClick={() => {
+								this.setState({ scatterHelp: false });
+							}}
+						>
+							<Close />
+						</IconButton>
+					</DialogActions>
+
+					<DialogContent>
+						<img src={scatterGif} alt="fitment" width="100%" />
+
+						<Box display="flex" justifyContent="center">
+							<Box marginBottom={5}>
+								<Typography variant="h6">Summary</Typography>
+
+								<Typography variant="body2">
+									The black line represents the current
+									predictions of the neural network.
+								</Typography>
+
+								<Typography variant="body2">
+									Each gray dot is a xy coordinate that
+									represents the input and input label.
+								</Typography>
+							</Box>
+						</Box>
+					</DialogContent>
+				</Dialog>
 			</div>
 		);
 	}

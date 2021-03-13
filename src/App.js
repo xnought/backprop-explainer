@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { Bar, MainTool } from "./components/exports";
+import { Bar, MainTool, Explanation } from "./components/exports";
+import "katex/dist/katex.min.css";
+import { InlineMath, BlockMath } from "react-katex";
 
 class App extends Component {
 	constructor(props) {
@@ -7,9 +9,9 @@ class App extends Component {
 		this.state = {};
 	}
 	render() {
+		const bar = <Bar title={"Backpropogation Explainer"} />;
 		return (
 			<div>
-				<Bar title={"Backpropogation Explainer"} />
 				<MainTool />
 			</div>
 		);
