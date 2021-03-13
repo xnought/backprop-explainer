@@ -125,6 +125,7 @@ const Explanation = () => (
 						What is Comes Next?
 					</Typography>
 				</CardContent>
+				<CardContent></CardContent>
 			</Card>
 		</Box>
 	</Box>
