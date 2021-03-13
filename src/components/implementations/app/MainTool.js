@@ -95,6 +95,7 @@ class MainTool extends Component {
 			subEpoch: "",
 			isAnimating: false,
 			lossSavings: 0,
+			lossDifference: 0,
 			singleInputExample: 0,
 			singleLabelExample: 0,
 			newOutput: 0,
@@ -143,6 +144,7 @@ class MainTool extends Component {
 		const newOutput = clone.yhat;
 		const updatedLoss = clone.loss.output;
 		const lossSavings = updatedLoss;
+		const lossDifference = nn.loss.output - updatedLoss;
 
 		const forwardAll = (inputArray) => {
 			/* Here we return an array of all the inputs fed forward */
@@ -164,6 +166,7 @@ class MainTool extends Component {
 			potentialYhat: a,
 			mode: true,
 			lossSavings,
+			lossDifference,
 			singleInputIndex: randomInput,
 			singleInputExample,
 			singleLabelExample,
@@ -590,35 +593,7 @@ class MainTool extends Component {
 			</CardActions>
 		);
 		const controlsBackProp = (
-			<Box>
-				<CardActions>
-					Phase:
-					<Button
-						disabled={true}
-						style={{
-							color: subEpoch === "forward" ? "orange" : "grey",
-						}}
-					>
-						Forward
-					</Button>
-					<Button
-						disabled={true}
-						style={{
-							color: subEpoch === "backward" ? "orange" : "grey",
-						}}
-					>
-						Backward
-					</Button>
-					<Button
-						disabled={true}
-						disabled={true}
-						style={{
-							color: subEpoch === "update" ? "orange" : "grey",
-						}}
-					>
-						Update
-					</Button>
-				</CardActions>
+			<Box marginTop={2}>
 				<CardActions>
 					<Button
 						onClick={async () => {
@@ -628,7 +603,7 @@ class MainTool extends Component {
 						style={{ color: isAnimating ? "lightgrey" : "black" }}
 						variant="outlined"
 					>
-						REPLAY
+						<Replay /> {"  "}REPLAY
 					</Button>
 
 					<Button
@@ -675,17 +650,18 @@ class MainTool extends Component {
 							</IconButton>
 						</Typography>
 						<div></div>
+
 						<Tooltip
 							title={
 								<Typography variant="h6">
 									{mode
 										? "Click to go back"
-										: "Click to see Backpropagation"}
+										: "Click to see single epoch"}
 								</Typography>
 							}
 							arrow
 							placement="right-start"
-							open={loss === null || (mode && !isAnimating)}
+							open={loss !== null || (mode && !isAnimating)}
 						>
 							<Button
 								disabled={loss == null || isAnimating}
@@ -713,6 +689,68 @@ class MainTool extends Component {
 							</Button>
 						</Tooltip>
 
+						{mode ? (
+							<CardActions>
+								<Typography
+									style={{
+										color: "orange",
+									}}
+									variant="h6"
+								>
+									Phase:
+								</Typography>
+								<Button
+									disabled={true}
+									style={{
+										color:
+											subEpoch === "forward"
+												? "orange"
+												: "grey",
+									}}
+								>
+									Forward
+								</Button>
+								<Button
+									disabled={true}
+									style={{
+										color:
+											subEpoch === "backward"
+												? "orange"
+												: "grey",
+									}}
+								>
+									Backward
+								</Button>
+								<Button
+									disabled={true}
+									style={{
+										color:
+											subEpoch === "update"
+												? "orange"
+												: "grey",
+									}}
+								>
+									Update
+								</Button>
+							</CardActions>
+						) : (
+							""
+						)}
+
+						<Typography variant="h6">
+							{loss == null || mode
+								? ""
+								: `Loss: ${loss.toPrecision(6)}`}
+						</Typography>
+
+						<Typography variant="h6" style={{ color: "#4BA3C3" }}>
+							{mode
+								? `Training Example: (${singleInputExample.toPrecision(
+										3
+								  )}, ${singleLabelExample.toPrecision(3)})`
+								: ""}
+						</Typography>
+
 						<Typography
 							variant="h5"
 							style={{
@@ -737,18 +775,21 @@ class MainTool extends Component {
 								""
 							)}
 						</Typography>
-						<Typography variant="h6">
-							{loss == null || mode
-								? ""
-								: `Loss: ${loss.toPrecision(6)}`}
-						</Typography>
-
-						<Typography variant="h6" style={{ color: "#4BA3C3" }}>
-							{mode
-								? `Training Example: (${singleInputExample.toPrecision(
-										6
-								  )}, ${singleLabelExample.toPrecision(6)})`
+						<Typography style={{ color: "grey" }} variant="caption">
+							{keyFrameScatter > 3 && mode
+								? "loss decrease: "
 								: ""}
+							{keyFrameScatter > 3 && mode ? (
+								<AnimatedNumber
+									value={this.state.lossDifference}
+									formatValue={(value) =>
+										value.toPrecision(6)
+									}
+									duration={750}
+								/>
+							) : (
+								""
+							)}
 						</Typography>
 
 						{mode ? controlsBackProp : controlsReg}
