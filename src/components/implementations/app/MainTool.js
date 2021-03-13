@@ -8,7 +8,12 @@
 import React, { Component } from "react";
 import * as tf from "@tensorflow/tfjs";
 import AnimatedNumber from "animated-number-react";
-import { NeuralNetworkComponent, ScatterPlot, Loss } from "../../exports";
+import {
+	NeuralNetworkComponent,
+	ScatterPlot,
+	Loss,
+	AnimatedScatterPlot,
+} from "../../exports";
 import {
 	Typography,
 	Box,
@@ -58,6 +63,8 @@ class MainTool extends Component {
 			shape: [1, 8, 8, 1],
 			lr: 0.01,
 			epoch: 0,
+			cpyEpoch: 0,
+
 			biasesData: [],
 			weightsData: [],
 			lossArray: [],
@@ -84,6 +91,7 @@ class MainTool extends Component {
 			stopRender: false,
 			keyFrameLayer: 0,
 			keyFrameLoss: 0,
+			keyFrameScatter: 0,
 			subEpoch: "",
 			isAnimating: false,
 			lossSavings: 0,
@@ -98,6 +106,8 @@ class MainTool extends Component {
 			scatterHelp: false,
 			lossHelp: false,
 			lossChange: 0,
+			potentialYhat: [],
+			singleInputIndex: -1,
 		};
 
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
@@ -134,11 +144,27 @@ class MainTool extends Component {
 		const updatedLoss = clone.loss.output;
 		const lossSavings = updatedLoss;
 
+		const forwardAll = (inputArray) => {
+			/* Here we return an array of all the inputs fed forward */
+			const inputArrayLength = inputArray.length;
+			let outputArray = new Array(inputArrayLength);
+
+			for (let i = 0; i < inputArrayLength; i++) {
+				clone.forward(inputArray[i], 0); //we dont care about loss here so the input label doesnt matter
+				outputArray[i] = clone.yhat; //store all outputs to the outputArray
+			}
+
+			return outputArray; //return the output array to be used elsewhere
+		};
+		let a = forwardAll(X);
+
 		this.setState({
 			...this.state,
 			miniNN: nn,
+			potentialYhat: a,
 			mode: true,
 			lossSavings,
+			singleInputIndex: randomInput,
 			singleInputExample,
 			singleLabelExample,
 			newOutput,
@@ -160,6 +186,8 @@ class MainTool extends Component {
 			subEpoch: "forward",
 			isAnimating: true,
 			lossChange: 0,
+			cpyEpoch: this.state.epoch,
+			keyFrameScatter: 0,
 		});
 		for (let i = 0; i < shape.length; i++) {
 			this.setState({ keyFrameLayer: i });
@@ -169,8 +197,6 @@ class MainTool extends Component {
 			await timer(speed);
 		}
 
-		/* animate the backward pass */
-		/* animate the forward pass */
 		this.setState({ keyFrameLoss: 1 });
 		await timer(speed);
 		this.setState({ keyFrameLoss: 2 });
@@ -178,8 +204,11 @@ class MainTool extends Component {
 		this.setState({ keyFrameLoss: 3 });
 
 		//we update the losschange
-		this.setState({ lossChange: this.state.miniNN.loss.output });
-		this.setState({ subEpoch: "backward" });
+		this.setState({
+			lossChange: this.state.miniNN.loss.output,
+			keyFrameScatter: 1,
+		});
+		this.setState({ subEpoch: "backward", keyFrameScatter: 2 });
 
 		for (let i = shape.length - 1; i >= 0; i--) {
 			this.setState({ keyFrameLayer: i });
@@ -197,6 +226,8 @@ class MainTool extends Component {
 		this.setState({
 			isAnimating: false,
 			lossChange: this.state.lossSavings,
+			keyFrameScatter: 4,
+			cpyEpoch: this.state.cpyEpoch + 1,
 		});
 
 		/* animate update */
@@ -499,6 +530,7 @@ class MainTool extends Component {
 			neuralNetworkHelp,
 			lossChange,
 			scatterHelp,
+			keyFrameScatter,
 		} = this.state;
 		const { playing, speed } = controls;
 
@@ -607,12 +639,12 @@ class MainTool extends Component {
 								weightsData,
 								biasesData,
 								shape,
-								lr,
+								0.001,
 								mode
 							);
 							await this.anim();
 						}}
-						style={{ color: isAnimating ? "lightgrey" : "black" }}
+						style={{ color: isAnimating ? "lightgrey" : "#4BA3C3" }}
 						disabled={isAnimating}
 						variant="outlined"
 					>
@@ -622,7 +654,7 @@ class MainTool extends Component {
 			</Box>
 		);
 		const controlCenter = (
-			<Box width={400}>
+			<Box width={400} marginLeft={10}>
 				<Card variant="outlined">
 					<CardContent>
 						<Typography
@@ -653,7 +685,7 @@ class MainTool extends Component {
 							}
 							arrow
 							placement="right-start"
-							open={playing || (mode && !isAnimating)}
+							open={loss === null || (mode && !isAnimating)}
 						>
 							<Button
 								disabled={loss == null || isAnimating}
@@ -668,7 +700,7 @@ class MainTool extends Component {
 											weightsData,
 											biasesData,
 											shape,
-											lr,
+											0.0001,
 											mode
 										);
 										await this.anim();
@@ -676,13 +708,23 @@ class MainTool extends Component {
 								}}
 							>
 								<Typography variant="h4">
-									Epoch: {epoch}
+									Epoch: {mode ? this.state.cpyEpoch : epoch}
 								</Typography>
 							</Button>
 						</Tooltip>
 
-						<Typography variant="h5">
-							{mode && lossChange != 0 ? "loss: " : ""}
+						<Typography
+							variant="h5"
+							style={{
+								color:
+									keyFrameScatter < 3 ? "black" : "orangered",
+							}}
+						>
+							{mode && lossChange != 0
+								? keyFrameScatter < 3
+									? "loss: "
+									: "new loss: "
+								: ""}
 							{mode && lossChange != 0 ? (
 								<AnimatedNumber
 									value={lossChange}
@@ -701,13 +743,11 @@ class MainTool extends Component {
 								: `Loss: ${loss.toPrecision(6)}`}
 						</Typography>
 
-						<Typography variant="h6">
+						<Typography variant="h6" style={{ color: "#4BA3C3" }}>
 							{mode
-								? `Input: ${singleInputExample.toPrecision(
+								? `Training Example: (${singleInputExample.toPrecision(
 										6
-								  )}, Label: ${singleLabelExample.toPrecision(
-										6
-								  )}`
+								  )}, ${singleLabelExample.toPrecision(6)})`
 								: ""}
 						</Typography>
 
@@ -863,16 +903,35 @@ class MainTool extends Component {
 		const scatter = (
 			<Box marginLeft={10}>
 				<Box>
-					<ScatterPlot
-						width={300}
-						height={300}
-						padding={0}
-						start={-scale}
-						stop={scale}
-						X={X}
-						y={y}
-						yhat={yhat}
-					/>
+					{mode ? (
+						<AnimatedScatterPlot
+							width={300}
+							height={300}
+							padding={0}
+							start={-scale}
+							stop={scale}
+							X={X}
+							y={y}
+							yhat={yhat}
+							potential={this.state.potentialYhat}
+							id={2}
+							select={this.state.singleInputIndex}
+							times={this.state.keyFrameScatter}
+						/>
+					) : (
+						<ScatterPlot
+							width={300}
+							height={300}
+							padding={0}
+							start={-scale}
+							stop={scale}
+							X={X}
+							y={y}
+							yhat={yhat}
+							id={1}
+							select={-1}
+						/>
+					)}
 
 					<IconButton
 						size="small"
@@ -897,7 +956,7 @@ class MainTool extends Component {
 			</Box>
 		);
 		const neuralNetwork = (
-			<Box marginLeft={10}>
+			<Box>
 				<NeuralNetworkComponent
 					miniNN={miniNN}
 					input={singleInputExample}
@@ -962,9 +1021,9 @@ class MainTool extends Component {
 							justifyContent="center"
 							marginTop={10}
 						>
-							{controlCenter}
 							{neuralNetwork}
 							{scatter}
+							{controlCenter}
 						</Box>
 					</CardContent>
 				</Card>

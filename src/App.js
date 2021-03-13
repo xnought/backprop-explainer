@@ -9,9 +9,9 @@ class App extends Component {
 		this.state = {};
 	}
 	render() {
+		const bar = <Bar title={"Backpropogation Explainer"} />;
 		return (
 			<div>
-				<Bar title={"Backpropogation Explainer"} />
 				<MainTool />
 			</div>
 		);
