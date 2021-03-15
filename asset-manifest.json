@@ -1,30 +1,34 @@
 {
   "files": {
     "main.css": "/Backpropagation-Visualizer/static/css/main.438f32d1.chunk.css",
-    "main.js": "/Backpropagation-Visualizer/static/js/main.0cdaf552.chunk.js",
-    "main.js.map": "/Backpropagation-Visualizer/static/js/main.0cdaf552.chunk.js.map",
-    "runtime-main.js": "/Backpropagation-Visualizer/static/js/runtime-main.4a29b0b3.js",
-    "runtime-main.js.map": "/Backpropagation-Visualizer/static/js/runtime-main.4a29b0b3.js.map",
+    "main.js": "/Backpropagation-Visualizer/static/js/main.e1eca833.chunk.js",
+    "main.js.map": "/Backpropagation-Visualizer/static/js/main.e1eca833.chunk.js.map",
+    "runtime-main.js": "/Backpropagation-Visualizer/static/js/runtime-main.df5d483b.js",
+    "runtime-main.js.map": "/Backpropagation-Visualizer/static/js/runtime-main.df5d483b.js.map",
     "static/css/2.3b37adae.chunk.css": "/Backpropagation-Visualizer/static/css/2.3b37adae.chunk.css",
-    "static/js/2.2a112813.chunk.js": "/Backpropagation-Visualizer/static/js/2.2a112813.chunk.js",
-    "static/js/2.2a112813.chunk.js.map": "/Backpropagation-Visualizer/static/js/2.2a112813.chunk.js.map",
-    "static/js/3.7a4c76c6.chunk.js": "/Backpropagation-Visualizer/static/js/3.7a4c76c6.chunk.js",
-    "static/js/3.7a4c76c6.chunk.js.map": "/Backpropagation-Visualizer/static/js/3.7a4c76c6.chunk.js.map",
+    "static/js/2.a34b6a2b.chunk.js": "/Backpropagation-Visualizer/static/js/2.a34b6a2b.chunk.js",
+    "static/js/2.a34b6a2b.chunk.js.map": "/Backpropagation-Visualizer/static/js/2.a34b6a2b.chunk.js.map",
+    "static/js/3.31389dd4.chunk.js": "/Backpropagation-Visualizer/static/js/3.31389dd4.chunk.js",
+    "static/js/3.31389dd4.chunk.js.map": "/Backpropagation-Visualizer/static/js/3.31389dd4.chunk.js.map",
     "index.html": "/Backpropagation-Visualizer/index.html",
     "static/css/2.3b37adae.chunk.css.map": "/Backpropagation-Visualizer/static/css/2.3b37adae.chunk.css.map",
     "static/css/main.438f32d1.chunk.css.map": "/Backpropagation-Visualizer/static/css/main.438f32d1.chunk.css.map",
-    "static/js/2.2a112813.chunk.js.LICENSE.txt": "/Backpropagation-Visualizer/static/js/2.2a112813.chunk.js.LICENSE.txt",
+    "static/js/2.a34b6a2b.chunk.js.LICENSE.txt": "/Backpropagation-Visualizer/static/js/2.a34b6a2b.chunk.js.LICENSE.txt",
     "static/media/katex.min.css": "/Backpropagation-Visualizer/static/media/KaTeX_Typewriter-Regular.c5441b17.ttf",
+    "static/media/backward.0c67cde4.svg": "/Backpropagation-Visualizer/static/media/backward.0c67cde4.svg",
     "static/media/controlcenter.3793afef.gif": "/Backpropagation-Visualizer/static/media/controlcenter.3793afef.gif",
     "static/media/customization.05bd2f71.gif": "/Backpropagation-Visualizer/static/media/customization.05bd2f71.gif",
+    "static/media/forward.94373b2e.svg": "/Backpropagation-Visualizer/static/media/forward.94373b2e.svg",
+    "static/media/header.f51054ca.svg": "/Backpropagation-Visualizer/static/media/header.f51054ca.svg",
+    "static/media/nn.185334eb.svg": "/Backpropagation-Visualizer/static/media/nn.185334eb.svg",
     "static/media/nn.984f5d8c.png": "/Backpropagation-Visualizer/static/media/nn.984f5d8c.png",
     "static/media/scatter.1bf50e5e.gif": "/Backpropagation-Visualizer/static/media/scatter.1bf50e5e.gif"
   },
   "entrypoints": [
-    "static/js/runtime-main.4a29b0b3.js",
+    "static/js/runtime-main.df5d483b.js",
     "static/css/2.3b37adae.chunk.css",
-    "static/js/2.2a112813.chunk.js",
+    "static/js/2.a34b6a2b.chunk.js",
     "static/css/main.438f32d1.chunk.css",
-    "static/js/main.0cdaf552.chunk.js"
+    "static/js/main.e1eca833.chunk.js"
   ]
 }
