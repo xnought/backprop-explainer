@@ -1,19 +1,19 @@
 {
   "files": {
     "main.css": "/backprop-explainer/static/css/main.438f32d1.chunk.css",
-    "main.js": "/backprop-explainer/static/js/main.64336ead.chunk.js",
-    "main.js.map": "/backprop-explainer/static/js/main.64336ead.chunk.js.map",
-    "runtime-main.js": "/backprop-explainer/static/js/runtime-main.044eea9f.js",
-    "runtime-main.js.map": "/backprop-explainer/static/js/runtime-main.044eea9f.js.map",
+    "main.js": "/backprop-explainer/static/js/main.e31147d8.chunk.js",
+    "main.js.map": "/backprop-explainer/static/js/main.e31147d8.chunk.js.map",
+    "runtime-main.js": "/backprop-explainer/static/js/runtime-main.a9e73049.js",
+    "runtime-main.js.map": "/backprop-explainer/static/js/runtime-main.a9e73049.js.map",
     "static/css/2.6eaf588d.chunk.css": "/backprop-explainer/static/css/2.6eaf588d.chunk.css",
-    "static/js/2.cc988836.chunk.js": "/backprop-explainer/static/js/2.cc988836.chunk.js",
-    "static/js/2.cc988836.chunk.js.map": "/backprop-explainer/static/js/2.cc988836.chunk.js.map",
-    "static/js/3.608a46b8.chunk.js": "/backprop-explainer/static/js/3.608a46b8.chunk.js",
-    "static/js/3.608a46b8.chunk.js.map": "/backprop-explainer/static/js/3.608a46b8.chunk.js.map",
+    "static/js/2.a6c1f420.chunk.js": "/backprop-explainer/static/js/2.a6c1f420.chunk.js",
+    "static/js/2.a6c1f420.chunk.js.map": "/backprop-explainer/static/js/2.a6c1f420.chunk.js.map",
+    "static/js/3.37338899.chunk.js": "/backprop-explainer/static/js/3.37338899.chunk.js",
+    "static/js/3.37338899.chunk.js.map": "/backprop-explainer/static/js/3.37338899.chunk.js.map",
     "index.html": "/backprop-explainer/index.html",
     "static/css/2.6eaf588d.chunk.css.map": "/backprop-explainer/static/css/2.6eaf588d.chunk.css.map",
     "static/css/main.438f32d1.chunk.css.map": "/backprop-explainer/static/css/main.438f32d1.chunk.css.map",
-    "static/js/2.cc988836.chunk.js.LICENSE.txt": "/backprop-explainer/static/js/2.cc988836.chunk.js.LICENSE.txt",
+    "static/js/2.a6c1f420.chunk.js.LICENSE.txt": "/backprop-explainer/static/js/2.a6c1f420.chunk.js.LICENSE.txt",
     "static/media/katex.min.css": "/backprop-explainer/static/media/KaTeX_Typewriter-Regular.c5441b17.ttf",
     "static/media/backward.0c67cde4.svg": "/backprop-explainer/static/media/backward.0c67cde4.svg",
     "static/media/controlcenter.3793afef.gif": "/backprop-explainer/static/media/controlcenter.3793afef.gif",
@@ -25,10 +25,10 @@
     "static/media/scatter.1bf50e5e.gif": "/backprop-explainer/static/media/scatter.1bf50e5e.gif"
   },
   "entrypoints": [
-    "static/js/runtime-main.044eea9f.js",
+    "static/js/runtime-main.a9e73049.js",
     "static/css/2.6eaf588d.chunk.css",
-    "static/js/2.cc988836.chunk.js",
+    "static/js/2.a6c1f420.chunk.js",
     "static/css/main.438f32d1.chunk.css",
-    "static/js/main.64336ead.chunk.js"
+    "static/js/main.e31147d8.chunk.js"
   ]
 }
