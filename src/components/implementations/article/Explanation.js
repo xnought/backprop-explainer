@@ -7,6 +7,7 @@ import nnSVG from "./assets/nn.svg";
 import forwardSVG from "./assets/forward.svg";
 import backwardSVG from "./assets/backward.svg";
 import LinearScatter from "./LinearScatter";
+import SubTool from "./SubTool";
 const Explanation = () => {
 	const link = (href, content) => (
 		<Button
@@ -240,6 +241,7 @@ const Explanation = () => {
 				component which computes forward, backward and update per epoch.
 				Automatically.
 			</p>
+			<SubTool />
 
 			<h1>Scaling up to larger networks</h1>
 			<p>

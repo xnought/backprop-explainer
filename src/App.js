@@ -38,10 +38,20 @@ class App extends Component {
 				</Typography>
 			</div>
 		);
+		const acks = (
+			<div>
+				<h1>
+					Reserve this space under the main tool for refereces, credit
+					acknowledgements
+				</h1>
+			</div>
+		);
 		return (
 			<div>
 				{header}
 				<Explanation />
+				<MainTool />
+				{acks}
 			</div>
 		);
 	}

@@ -7,6 +7,7 @@ import Loss from "./implementations/graphs/Loss";
 import Explanation from "./implementations/article/Explanation";
 import MainTool from "./implementations/app/MainTool";
 import Header from "./implementations/article/Header";
+import SubTool from "./implementations/article/SubTool";
 import * as Typeset from "./implementations/article/Typeset";
 
 export {
@@ -16,6 +17,7 @@ export {
 	Loss,
 	MainTool,
 	Header,
+	SubTool,
 	Typeset,
 	Explanation,
 };
