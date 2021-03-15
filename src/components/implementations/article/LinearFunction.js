@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { $, $$ } from "./Typeset";
 import { Typography, Slider, Box, Card, CardContent } from "@material-ui/core";
 
 class LinearFunction extends Component {
@@ -20,32 +21,20 @@ class LinearFunction extends Component {
 	}
 
 	render() {
+		const { input, output } = this.state;
 		return (
 			<Box display="flex">
 				<Box minWidth={300}>
 					<Card variant="outlined">
 						<CardContent>
 							<Slider
-								value={this.state.input}
+								value={input}
 								onChange={(e, n) => {
 									this.compute(n);
 								}}
 								color="secondary"
 							></Slider>
-							<Typography variant="h5">
-								f(
-								<Typography color="secondary">
-									{this.state.input}
-								</Typography>
-								) = 2(
-								<Typography color="secondary">
-									{this.state.input}
-								</Typography>
-								) + 1 ={" "}
-								<Typography style={{ color: "#8db600" }}>
-									{this.state.output}
-								</Typography>
-							</Typography>
+							{$$(`f(${input}) = 2(${input}) + 1 = ${output}`)}
 						</CardContent>
 					</Card>
 				</Box>

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { Bar, MainTool, Explanation } from "./components/exports";
-import "katex/dist/katex.min.css";
-import { InlineMath, BlockMath } from "react-katex";
+import headerSvg from "./header.svg";
+import { MainTool, Explanation } from "./components/exports";
+import { Typography } from "@material-ui/core";
 
 class App extends Component {
 	constructor(props) {
@@ -9,10 +9,39 @@ class App extends Component {
 		this.state = {};
 	}
 	render() {
-		const bar = <Bar title={"Backpropogation Explainer"} />;
+		const mainTool = <MainTool />;
+		const header = (
+			<div>
+				<img src={headerSvg} width="100%" />
+				<Typography
+					style={{
+						position: "relative",
+						bottom: 200,
+						left: 100,
+						color: "white",
+					}}
+					variant="h2"
+				>
+					<b>How Neural Networks Learn </b>
+				</Typography>
+				<Typography
+					style={{
+						position: "relative",
+						bottom: 200,
+						left: 100,
+						color: "white",
+					}}
+					variant="h6"
+				>
+					Learn backpropogation and optimization with interactive
+					tools
+				</Typography>
+			</div>
+		);
 		return (
 			<div>
-				<MainTool />
+				{header}
+				<Explanation />
 			</div>
 		);
 	}

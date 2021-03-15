@@ -656,7 +656,7 @@ class MainTool extends Component {
 								<Typography variant="h6">
 									{mode
 										? "Click to go back"
-										: "Click to see single epoch"}
+										: "Click for Epoch Mode"}
 								</Typography>
 							}
 							arrow
@@ -970,6 +970,7 @@ class MainTool extends Component {
 							y={y}
 							yhat={yhat}
 							id={1}
+							duration={100}
 							select={-1}
 						/>
 					)}

@@ -112,7 +112,7 @@ class ScatterPlot extends Component {
 
 		svg.select("#epic")
 			.transition()
-			.duration(100)
+			.duration(this.props.duration)
 			.attr("d", d3.line()(a))
 			.attr("stroke", "black")
 			.attr("fill", "none");
