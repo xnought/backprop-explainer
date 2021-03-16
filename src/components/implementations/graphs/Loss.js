@@ -51,7 +51,7 @@ class Loss extends Component {
 		//svg.append("text").attr("x", 1).attr("y", -5).text("loss:");
 	}
 	componentDidUpdate() {
-		const { lossArray, loss } = this.props;
+		const { lossArray, duration } = this.props;
 		const height = 100;
 		const width = 300;
 		const start = 0;
@@ -84,6 +84,8 @@ class Loss extends Component {
 			.attr("transform", "translate(" + (width - 2 * padding) + ",0)")
 			.call(yAxis.ticks(5));
 		svg.select("#line")
+			.transition()
+			.duration(duration)
 			.attr("d", d3.line()(a))
 			.attr("stroke", "black")
 			.attr("fill", "none");

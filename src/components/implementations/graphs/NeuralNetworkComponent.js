@@ -195,7 +195,7 @@ class NeuralNetworkComponent extends Component {
 						});
 					})}
 					<rect
-						x={34}
+						x={55}
 						y={234}
 						width={squareWidth}
 						height={squareWidth}

@@ -60,8 +60,8 @@ class MainTool extends Component {
 			X: [],
 			y: [],
 			yhat: [],
-			shape: [1, 8, 8, 1],
-			lr: 0.01,
+			shape: [1, 8, 8, 8, 1],
+			lr: 0.001,
 			epoch: 0,
 			cpyEpoch: 0,
 
@@ -84,7 +84,7 @@ class MainTool extends Component {
 			/* State for Components */
 			controls: {
 				playing: false,
-				speed: 0,
+				speed: 100,
 			},
 			sliderVal: 2,
 			mode: false,
@@ -109,6 +109,8 @@ class MainTool extends Component {
 			lossChange: 0,
 			potentialYhat: [],
 			singleInputIndex: -1,
+			shouldNotRender: false,
+			status: "reset",
 		};
 
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
@@ -187,6 +189,7 @@ class MainTool extends Component {
 		/* animate the forward pass */
 		this.setState({
 			subEpoch: "forward",
+			status: "reset",
 			isAnimating: true,
 			lossChange: 0,
 			cpyEpoch: this.state.epoch,
@@ -200,16 +203,21 @@ class MainTool extends Component {
 			await timer(speed);
 		}
 
-		this.setState({ keyFrameLoss: 1 });
+		this.setState({
+			keyFrameLoss: 1,
+			keyFrameScatter: 1,
+			status: "real",
+			shouldNotRender: true,
+		});
+
 		await timer(speed);
-		this.setState({ keyFrameLoss: 2 });
+		this.setState({ keyFrameLoss: 2, shouldNotRender: true });
 		await timer(speed);
 		this.setState({ keyFrameLoss: 3 });
 
 		//we update the losschange
 		this.setState({
 			lossChange: this.state.miniNN.loss.output,
-			keyFrameScatter: 1,
 		});
 		this.setState({ subEpoch: "backward", keyFrameScatter: 2 });
 
@@ -223,7 +231,7 @@ class MainTool extends Component {
 		this.setState({ subEpoch: "transition" });
 
 		await timer(1000);
-		this.setState({ subEpoch: "update" });
+		this.setState({ subEpoch: "update", shouldNotRender: false });
 		await timer(1000);
 		//we update the new loss
 		this.setState({
@@ -231,6 +239,7 @@ class MainTool extends Component {
 			lossChange: this.state.lossSavings,
 			keyFrameScatter: 4,
 			cpyEpoch: this.state.cpyEpoch + 1,
+			status: "pred",
 		});
 
 		/* animate update */
@@ -249,7 +258,7 @@ class MainTool extends Component {
 			//prettier-ignore
 			const {xScale, yScale} = draw.generateLinearScale(xConstraints,yConstraints);
 			// Create the starting point and the stopping point for the neural network
-			const start = { x: 50 - squareWidth / 2, y: 250 - squareWidth / 2 };
+			const start = { x: 71 - squareWidth / 2, y: 250 - squareWidth / 2 };
 			const stop = { x: 750 - squareWidth / 2, y: 250 - squareWidth / 2 };
 			// generate function to create paths from (x,y) to (x,y)
 			const linksGenerator = draw.generateLink(squareWidth / 2);
@@ -388,6 +397,7 @@ class MainTool extends Component {
 			play = playing;
 			await model.fit(XTensor, yTensor, {
 				epochs: 1,
+				batchSize: 1,
 			});
 			tf.tidy(() => {
 				let yhatTensor = model.predict(XTensor);
@@ -614,7 +624,7 @@ class MainTool extends Component {
 								weightsData,
 								biasesData,
 								shape,
-								0.001,
+								lr,
 								mode
 							);
 							await this.anim();
@@ -654,9 +664,7 @@ class MainTool extends Component {
 						<Tooltip
 							title={
 								<Typography variant="h6">
-									{mode
-										? "Click to go back"
-										: "Click for Epoch Mode"}
+									{mode ? "Click: Back" : "Click: Epoch Mode"}
 								</Typography>
 							}
 							arrow
@@ -676,7 +684,7 @@ class MainTool extends Component {
 											weightsData,
 											biasesData,
 											shape,
-											0.0001,
+											lr,
 											mode
 										);
 										await this.anim();
@@ -958,6 +966,8 @@ class MainTool extends Component {
 							id={2}
 							select={this.state.singleInputIndex}
 							times={this.state.keyFrameScatter}
+							shouldNotRender={this.state.shouldNotRender}
+							status={this.state.status}
 						/>
 					) : (
 						<ScatterPlot
@@ -993,7 +1003,7 @@ class MainTool extends Component {
 					</IconButton>
 				</Box>
 				<Box marginTop={10}>
-					<Loss lossArray={this.state.lossArray} loss={loss} />
+					<Loss lossArray={this.state.lossArray} duration={100} />
 				</Box>
 			</Box>
 		);

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import headerSvg from "./header.svg";
+import ReactGa from "react-ga";
 import { MainTool, Explanation } from "./components/exports";
 import { Typography } from "@material-ui/core";
 
@@ -7,6 +8,10 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {};
+	}
+	componentDidMount() {
+		ReactGa.initialize("UA-192166007-1");
+		ReactGa.pageview("/");
 	}
 	render() {
 		const mainTool = <MainTool />;
@@ -52,6 +57,13 @@ class App extends Component {
 				<Explanation />
 				<MainTool />
 				{acks}
+				<h1>Nice</h1>
+				<h1>Nice</h1>
+				<h1>Nice</h1>
+				<h1>Nice</h1>
+				<h1>Nice</h1>
+				<h1>Nice</h1>
+				<h1>Nice</h1>
 			</div>
 		);
 	}
