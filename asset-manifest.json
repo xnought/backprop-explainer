@@ -1,34 +1,39 @@
 {
   "files": {
     "main.css": "/backprop-explainer/static/css/main.438f32d1.chunk.css",
-    "main.js": "/backprop-explainer/static/js/main.22bd22a4.chunk.js",
-    "main.js.map": "/backprop-explainer/static/js/main.22bd22a4.chunk.js.map",
-    "runtime-main.js": "/backprop-explainer/static/js/runtime-main.a9e73049.js",
-    "runtime-main.js.map": "/backprop-explainer/static/js/runtime-main.a9e73049.js.map",
+    "main.js": "/backprop-explainer/static/js/main.193f407f.chunk.js",
+    "main.js.map": "/backprop-explainer/static/js/main.193f407f.chunk.js.map",
+    "runtime-main.js": "/backprop-explainer/static/js/runtime-main.7e6dcf00.js",
+    "runtime-main.js.map": "/backprop-explainer/static/js/runtime-main.7e6dcf00.js.map",
     "static/css/2.6eaf588d.chunk.css": "/backprop-explainer/static/css/2.6eaf588d.chunk.css",
-    "static/js/2.a6c1f420.chunk.js": "/backprop-explainer/static/js/2.a6c1f420.chunk.js",
-    "static/js/2.a6c1f420.chunk.js.map": "/backprop-explainer/static/js/2.a6c1f420.chunk.js.map",
-    "static/js/3.37338899.chunk.js": "/backprop-explainer/static/js/3.37338899.chunk.js",
-    "static/js/3.37338899.chunk.js.map": "/backprop-explainer/static/js/3.37338899.chunk.js.map",
+    "static/js/2.d8ea528e.chunk.js": "/backprop-explainer/static/js/2.d8ea528e.chunk.js",
+    "static/js/2.d8ea528e.chunk.js.map": "/backprop-explainer/static/js/2.d8ea528e.chunk.js.map",
+    "static/js/3.a68b5078.chunk.js": "/backprop-explainer/static/js/3.a68b5078.chunk.js",
+    "static/js/3.a68b5078.chunk.js.map": "/backprop-explainer/static/js/3.a68b5078.chunk.js.map",
     "index.html": "/backprop-explainer/index.html",
     "static/css/2.6eaf588d.chunk.css.map": "/backprop-explainer/static/css/2.6eaf588d.chunk.css.map",
     "static/css/main.438f32d1.chunk.css.map": "/backprop-explainer/static/css/main.438f32d1.chunk.css.map",
-    "static/js/2.a6c1f420.chunk.js.LICENSE.txt": "/backprop-explainer/static/js/2.a6c1f420.chunk.js.LICENSE.txt",
+    "static/js/2.d8ea528e.chunk.js.LICENSE.txt": "/backprop-explainer/static/js/2.d8ea528e.chunk.js.LICENSE.txt",
     "static/media/katex.min.css": "/backprop-explainer/static/media/KaTeX_Typewriter-Regular.c5441b17.ttf",
     "static/media/backward.0c67cde4.svg": "/backprop-explainer/static/media/backward.0c67cde4.svg",
     "static/media/controlcenter.3793afef.gif": "/backprop-explainer/static/media/controlcenter.3793afef.gif",
     "static/media/customization.05bd2f71.gif": "/backprop-explainer/static/media/customization.05bd2f71.gif",
     "static/media/forward.94373b2e.svg": "/backprop-explainer/static/media/forward.94373b2e.svg",
     "static/media/header.f51054ca.svg": "/backprop-explainer/static/media/header.f51054ca.svg",
+    "static/media/headerTitle.0f9249c8.svg": "/backprop-explainer/static/media/headerTitle.0f9249c8.svg",
     "static/media/nn.185334eb.svg": "/backprop-explainer/static/media/nn.185334eb.svg",
     "static/media/nn.984f5d8c.png": "/backprop-explainer/static/media/nn.984f5d8c.png",
-    "static/media/scatter.1bf50e5e.gif": "/backprop-explainer/static/media/scatter.1bf50e5e.gif"
+    "static/media/scatter.1bf50e5e.gif": "/backprop-explainer/static/media/scatter.1bf50e5e.gif",
+    "static/media/structArt.5830dcf2.svg": "/backprop-explainer/static/media/structArt.5830dcf2.svg",
+    "static/media/structLin.936d1ee7.svg": "/backprop-explainer/static/media/structLin.936d1ee7.svg",
+    "static/media/structMan.d909fd24.svg": "/backprop-explainer/static/media/structMan.d909fd24.svg",
+    "static/media/structNN.e936abf1.svg": "/backprop-explainer/static/media/structNN.e936abf1.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.a9e73049.js",
+    "static/js/runtime-main.7e6dcf00.js",
     "static/css/2.6eaf588d.chunk.css",
-    "static/js/2.a6c1f420.chunk.js",
+    "static/js/2.d8ea528e.chunk.js",
     "static/css/main.438f32d1.chunk.css",
-    "static/js/main.22bd22a4.chunk.js"
+    "static/js/main.193f407f.chunk.js"
   ]
 }
