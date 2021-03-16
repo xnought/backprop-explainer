@@ -172,7 +172,10 @@ class LinearScatter extends Component {
 							<Button
 								size="small"
 								variant="contained"
-								color="primary"
+								style={{
+									backgroundColor: "#155676",
+									color: "white",
+								}}
 								onClick={() => {
 									this.setState({ show: !this.state.show });
 								}}

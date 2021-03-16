@@ -8,6 +8,8 @@ import forwardSVG from "./assets/forward.svg";
 import backwardSVG from "./assets/backward.svg";
 import LinearScatter from "./LinearScatter";
 import SubTool from "./SubTool";
+import { Nav } from "./Nav";
+import { Element } from "react-scroll";
 const Explanation = () => {
 	const link = (href, content) => (
 		<Button
@@ -20,92 +22,27 @@ const Explanation = () => {
 			{content}
 		</Button>
 	);
-	const introduction = (
-		<div>
-			<Typography variant="h3">Table of Contents</Typography>
-			<Button disabled={true} size="small" color="secondary">
-				Color Legend:
-			</Button>
-			<Button size="small" style={{ pointerEvents: "none" }}>
-				Section
-			</Button>
-			<Button
-				size="small"
-				color="primary"
-				style={{ pointerEvents: "none" }}
-			>
-				Static Text
-			</Button>
-			<Button
-				size="small"
-				color="secondary"
-				style={{ pointerEvents: "none" }}
-			>
-				Interactive Tool
-			</Button>
-			<ol>
-				<li>
-					<Button size="large">Introduction</Button>
-				</li>
-				<li>
-					<Button size="large">backpropagation on one neuron</Button>
-					<ol type="a">
-						<li>
-							<Button color="secondary" size="small">
-								Manual Best Fit
-							</Button>
-						</li>
-						<li>
-							<Button color="primary" size="small">
-								Explanation
-							</Button>
-						</li>
-						<li>
-							<Button color="primary" size="small">
-								Math Example
-							</Button>
-						</li>
-						<li>
-							<Button color="secondary" size="small">
-								Training Best Fit
-							</Button>
-						</li>
-					</ol>
-				</li>
-				<li>
-					<Button size="large">Scaling up</Button>
-					<ol type="a">
-						<li>
-							<Button color="primary" size="small">
-								Explanation
-							</Button>
-						</li>
-						<li>
-							<Button color="primary" size="small">
-								Math Example
-							</Button>
-						</li>
-						<li>
-							<Button color="secondary" size="small">
-								Full Neural Network Backpropagation Explainer
-							</Button>
-						</li>
-					</ol>
-				</li>
-			</ol>
-		</div>
-	);
 
+	const colab = (href) => (
+		<a href={href}>
+			<img
+				src="https://colab.research.google.com/assets/colab-badge.svg"
+				alt="Open In Colab"
+			/>
+		</a>
+	);
 	const paper = (
 		<div>
+			<br />
 			<Typography variant="h3">Introduction</Typography>
-			<p>
+			<Typography variant="h6">
 				Most people abstract the idea of backpropagation when learning
 				neural networks because it is by far the most notation heavy
 				part. The goal of this article is to marry the notation with
 				some interactive tools to better understand a very important
 				idea.
-			</p>
+			</Typography>
+			<Nav />
 
 			<p>
 				Our goal in a neural network is to lower whatever loss function
@@ -122,7 +59,9 @@ const Explanation = () => {
 				some help), reveal the graph.
 			</p>
 			<br />
-			<LinearScatter />
+			<Element name="structMan">
+				<LinearScatter />
+			</Element>
 			<br />
 			<p>
 				The intuition from this one scenario essentially explains all of
@@ -241,7 +180,9 @@ const Explanation = () => {
 				component which computes forward, backward and update per epoch.
 				Automatically.
 			</p>
-			<SubTool />
+			<Element name="structLin">
+				<SubTool />
+			</Element>
 
 			<h1>Scaling up to larger networks</h1>
 			<p>
@@ -283,10 +224,7 @@ const Explanation = () => {
 
 	return (
 		<Box justifyContent="center" display="flex">
-			<Box maxWidth="65%">
-				{introduction}
-				{paper}
-			</Box>
+			<Box maxWidth="65%">{paper}</Box>
 		</Box>
 	);
 };

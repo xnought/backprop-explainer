@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import headerSvg from "./header.svg";
+import headerTitleSVG from "./headerTitle.svg";
 import ReactGa from "react-ga";
 import { MainTool, Explanation } from "./components/exports";
-import { Typography } from "@material-ui/core";
+import { Typography, Button, Box } from "@material-ui/core";
+import { Element } from "react-scroll";
 
 class App extends Component {
 	constructor(props) {
@@ -17,30 +19,7 @@ class App extends Component {
 		const mainTool = <MainTool />;
 		const header = (
 			<div>
-				<img src={headerSvg} width="100%" />
-				<Typography
-					style={{
-						position: "relative",
-						bottom: 200,
-						left: 100,
-						color: "white",
-					}}
-					variant="h2"
-				>
-					<b>How Neural Networks Learn </b>
-				</Typography>
-				<Typography
-					style={{
-						position: "relative",
-						bottom: 200,
-						left: 100,
-						color: "white",
-					}}
-					variant="h6"
-				>
-					Learn backpropogation and optimization with interactive
-					tools
-				</Typography>
+				<img src={headerTitleSVG} width="100%" />
 			</div>
 		);
 		const acks = (
@@ -54,8 +33,13 @@ class App extends Component {
 		return (
 			<div>
 				{header}
-				<Explanation />
-				<MainTool />
+
+				<Element name="article">
+					<Explanation />
+				</Element>
+				<Element name="mainTool">
+					<MainTool />
+				</Element>
 				{acks}
 				<h1>Nice</h1>
 				<h1>Nice</h1>
