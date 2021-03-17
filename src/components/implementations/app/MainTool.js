@@ -42,6 +42,7 @@ import controlGif from "./assets/controlcenter.gif";
 import customGif from "./assets/customization.gif";
 import nnDiagram from "./assets/nn.png";
 import scatterGif from "./assets/scatter.gif";
+import keySVG from "./assets/key.svg";
 import { NeuralNetwork, tools } from "../../../nnMiniLibrary/exports";
 import { draw } from "../../../Utils/exports";
 /*  END IMPORTS  */
@@ -60,8 +61,8 @@ class MainTool extends Component {
 			X: [],
 			y: [],
 			yhat: [],
-			shape: [1, 8, 8, 8, 1],
-			lr: 0.001,
+			shape: [1, 8, 8, 1],
+			lr: 0.005,
 			epoch: 0,
 			cpyEpoch: 0,
 
@@ -933,7 +934,7 @@ class MainTool extends Component {
 									disabled={playing || mode}
 									onClick={() => {
 										let a = shape;
-										if (a.length > 2) {
+										if (a.length > 3) {
 											a.splice(a.length - 2, 1);
 											this.setState({ shape: a });
 											this.initNeuralNetwork(a);
@@ -1067,11 +1068,21 @@ class MainTool extends Component {
 					}}
 				>
 					<CardContent>
+						<Box display="flex" justifyContent="center">
+							<Box marginRight={90}>
+								<img src={keySVG}></img>
+							</Box>
+							<Box>
+								<Typography variant="h2">
+									<b>Backprop Tool</b>
+								</Typography>
+							</Box>
+						</Box>
 						<Box
 							className="regular"
 							display="flex"
 							justifyContent="center"
-							marginTop={10}
+							marginTop={2}
 						>
 							{neuralNetwork}
 							{scatter}

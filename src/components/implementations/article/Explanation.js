@@ -3,7 +3,9 @@ import { $, $$ } from "./Typeset";
 import LinearFunction from "./LinearFunction";
 import NestedFunction from "./NestedFunction";
 import { Box, Button, Card, CardContent, Typography } from "@material-ui/core";
+import { Help } from "@material-ui/icons";
 import nnSVG from "./assets/nn.svg";
+import scaledGIF from "./assets/scaled.gif";
 import forwardSVG from "./assets/forward.svg";
 import backwardSVG from "./assets/backward.svg";
 import LinearScatter from "./LinearScatter";
@@ -31,10 +33,16 @@ const Explanation = () => {
 			/>
 		</a>
 	);
+	const topic = (title) => (
+		<Typography variant="h3">
+			<b>{title}</b>
+		</Typography>
+	);
+	const subtopic = (title) => <Typography variant="h4">{title}</Typography>;
 	const paper = (
 		<div>
 			<br />
-			<Typography variant="h3">Introduction</Typography>
+			{topic("Introduction")}
 			<Typography variant="h6">
 				Most people abstract the idea of backpropagation when learning
 				neural networks because it is by far the most notation heavy
@@ -42,38 +50,48 @@ const Explanation = () => {
 				some interactive tools to better understand a very important
 				idea.
 			</Typography>
+			<Typography variant="h6">
+				<b>
+					If you want to skip ahead, click on a tool below. Otherwise,
+					click the "Article" section, or scroll to the start of the
+					article.
+				</b>
+			</Typography>
 			<Nav />
-
-			<p>
+			<Element name="article">
+				{topic("Backpropagation on one Neuron")}
+			</Element>
+			<br />
+			{subtopic("Getting Started")}
+			<Typography variant="h6">
 				Our goal in a neural network is to lower whatever loss function
 				we define. For this article, we will be performing regression
 				and using mean squared error loss (MSE).
-			</p>
+			</Typography>
 			{$$("\\text{MSE} = \\frac{1}{J}\\sum_{i=0}^{J}(\\hat{y} - y)^2")}
-
-			<Typography variant="h3">Backpropogation on One Neuron</Typography>
-			<p>
+			<Typography variant="h6">
 				Before hitting the calculus, try to lower loss the best you can
 				by adjusting the weight and bias on this one neuron network.
 				When you feel like you&rsquo;ve lowered the loss enough (or need
 				some help), reveal the graph.
-			</p>
+			</Typography>
 			<br />
 			<Element name="structMan">
 				<LinearScatter />
 			</Element>
 			<br />
-			<p>
+			{subtopic("Explanation")}
+			<Typography variant="h6">
 				The intuition from this one scenario essentially explains all of
 				backpropagation and optimization. It is really that simple!
-			</p>
-			<p>
+			</Typography>
+			<Typography variant="h6">
 				When you start to change the weight, you observe where the loss
 				moves, if it moves up, you probably move the weight the other
 				direction to lower the loss. This, without the math, is the main
 				principle behind optimizing a nerual network.
-			</p>
-			<p>
+			</Typography>
+			<Typography variant="h6">
 				The change you observed from the ouput of the loss function is
 				the rate of change. For a more accurate instantaneous rate of
 				change we essentially do the slope formula but have the change
@@ -81,8 +99,8 @@ const Explanation = () => {
 				{$$(
 					"\\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h} = \\frac{df}{dx}"
 				)}
-			</p>
-			<p>
+			</Typography>
+			<Typography variant="h6">
 				Where {$("\\frac{df}{dx}")} is the derivative of {$("f")} with
 				respect to {$("x")}, or in plain english: how the output of{" "}
 				{$("f")} is affected by the variable {$("x")}. In the context of
@@ -95,29 +113,28 @@ const Explanation = () => {
 				{$$(
 					"\\lim_{h \\to 0} \\frac{\\text{MSE}(n(w_0,b+h)) - \\text{MSE}(n(w_0,b))}{h} = \\frac{\\partial \\text{MSE}}{\\partial b}"
 				)}
-			</p>
-			<p>
+			</Typography>
+			<Typography variant="h6">
 				Where {$("\\frac{\\partial \\text{MSE}}{\\partial w_0}")} is the
 				partial derivative of {$("\\text{MSE}")} with respect to{" "}
 				{$("w_0")} or in plain english: how the output of{" "}
 				{$("\\text{MSE}")} is affected by the variable {$("w_0")}.
-			</p>
-			<p>
+			</Typography>
+			<Typography variant="h6">
 				Where {$("\\frac{\\partial \\text{MSE}}{\\partial b}")} is the
 				partial derivative of {$("\\text{MSE}")} with respect to{" "}
 				{$("b")} or in plain english: how the output of{" "}
 				{$("\\text{MSE}")} is affected by the variable {$("b")}.
-			</p>
-
-			<p>
+			</Typography>
+			<Typography variant="h6">
 				Now we have a way to compute how each parameter affects the
 				output loss {$("\\text{MSE}")}. Which is also called the
 				gradient of {$("\\text{MSE}")}.And can use the intuiton we
 				gained from the interactive exercise before, and use the partial
 				derivatives of loss with respect to each parameter to tune those
 				paramters into lowering the loss.
-			</p>
-			<p>
+			</Typography>
+			<Typography variant="h6">
 				Backpropagation is the term we use to describe the calculuating
 				of the partial derivatives of with respect to each paramter
 				because of the direction we travel to compute the derivatives.
@@ -133,16 +150,17 @@ const Explanation = () => {
 				{$$(
 					"\\frac{\\partial \\text{MSE}}{\\partial b} = \\frac{\\partial \\text{MSE}}{\\partial n(w_0,b)} \\cdot \\frac{\\partial n(w_0,b)}{\\partial b} "
 				)}
-			</p>
-			<p>
+			</Typography>
+			<Typography variant="h6">
 				Where how {$("\\frac{\\partial \\text{MSE}}{\\partial w_0}")}{" "}
 				(how {$("w_0")} affects loss) is broken up into how the input of
 				loss (the output of the neuron) affects loss compounded with how
 				the weight affects the output of the neuron. Essnetially we are
 				chaining rates of change due to the nested nature of the
 				function.
-			</p>
-
+			</Typography>
+			<br />
+			{subtopic("Concrete Example")}
 			<Typography variant="h6">
 				Let's go through a concrete example of a forward and backward
 				pass. We will define the input as {$("x_0 = 2.1")}, the weight
@@ -154,12 +172,10 @@ const Explanation = () => {
 				chain rule to get the gradient {$("\\nabla \\text{loss}")}
 			</Typography>
 			<img width="100%" src={backwardSVG} />
-
 			<Typography variant="h6">
 				{$$("\\frac{\\partial \\text{loss}}{\\partial w_0} = -7.98")}
 				{$$("\\frac{\\partial \\text{loss}}{\\partial b} = -3.8")}
 			</Typography>
-
 			<Typography variant="h6">
 				Reassign the parameters to opposite gradient to descend loss, in
 				this case learning rate is {$("\\text{lr} = 0.01")}
@@ -175,56 +191,97 @@ const Explanation = () => {
 			<Typography variant="h6">
 				Total loss savings of {$("3.61 - 2.87 = 0.74")}
 			</Typography>
-			<p>
+			<Typography variant="h6">
 				To see this in action over many epochs try out playing the next
 				component which computes forward, backward and update per epoch.
 				Automatically.
-			</p>
+			</Typography>
 			<Element name="structLin">
 				<SubTool />
 			</Element>
-
-			<h1>Scaling up to larger networks</h1>
-			<p>
-				When scaling up to more neurons with more layers, the principles
-				stay the same. The only difference now is we are going further
-				back with chain rule to calculate more derivatives.
-			</p>
-			<p>
-				And to spice things up, we&rsquo;ll add the activation function
-				ReLU to neurons on the hidden layers so we can fit some
-				non-linear data as opposed to boring linear data.
-			</p>
-			<ul>
-				<li>
-					First feed the values through the network. Forward
-					Propagation.
-				</li>
-				<li>
-					Calculate the derivative of loss with respect to each
-					variable (going backwards using the chain rule)
-				</li>
-				<li>update the parameters with gradient descent</li>
-			</ul>
-			<p>
-				Now that you see the underlying logic, Use the explainer tool
-				below. Start by pressing play to train the network and click
-				EPOCH when you want to see the whole process (forward, backward,
-				update) at that particular epoch. If you need help or are
-				confused press on the associated question mark.
-			</p>
-			<p>
-				In explainer mode, make sure to color each neuron, this
-				represents the activation (output of the neuron), and in the
-				backwards propagation the orange arrow which represents the
-				computed derivative of loss with respect to the activation.
-			</p>
+			Now you understand how the logic and intuition of backpropagation
+			and how neural networks learn, but what about neural networks with
+			more neurons?
+			<br />
+			{topic("Scaling up Neurons and Layers")}
+			{subtopic("The Changes")}
+			<Typography variant="h6">
+				Scaling up to more neurons and layers. Doing backward
+				propagation on one neuron is not difficult and can produce great
+				results when fitting linear data. But as we want to process more
+				non linear data, we have to increase complexity to vary the
+				output and create more parameters that we can tune. We do this
+				by adding layers of neurons where all the outputs of one layer
+				are the inputs to the next, essentially a very nested function
+				where inputs are distributed to all functions. This is the
+				simple intuition in scaling up to more neurons and more layers.
+				Other than this we also use an activation function, ReLU in our
+				case, to introduce non linearity to the linear nature of each
+				neuron while also introducing a point of deactivation. This
+				point of deactivation is simply 0, which removes the impact of
+				that neuron on updating parameters allowing for certain neurons
+				to “fire” while others don't change at all depending on input.
+			</Typography>
+			<br />
+			{subtopic("The Process")}
+			<Typography variant="h6">
+				First we define the network, we push our inputs through the
+				model (forward propagation), then we calculate how each
+				parameter in the network affects the loss (backward
+				propagation), then we update the parameters with gradient
+				descent. Notice how this is the same process as the one neuron
+				network. THE PROCESS DOESNT CHANGE. We have to do more backward
+				calculations, more chain rule, but that process does not change
+				either.
+			</Typography>
+			<img width="100%" src={scaledGIF} />
+			<Typography variant="h6">
+				Above is an exaple of a forward pass, backward pass and update.
+				Notice the orange arrows that represent{" "}
+				{$(
+					"-\\frac{\\partial \\text{activation}}{\\partial \\text{loss}}"
+				)}
+				, which tells us which direction the activation of neuron should
+				be nudged to lower loss.
+			</Typography>
+			<Typography variant="body2">
+				In this training example we use the original definiton of SGD
+				(stochastic gradient descent) and only use one training example
+				(batch size 1).
+			</Typography>
+			<br />
+			{topic("Conclusion")}
+			{subtopic("Closing Statement")}
+			<Typography variant="h6">
+				By the end, I hope you gained some degree of intution for how
+				and why we perform backproagation in neural networks. Now if you
+				come into contact with neural networks and things aren't working
+				out don't simply throw more data at it like many do, instead
+				think back to the logic and intuition or the processes that
+				occur and you be able to solve your problems better and faster.
+			</Typography>
+			<br />
+			{subtopic("Seeing things in Action")}
+			<Typography variant="h6">
+				Since you know how and why backpropagation is performed, cement
+				that knowledge by seeing the whole process in action below.
+				Start by pressing play, then when you are ready press the EPOCH
+				to see the whole process on the a single Epoch: forward,
+				backward, update. And customize the hyperparamters as you see
+				fit.
+			</Typography>
+			<Typography variant="h6">
+				<b>If you need help, click on a </b>
+				<Help style={{ color: "#FFA500" }} />{" "}
+				<b>to reveal extra descriptions</b>
+			</Typography>
+			<br />
 		</div>
 	);
 
 	return (
 		<Box justifyContent="center" display="flex">
-			<Box maxWidth="65%">{paper}</Box>
+			<Box maxWidth="60%">{paper}</Box>
 		</Box>
 	);
 };

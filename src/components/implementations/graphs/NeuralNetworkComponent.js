@@ -215,7 +215,6 @@ class NeuralNetworkComponent extends Component {
 							) {
 								actColor = true;
 							}
-
 							return (
 								<g>
 									<rect
@@ -232,15 +231,19 @@ class NeuralNetworkComponent extends Component {
 															this.props.lr
 													: 1
 											)}
-										stroke={"black"}
-										strokeWidth={2}
-										className="bar"
+										stroke={
+											d.x === 734 && d.y === 234
+												? "#507BB6"
+												: "black"
+										}
+										strokeWidth={3}
 									></rect>
 
 									{miniNN !== null &&
 									mode &&
 									beforeUpdate &&
-									i >= keyFrameLayer - 1
+									i >= keyFrameLayer - 1 &&
+									miniNN.model[i][j].dActStep !== 0
 										? VerticalArrow(
 												d.x + 16,
 												d.y + 16,
@@ -275,12 +278,7 @@ class NeuralNetworkComponent extends Component {
 				</g>
 			</svg>
 		);
-		return (
-			<div id="nn">
-				{nn}
-				<Legend />
-			</div>
-		);
+		return <div id="nn">{nn}</div>;
 	}
 }
 

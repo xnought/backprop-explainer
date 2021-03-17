@@ -34,20 +34,11 @@ class App extends Component {
 			<div>
 				{header}
 
-				<Element name="article">
-					<Explanation />
-				</Element>
+				<Explanation />
 				<Element name="mainTool">
 					<MainTool />
 				</Element>
 				{acks}
-				<h1>Nice</h1>
-				<h1>Nice</h1>
-				<h1>Nice</h1>
-				<h1>Nice</h1>
-				<h1>Nice</h1>
-				<h1>Nice</h1>
-				<h1>Nice</h1>
 			</div>
 		);
 	}
