@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import "../d3.css";
 import * as d3 from "d3";
-import { zerosLike } from "@tensorflow/tfjs-core";
 
 class AnimatedScatterPlot extends Component {
 	constructor(props) {
@@ -28,12 +27,6 @@ class AnimatedScatterPlot extends Component {
 			.attr("d", d3.line()(a))
 			.attr("stroke", "blue")
 			.attr("fill", "none");
-	}
-	/* This will plot the potential line and have animation till it gets into place */
-	animatePotentialPredictions() {
-		/* We start by plotting the line at 0 points */
-		/* We then use the same path to plot the potential points */
-		/* We use a transition to show the change */
 	}
 
 	/* This is where we initialize the Scatter Plot */
@@ -134,16 +127,13 @@ class AnimatedScatterPlot extends Component {
 		}
 		svg.selectAll("circle").remove();
 		this.plotPoints(svg, dataSet, select);
-		if (times === 0) {
+		if (this.props.status === "reset") {
 			svg.select("#epic")
 				.attr("id", "epic")
 				.attr("stroke", "none")
 				.attr("fill", "none");
-		}
-		if (times === 2) {
-			//do nothing
-		} else if (times !== 2) {
-			if (this.props.times === 1) {
+		} else {
+			if (this.props.status === "real") {
 				/* This is how we plot the point */
 				svg.select("#epic")
 					.attr("d", d3.line()(zeroArray))
@@ -151,19 +141,22 @@ class AnimatedScatterPlot extends Component {
 					.attr("fill", "none");
 				svg.select("#epic")
 					.transition()
-					.duration(1000)
+					.duration(750)
 					.attr("d", d3.line()(realYhat));
-			} else if (this.props.times === 4) {
+			} else if (this.props.status === "pred") {
 				svg.select("#epic")
-					.attr("d", d3.line()(zeroArray))
+					.attr("d", d3.line()(realYhat))
 					.attr("stroke", "orangered")
 					.attr("fill", "none");
 				svg.select("#epic")
 					.transition()
-					.duration(1000)
+					.duration(750)
 					.attr("d", d3.line()(potentialYhat));
 			}
 		}
+	}
+	shouldComponentUpdate() {
+		return !this.props.shouldNotRender;
 	}
 
 	render() {

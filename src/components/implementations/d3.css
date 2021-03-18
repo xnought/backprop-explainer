@@ -73,13 +73,6 @@
 	);
 }
 
-.bar {
-}
-
-.bar:hover {
-	transition: fill 1s ease;
-	fill: #d62839 !important;
-}
 
 @keyframes invertArrow {
 	from {

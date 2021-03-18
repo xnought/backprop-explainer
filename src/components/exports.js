@@ -5,8 +5,10 @@ import ScatterPlot from "./implementations/graphs/ScatterPlot";
 import AnimatedScatterPlot from "./implementations/graphs/AnimatedScatterPlot";
 import Loss from "./implementations/graphs/Loss";
 import Explanation from "./implementations/article/Explanation";
-import Bar from "./implementations/app/Bar";
 import MainTool from "./implementations/app/MainTool";
+import Header from "./implementations/article/Header";
+import SubTool from "./implementations/article/SubTool";
+import * as Typeset from "./implementations/article/Typeset";
 
 export {
 	NeuralNetworkComponent,
@@ -14,6 +16,8 @@ export {
 	AnimatedScatterPlot,
 	Loss,
 	MainTool,
+	Header,
+	SubTool,
+	Typeset,
 	Explanation,
-	Bar,
 };

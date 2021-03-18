@@ -33,6 +33,7 @@ import {
 import {
 	Replay,
 	SlowMotionVideo,
+	FastForward,
 	PlayArrow,
 	Stop,
 	Help,
@@ -42,6 +43,7 @@ import controlGif from "./assets/controlcenter.gif";
 import customGif from "./assets/customization.gif";
 import nnDiagram from "./assets/nn.png";
 import scatterGif from "./assets/scatter.gif";
+import keySVG from "./assets/key.svg";
 import { NeuralNetwork, tools } from "../../../nnMiniLibrary/exports";
 import { draw } from "../../../Utils/exports";
 /*  END IMPORTS  */
@@ -60,8 +62,8 @@ class MainTool extends Component {
 			X: [],
 			y: [],
 			yhat: [],
-			shape: [1, 8, 8, 1],
-			lr: 0.01,
+			shape: [1, 8, 8, 8, 1],
+			lr: 0.001,
 			epoch: 0,
 			cpyEpoch: 0,
 
@@ -84,7 +86,7 @@ class MainTool extends Component {
 			/* State for Components */
 			controls: {
 				playing: false,
-				speed: 0,
+				speed: 100,
 			},
 			sliderVal: 2,
 			mode: false,
@@ -109,6 +111,9 @@ class MainTool extends Component {
 			lossChange: 0,
 			potentialYhat: [],
 			singleInputIndex: -1,
+			shouldNotRender: false,
+			status: "reset",
+			zoom: 1,
 		};
 
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
@@ -187,6 +192,7 @@ class MainTool extends Component {
 		/* animate the forward pass */
 		this.setState({
 			subEpoch: "forward",
+			status: "reset",
 			isAnimating: true,
 			lossChange: 0,
 			cpyEpoch: this.state.epoch,
@@ -200,16 +206,21 @@ class MainTool extends Component {
 			await timer(speed);
 		}
 
-		this.setState({ keyFrameLoss: 1 });
+		this.setState({
+			keyFrameLoss: 1,
+			keyFrameScatter: 1,
+			status: "real",
+			shouldNotRender: true,
+		});
+
 		await timer(speed);
-		this.setState({ keyFrameLoss: 2 });
+		this.setState({ keyFrameLoss: 2, shouldNotRender: true });
 		await timer(speed);
 		this.setState({ keyFrameLoss: 3 });
 
 		//we update the losschange
 		this.setState({
 			lossChange: this.state.miniNN.loss.output,
-			keyFrameScatter: 1,
 		});
 		this.setState({ subEpoch: "backward", keyFrameScatter: 2 });
 
@@ -223,7 +234,7 @@ class MainTool extends Component {
 		this.setState({ subEpoch: "transition" });
 
 		await timer(1000);
-		this.setState({ subEpoch: "update" });
+		this.setState({ subEpoch: "update", shouldNotRender: false });
 		await timer(1000);
 		//we update the new loss
 		this.setState({
@@ -231,6 +242,7 @@ class MainTool extends Component {
 			lossChange: this.state.lossSavings,
 			keyFrameScatter: 4,
 			cpyEpoch: this.state.cpyEpoch + 1,
+			status: "pred",
 		});
 
 		/* animate update */
@@ -249,7 +261,7 @@ class MainTool extends Component {
 			//prettier-ignore
 			const {xScale, yScale} = draw.generateLinearScale(xConstraints,yConstraints);
 			// Create the starting point and the stopping point for the neural network
-			const start = { x: 50 - squareWidth / 2, y: 250 - squareWidth / 2 };
+			const start = { x: 71 - squareWidth / 2, y: 250 - squareWidth / 2 };
 			const stop = { x: 750 - squareWidth / 2, y: 250 - squareWidth / 2 };
 			// generate function to create paths from (x,y) to (x,y)
 			const linksGenerator = draw.generateLink(squareWidth / 2);
@@ -388,6 +400,7 @@ class MainTool extends Component {
 			play = playing;
 			await model.fit(XTensor, yTensor, {
 				epochs: 1,
+				batchSize: 1,
 			});
 			tf.tidy(() => {
 				let yhatTensor = model.predict(XTensor);
@@ -482,14 +495,24 @@ class MainTool extends Component {
 		this.asyncPause();
 		this.resetParameters(scale);
 	}
+
+	correctZoom(width) {
+		const zoomFactor = (1 - 0.75) / (1387 - 913);
+		const zoomShift = 0.75 - zoomFactor * 913;
+		const zoom = Math.min(1, zoomFactor * width + zoomShift - 0.2);
+		return zoom;
+	}
 	async componentDidMount() {
 		tf.setBackend("cpu");
 		this.genTensorData(tf.sin, this.state.scale, 50);
 		this.initNeuralNetwork(this.state.shape);
 		const model = tf.tidy(() => {
-			return this.modelCompile(0.01);
+			return this.modelCompile(this.state.lr);
 		});
-		this.setState({ tensorFlowNN: model });
+
+		const width = document.body.clientWidth;
+		const zoom = this.correctZoom(width);
+		this.setState({ tensorFlowNN: model, zoom });
 	}
 	shouldComponentUpdate() {
 		if (this.state.stopRender) {
@@ -534,10 +557,11 @@ class MainTool extends Component {
 			lossChange,
 			scatterHelp,
 			keyFrameScatter,
+			zoom,
 		} = this.state;
 		const { playing, speed } = controls;
 
-		const lrs = [0.001, 0.005, 0.01, 0.05, 0.1];
+		const lrs = [0.0001, 0.001, 0.003, 0.005, 0.05];
 		const dataSets = [
 			{ label: "sin", eqn: tf.sin, scale: 5 },
 			{ label: "cos", eqn: tf.cos, scale: 5 },
@@ -573,10 +597,10 @@ class MainTool extends Component {
 					</IconButton>
 				</Tooltip>
 				{PlayButtonClick}
-				<Tooltip title="slomo" arrow>
+				<Tooltip title="speed up" arrow>
 					<IconButton
 						style={{
-							color: speed === 0 ? "grey" : "#FFC006",
+							color: speed === 0 ? "#FFC006" : "grey",
 						}}
 						onClick={() => {
 							this.setState({
@@ -587,7 +611,7 @@ class MainTool extends Component {
 							});
 						}}
 					>
-						<SlowMotionVideo />
+						<FastForward />
 					</IconButton>
 				</Tooltip>
 			</CardActions>
@@ -614,7 +638,7 @@ class MainTool extends Component {
 								weightsData,
 								biasesData,
 								shape,
-								0.001,
+								lr,
 								mode
 							);
 							await this.anim();
@@ -654,21 +678,26 @@ class MainTool extends Component {
 						<Tooltip
 							title={
 								<Typography variant="h6">
-									{mode
-										? "Click to go back"
-										: "Click to see single epoch"}
+									<b>
+										{mode
+											? "Click to go back to fitting"
+											: "Click to see backpropagation"}
+									</b>
 								</Typography>
 							}
 							arrow
-							placement="right-start"
-							open={loss !== null || (mode && !isAnimating)}
+							placement="top-start"
 						>
 							<Button
 								disabled={loss == null || isAnimating}
+								variant="contained"
 								onClick={async () => {
 									if (mode) {
-										this.setState({ subEpoch: "" });
-										this.setState({ mode: !mode });
+										this.setState({
+											subEpoch: "",
+											mode: !mode,
+										});
+										this.run();
 									} else {
 										this.randomInputGeneration(
 											X,
@@ -676,7 +705,7 @@ class MainTool extends Component {
 											weightsData,
 											biasesData,
 											shape,
-											0.0001,
+											lr,
 											mode
 										);
 										await this.anim();
@@ -925,7 +954,7 @@ class MainTool extends Component {
 									disabled={playing || mode}
 									onClick={() => {
 										let a = shape;
-										if (a.length > 2) {
+										if (a.length > 3) {
 											a.splice(a.length - 2, 1);
 											this.setState({ shape: a });
 											this.initNeuralNetwork(a);
@@ -958,6 +987,8 @@ class MainTool extends Component {
 							id={2}
 							select={this.state.singleInputIndex}
 							times={this.state.keyFrameScatter}
+							shouldNotRender={this.state.shouldNotRender}
+							status={this.state.status}
 						/>
 					) : (
 						<ScatterPlot
@@ -970,6 +1001,7 @@ class MainTool extends Component {
 							y={y}
 							yhat={yhat}
 							id={1}
+							duration={200}
 							select={-1}
 						/>
 					)}
@@ -992,7 +1024,7 @@ class MainTool extends Component {
 					</IconButton>
 				</Box>
 				<Box marginTop={10}>
-					<Loss lossArray={this.state.lossArray} loss={loss} />
+					<Loss lossArray={this.state.lossArray} duration={100} />
 				</Box>
 			</Box>
 		);
@@ -1055,12 +1087,26 @@ class MainTool extends Component {
 						paddingBottom: "1em",
 					}}
 				>
-					<CardContent>
+					<CardContent
+						style={{
+							transform: `scale(${zoom})`,
+						}}
+					>
+						<Box display="flex" justifyContent="center">
+							<Box marginRight={90}>
+								<img src={keySVG}></img>
+							</Box>
+							<Box>
+								<Typography variant="h2">
+									<b>Backprop Tool</b>
+								</Typography>
+							</Box>
+						</Box>
 						<Box
 							className="regular"
 							display="flex"
 							justifyContent="center"
-							marginTop={10}
+							marginTop={2}
 						>
 							{neuralNetwork}
 							{scatter}
