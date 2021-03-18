@@ -208,7 +208,6 @@ class SubTool extends Component {
 					<Card variant="outlined">
 						<CardContent>
 							<h2>Auto Best Fit</h2>
-							<p>forward, backward, update per EPOCH</p>
 							<Typography variant="h4" component="h2">
 								EPOCH: {epochs}
 							</Typography>

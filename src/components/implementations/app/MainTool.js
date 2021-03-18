@@ -62,7 +62,7 @@ class MainTool extends Component {
 			X: [],
 			y: [],
 			yhat: [],
-			shape: [1, 8, 8, 1],
+			shape: [1, 8, 8, 8, 1],
 			lr: 0.001,
 			epoch: 0,
 			cpyEpoch: 0,

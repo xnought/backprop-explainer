@@ -1,7 +1,15 @@
 /* Imports from other files */
 import React from "react";
 import { $, $$ } from "./Typeset";
-import { Box, Button, Typography, Fab } from "@material-ui/core";
+import {
+	Box,
+	Button,
+	Typography,
+	Fab,
+	Tooltip,
+	Card,
+	CardContent,
+} from "@material-ui/core";
 import { Help, PlayArrow } from "@material-ui/icons";
 import { Nav } from "./Nav";
 import { Element } from "react-scroll";
@@ -11,6 +19,7 @@ import LinearScatter from "./LinearScatter";
 import scaledGIF from "./assets/scaled.gif";
 import forwardSVG from "./assets/forward.svg";
 import backwardSVG from "./assets/backward.svg";
+import tanPNG from "./assets/tan.png";
 
 /* Functional Component */
 const Explanation = () => {
@@ -35,6 +44,27 @@ const Explanation = () => {
 			/>
 		</a>
 	);
+
+	const definiton = (word, desc) => (
+		<Tooltip
+			style={{
+				backgroundColor: "#ed3d78",
+				color: "black",
+			}}
+			title={
+				<Card>
+					<CardContent>{desc}</CardContent>
+				</Card>
+			}
+			placement="top"
+			arrow
+		>
+			{word}
+		</Tooltip>
+	);
+
+	const orange = "#FFA500";
+	const blue = "#56A8C7";
 	/* Topic formatted component */
 	const topic = (title) => (
 		<Typography variant="h3">
@@ -48,129 +78,259 @@ const Explanation = () => {
 	const paper = (
 		<div>
 			<br />
-			{topic("Introduction")}
+			{topic("Jump to a check point")}
+			<Typography variant="h6">
+				If you want to skip ahead, click on a checkpoint. Otherwise,
+				click <b>Article</b> or scroll to the start of the article.
+			</Typography>
+			<Nav />
+			<Element name="article">{topic("Introduction")}</Element>
 			<Typography variant="h6">
 				Most people abstract the idea of backpropagation when learning
 				neural networks because it is by far the most notation heavy
 				part. The goal of this article is to build an intuition for
 				backpropagation in the context of how neural networks "learn."
 				By marrying explanation, notation, and interactive tools, the
-				heuristic is to get a deeper understanding of the foundation.
+				aim is to get a understanding of the foundations.
 			</Typography>
-			<Typography variant="h6">
-				<b>
-					If you want to skip ahead, click on a checkpoint. Otherwise,
-					click the "Article", or scroll to the start of the article.
-				</b>
-			</Typography>
-			<Nav />
-			<Element name="article">
-				{topic("Backpropagation on one Neuron")}
-			</Element>
 			<br />
+			{topic("Backpropagation on One Neuron")}
 			{subtopic("Getting Started")}
 			<Typography variant="h6">
-				Our goal in a neural network is to lower whatever loss function
-				we define. For this article, we will be performing regression
-				and using mean squared error loss (MSE).
+				The goal in a neural network, or any optimization problem for
+				that matter, is to lower and minimize whatever{" "}
+				{definiton(
+					<span>loss</span>,
+					<Typography variant="body1">
+						Error between predicted values {$("\\hat{y}")} and true
+						values {$("y")}
+					</Typography>
+				)}{" "}
+				function we define. For this article, we will be performing
+				regression and using mean squared error loss{" "}
+				{definiton(
+					<span>MSE</span>,
+					<Box>
+						<Typography variant="h6">
+							{$$(
+								"\\text{MSE} = \\frac{1}{J}\\sum_{i = 1}^{J}(\\hat{y_i} - y_i)^2"
+							)}
+						</Typography>
+						<Typography variant="body1">
+							<b>Input Variables</b>
+							<br />
+							length of data {$("J")}
+							<br />
+							index {$("i")}
+							<br />
+							predicted values {$("\\hat{y}")}
+							<br />
+							true values {$("y")}
+						</Typography>
+					</Box>
+				)}
+				.
 			</Typography>
-			{$$("\\text{MSE} = \\frac{1}{J}\\sum_{i=0}^{J}(\\hat{y} - y)^2")}
 			<Typography variant="h6">
-				Before hitting the calculus, try to lower loss the best you can
-				by adjusting the weight and bias on this one neuron network.
-				When you feel like you&rsquo;ve lowered the loss enough (or need
-				some help), reveal the graph.
+				Before hitting the calculus, tune the{" "}
+				{definiton(
+					<span>weight and bias on one neuron</span>,
+					<Box>
+						<Typography variant="h6">
+							{$$("\\text{neuron}(x) = w_0x + b ")}
+						</Typography>
+						<Typography variant="body1">
+							<b>Neuron as a Function</b>
+							<br />
+							input {$("x")}
+							<br />
+							output {$("\\text{neuron}(x)")}
+							<br />
+							<b>Tunable Parameters</b>
+							<br />
+							weight {$("w_0")}
+							<br />
+							bias {$("b")}
+						</Typography>
+					</Box>
+				)}{" "}
+				by sliding the sliders under <b>Manual Best Fit</b>. By
+				observing changes in the <em style={{ color: "red" }}>loss</em>,
+				try to make it reach 0. When you feel like you've lowered the{" "}
+				<em style={{ color: "red" }}>loss</em> enough (or need some
+				help), press the{" "}
+				<Button
+					disabled={true}
+					size="small"
+					variant="contained"
+					style={{
+						backgroundColor: "#155676",
+						color: "white",
+					}}
+				>
+					Click to reveal the graph
+				</Button>{" "}
+				button below.
 			</Typography>
 			<br />
 			<Element name="structMan">
 				<LinearScatter />
 			</Element>
 			<br />
-			{subtopic("Explanation")}
+			{subtopic("Reflection")}
 			<Typography variant="h6">
-				The intuition from this one scenario essentially explains all of
-				backpropagation and optimization. It is really that simple!
+				<b>
+					The intuiton and logic from the exercise above, is the
+					foundation for what backpropagation and optimization is and
+					aims to achieve.
+				</b>
 			</Typography>
 			<Typography variant="h6">
-				When you start to change the weight, you observe where the loss
-				moves, if it moves up, you probably move the weight the other
-				direction to lower the loss. This, without the math, is the main
-				principle behind optimizing a nerual network.
+				&emsp;&emsp;&emsp;&emsp;When you start to change the weight, you
+				observe where the loss moves, if it moves up, you move the
+				weight the other direction to lower the loss. This, without the
+				math, is the main principle behind guaging the rate of change
+				and optimizing a nerual network.{" "}
+				<b>Let's apply this method of thinking!</b>
+			</Typography>
+			<br />
+			{subtopic("Defining Backpropagation")}
+			<Typography variant="h6">
+				First to get the{" "}
+				{definiton(
+					<span>instantaneous rate of change</span>,
+					<Box>
+						<Typography style={{ color: blue }} variant="h6">
+							{$$("\\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}")}
+						</Typography>
+						<Typography variant="h6" style={{ color: orange }}>
+							{$$("\\frac{df}{dx}")}
+						</Typography>
+
+						<Typography style={{ color: blue }} variant="body1">
+							Limit definition of derivative of {$("f(x)")} with
+							respect to {$("x")}
+						</Typography>
+						<Typography style={{ color: orange }} variant="body1">
+							Notation for derivative of {$("f(x)")} with respect
+							to {$("x")}
+						</Typography>
+					</Box>
+				)}
+				(derivative), we get our point of interest and another point
+				that is infinitely close and calculate slope, this can be
+				visualized as a{" "}
+				{definiton(
+					<span>tangent line</span>,
+					<Box>
+						<img src={tanPNG} width="100%" />
+					</Box>
+				)}{" "}
+				at the point of interest.
 			</Typography>
 			<Typography variant="h6">
-				The change you observed from the ouput of the loss function is
-				the rate of change. For a more accurate instantaneous rate of
-				change we essentially do the slope formula but have the change
-				the second point approach 0. For Example,
+				&emsp;&emsp;&emsp;&emsp;In the context of our one neuron neural
+				network, we can compose the whole network as a nested function
+				(input {$("x")} into {$("\\text{neuron}(x) = wx+b")}; output of
+				neuron {$("\\text{neuron}(x)")} is input as {$("\\hat{y}")} into
+				loss function{" "}
+				{$("\\text{loss}(\\hat{y},y) = \\sum(\\hat{y} - y)^2")}; output
+				of loss function is the loss).
+				{$$("\\text{loss}(\\text{neuron}(x,w,b),y)")}
+			</Typography>
+			<Typography variant="h6">
+				And since we want to tune the parameters weight {$("w")} and
+				bias {$("b")}, we want how they will affect the loss, or in
+				other words, the{" "}
+				{definiton(
+					<span>partial derivative</span>,
+					<Box>
+						<Typography style={{ color: blue }} variant="h6">
+							{$$(
+								"\\lim_{h \\to 0} \\frac{f(x + h, y) - f(x,y)}{h}"
+							)}
+						</Typography>
+						<Typography variant="h6" style={{ color: orange }}>
+							{$$("\\frac{\\partial f}{\\partial x}")}
+						</Typography>
+						<Typography style={{ color: blue }} variant="body1">
+							Limit definition of partial derivative of{" "}
+							{$("f(x,y)")} with respect to {$("x")}
+						</Typography>
+						<Typography style={{ color: orange }} variant="body1">
+							Notation for partial derivative of {$("f(x,y)")}{" "}
+							with respect to {$("x")}
+						</Typography>
+
+						<Typography style={{ color: blue }} variant="h6">
+							{$$(
+								"\\lim_{h \\to 0} \\frac{f(x, y + h) - f(x,y)}{h}"
+							)}
+						</Typography>
+
+						<Typography variant="h6" style={{ color: orange }}>
+							{$$("\\frac{\\partial f}{\\partial y}")}
+						</Typography>
+
+						<Typography style={{ color: blue }} variant="body1">
+							Limit definition of partial Derivative of{" "}
+							{$("f(x,y)")} with respect to {$("y")}
+						</Typography>
+						<Typography style={{ color: orange }} variant="body1">
+							Notation for partial derivative of {$("f(x,y)")}{" "}
+							with respect to {$("y")}
+						</Typography>
+					</Box>
+				)}{" "}
+				of loss with respect to each parameter, also called the{" "}
+				{definiton(
+					<span>gradient</span>,
+					<Box>
+						<Typography variant="h6">
+							{$$(
+								"\\nabla f(x,y) = \\begin{bmatrix} \\frac{\\partial f}{\\partial x} \\\\ \\frac{\\partial f}{\\partial y} \\\\ \\end{bmatrix}"
+							)}
+						</Typography>
+					</Box>
+				)}
+				.
+			</Typography>
+			<Typography variant="h6">
+				{$$("\\frac{ \\partial \\text{loss}}{\\partial w}")}
+				{$$("\\frac{ \\partial \\text{loss}}{\\partial b}")}
+			</Typography>
+			<Typography variant="h6">
+				In order to calculate these derivatives we must use the chain
+				rule due to the nested nature of neural networks.
+			</Typography>
+			<Typography variant="h6">
 				{$$(
-					"\\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h} = \\frac{df}{dx}"
+					"\\frac{ \\partial \\text{loss}}{\\partial w} = \\frac{ \\partial \\text{loss}}{\\partial \\text{neuron}} \\frac{ \\partial \\text{neuron}}{\\partial w} "
+				)}
+				{$$(
+					"\\frac{ \\partial \\text{loss}}{\\partial b} = \\frac{ \\partial \\text{loss}}{\\partial \\text{neuron}} \\frac{ \\partial \\text{neuron}}{\\partial b} "
 				)}
 			</Typography>
 			<Typography variant="h6">
-				Where {$("\\frac{df}{dx}")} is the derivative of {$("f")} with
-				respect to {$("x")}, or in plain english: how the output of{" "}
-				{$("f")} is affected by the variable {$("x")}. In the context of
-				our one neuron network, if I represent weight as {$("w_0")} bias
-				as {$("b")}, the neuron as {$("n")} and mean squared error loss{" "}
-				{$("\\text{MSE}")}
-				{$$(
-					"\\lim_{h \\to 0} \\frac{\\text{MSE}(n(w_0 + h,b)) - \\text{MSE}(n(w_0,b))}{h} = \\frac{\\partial \\text{MSE}}{\\partial w_0}"
+				Even this chain can be broken up into more primatives (basis of
+				{link(
+					"https://en.wikipedia.org/wiki/Automatic_differentiation",
+					"automatic differentiation"
 				)}
-				{$$(
-					"\\lim_{h \\to 0} \\frac{\\text{MSE}(n(w_0,b+h)) - \\text{MSE}(n(w_0,b))}{h} = \\frac{\\partial \\text{MSE}}{\\partial b}"
-				)}
-			</Typography>
-			<Typography variant="h6">
-				Where {$("\\frac{\\partial \\text{MSE}}{\\partial w_0}")} is the
-				partial derivative of {$("\\text{MSE}")} with respect to{" "}
-				{$("w_0")} or in plain english: how the output of{" "}
-				{$("\\text{MSE}")} is affected by the variable {$("w_0")}.
-			</Typography>
-			<Typography variant="h6">
-				Where {$("\\frac{\\partial \\text{MSE}}{\\partial b}")} is the
-				partial derivative of {$("\\text{MSE}")} with respect to{" "}
-				{$("b")} or in plain english: how the output of{" "}
-				{$("\\text{MSE}")} is affected by the variable {$("b")}.
-			</Typography>
-			<Typography variant="h6">
-				Now we have a way to compute how each parameter affects the
-				output loss {$("\\text{MSE}")}. Which is also called the
-				gradient of {$("\\text{MSE}")}.And can use the intuiton we
-				gained from the interactive exercise before, and use the partial
-				derivatives of loss with respect to each parameter to tune those
-				paramters into lowering the loss.
-			</Typography>
-			<Typography variant="h6">
-				Backpropagation is the term we use to describe the calculuating
-				of the partial derivatives of with respect to each paramter
-				because of the direction we travel to compute the derivatives.
-				In essence, we first need to forward propagate: push the input
-				through the network, get an output and loss. We then can go
-				backwards and compute how each value in the forward pass
-				affected the loss using the chain rule in calculus. The chain
-				rule is very intutive and essentially takes into account how
-				nested function affect each other.
-				{$$(
-					"\\frac{\\partial \\text{MSE}}{\\partial w_0} = \\frac{\\partial \\text{MSE}}{\\partial n(w_0,b)} \\cdot \\frac{\\partial n(w_0,b)}{\\partial w_0} "
-				)}
-				{$$(
-					"\\frac{\\partial \\text{MSE}}{\\partial b} = \\frac{\\partial \\text{MSE}}{\\partial n(w_0,b)} \\cdot \\frac{\\partial n(w_0,b)}{\\partial b} "
-				)}
-			</Typography>
-			<Typography variant="h6">
-				Where how {$("\\frac{\\partial \\text{MSE}}{\\partial w_0}")}{" "}
-				(how {$("w_0")} affects loss) is broken up into how the input of
-				loss (the output of the neuron) affects loss compounded with how
-				the weight affects the output of the neuron. Essnetially we are
-				chaining rates of change due to the nested nature of the
-				function.
+				), but as long as you get that we are gauging rate of change,
+				where to see how loss was affected by a parameter we first ask
+				how the output of neuron affected its value, then go back and
+				ask how the parameter affected the neuron output, then you know
+				the foundations for what is going on in the chain rule and, in
+				this case, backpropagation.
 			</Typography>
 			<br />
 			{subtopic("Concrete Example")}
 			<Typography variant="h6">
 				Let's go through a concrete example of a forward and backward
 				pass. We will define the input as {$("x_0 = 2.1")}, the weight
-				as {$("w_0 = 1")}, and the bias as {$("b = 0")}{" "}
+				as {$("w_0 = 1")}, and the bias as {$("b = 0")}. This is just
+				one training example, in reality we would have more data.
 			</Typography>
 			<img width="100%" src={forwardSVG} />
 			<Typography variant="h6">
@@ -197,10 +357,22 @@ const Explanation = () => {
 			<Typography variant="h6">
 				Total loss savings of {$("3.61 - 2.87 = 0.74")}
 			</Typography>
+			<br />
+			{subtopic("See it in Action")}
 			<Typography variant="h6">
-				To see this in action over many epochs try out playing the next
-				component which computes forward, backward and update per epoch.
-				Automatically.
+				To see the what we just did (forward, backward, update) on more
+				data and on the entire batch as opposed to a single training
+				example, press{" "}
+				<Fab
+					style={{
+						background: "#175676",
+						color: "white",
+					}}
+					size="small"
+				>
+					{<PlayArrow />}
+				</Fab>{" "}
+				to start the training process under <b>Auto Best Fit</b>.
 			</Typography>
 			<Element name="structLin">
 				<SubTool />

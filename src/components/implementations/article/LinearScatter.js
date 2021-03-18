@@ -15,6 +15,10 @@ class LinearScatter extends Component {
 			range: [],
 			line: [],
 			show: false,
+			width: 400,
+			biasColor: "#FFA500",
+			weightColor: "#56A8C7",
+			lossColor: "red",
 		};
 	}
 	//Define the loss function
@@ -67,8 +71,19 @@ class LinearScatter extends Component {
 		this.dataGenerator();
 	}
 	render() {
-		const width = 400;
-		const { domain, range, bias, weight, line, loss, show } = this.state;
+		const {
+			domain,
+			range,
+			bias,
+			weight,
+			line,
+			loss,
+			show,
+			width,
+			weightColor,
+			biasColor,
+			lossColor,
+		} = this.state;
 		return (
 			<Box display="flex" justifyContent="center">
 				<Box style={{ filter: `blur(${show ? 0 : 25}px)` }}>
@@ -93,12 +108,13 @@ class LinearScatter extends Component {
 							<h2>Manual Best Fit</h2>
 							<p>
 								Manually tune{" "}
-								<em style={{ color: "#4050B5" }}>weight</em> and{" "}
-								<em style={{ color: "#F50257" }}>bias</em> and
-								try to reach a{" "}
-								<em style={{ color: "red" }}>loss</em> of 0
+								<em style={{ color: weightColor }}>weight</em>{" "}
+								and <em style={{ color: biasColor }}>bias</em>{" "}
+								and try to reach a{" "}
+								<em style={{ color: lossColor }}>loss</em> of 0
 							</p>
 							<Slider
+								style={{ color: weightColor }}
 								value={weight}
 								onChange={(e, n) => {
 									const newLine = this.computeLine(
@@ -121,9 +137,9 @@ class LinearScatter extends Component {
 								step={0.01}
 								max={1}
 								valueLabelDisplay="auto"
-								color="primary"
 							></Slider>
 							<Slider
+								style={{ color: biasColor }}
 								value={bias}
 								onChange={(e, n) => {
 									const newLine = this.computeLine(
@@ -146,25 +162,24 @@ class LinearScatter extends Component {
 								step={0.01}
 								valueLabelDisplay="auto"
 								max={1}
-								color="secondary"
 							></Slider>
 
 							<h3>
 								{$("\\text{neuron}(x) = ")}{" "}
-								<em style={{ color: "#4050B5" }}>
+								<em style={{ color: weightColor }}>
 									{$(`${weight}`)}
 								</em>
 								{$("x + ")}{" "}
-								<em style={{ color: "#F50257" }}>
+								<em style={{ color: biasColor }}>
 									{$(`${bias}`)}
 								</em>
 							</h3>
 							<h3>
-								MSE loss:{" "}
+								<i style={{ color: lossColor }}>loss</i>{" "}
 								{$(
-									`\\frac{1}{J}\\sum_{i = 0}^J (\\hat{y} - y)^2 =`
+									` = \\frac{1}{J}\\sum_{i = 1}^J (\\hat{y_i} - y_i)^2 =`
 								)}
-								<em style={{ color: "darkred" }}>
+								<em style={{ color: lossColor }}>
 									{" "}
 									{$(`${loss.toFixed(7)}`)}
 								</em>
