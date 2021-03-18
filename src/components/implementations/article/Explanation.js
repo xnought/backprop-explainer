@@ -1,18 +1,20 @@
+/* Imports from other files */
 import React from "react";
 import { $, $$ } from "./Typeset";
-import LinearFunction from "./LinearFunction";
-import NestedFunction from "./NestedFunction";
-import { Box, Button, Card, CardContent, Typography } from "@material-ui/core";
-import { Help } from "@material-ui/icons";
-import nnSVG from "./assets/nn.svg";
+import { Box, Button, Typography, Fab } from "@material-ui/core";
+import { Help, PlayArrow } from "@material-ui/icons";
+import { Nav } from "./Nav";
+import { Element } from "react-scroll";
+import SubTool from "./SubTool";
+import LinearScatter from "./LinearScatter";
+/* Asset imports */
 import scaledGIF from "./assets/scaled.gif";
 import forwardSVG from "./assets/forward.svg";
 import backwardSVG from "./assets/backward.svg";
-import LinearScatter from "./LinearScatter";
-import SubTool from "./SubTool";
-import { Nav } from "./Nav";
-import { Element } from "react-scroll";
+
+/* Functional Component */
 const Explanation = () => {
+	/* Link Component that can be reused */
 	const link = (href, content) => (
 		<Button
 			size="small"
@@ -24,7 +26,7 @@ const Explanation = () => {
 			{content}
 		</Button>
 	);
-
+	/* Google colab link button to be reused if I ever add google colab notebooks */
 	const colab = (href) => (
 		<a href={href}>
 			<img
@@ -33,12 +35,16 @@ const Explanation = () => {
 			/>
 		</a>
 	);
+	/* Topic formatted component */
 	const topic = (title) => (
 		<Typography variant="h3">
 			<b>{title}</b>
 		</Typography>
 	);
+	/* SubTopic formatted component */
 	const subtopic = (title) => <Typography variant="h4">{title}</Typography>;
+
+	/* Explanation paper */
 	const paper = (
 		<div>
 			<br />
@@ -46,15 +52,15 @@ const Explanation = () => {
 			<Typography variant="h6">
 				Most people abstract the idea of backpropagation when learning
 				neural networks because it is by far the most notation heavy
-				part. The goal of this article is to marry the notation with
-				some interactive tools to better understand a very important
-				idea.
+				part. The goal of this article is to build an intuition for
+				backpropagation in the context of how neural networks "learn."
+				By marrying explanation, notation, and interactive tools, the
+				heuristic is to get a deeper understanding of the foundation.
 			</Typography>
 			<Typography variant="h6">
 				<b>
-					If you want to skip ahead, click on a tool below. Otherwise,
-					click the "Article" section, or scroll to the start of the
-					article.
+					If you want to skip ahead, click on a checkpoint. Otherwise,
+					click the "Article", or scroll to the start of the article.
 				</b>
 			</Typography>
 			<Nav />
@@ -251,6 +257,7 @@ const Explanation = () => {
 			</Typography>
 			<br />
 			{topic("Conclusion")}
+			<br />
 			{subtopic("Closing Statement")}
 			<Typography variant="h6">
 				By the end, I hope you gained some degree of intution for how
@@ -261,21 +268,45 @@ const Explanation = () => {
 				occur and you be able to solve your problems better and faster.
 			</Typography>
 			<br />
-			{subtopic("Seeing things in Action")}
+			<Typography variant="h4">
+				<b>Backprop Tool</b> Quick Start
+			</Typography>
 			<Typography variant="h6">
-				Since you know how and why backpropagation is performed, cement
-				that knowledge by seeing the whole process in action below.
-				Start by pressing play, then when you are ready press the EPOCH
-				to see the whole process on the a single Epoch: forward,
-				backward, update. And customize the hyperparamters as you see
-				fit.
+				<ol>
+					<li>
+						Press{" "}
+						<Fab
+							style={{
+								background: "#175676",
+								color: "white",
+							}}
+							size="small"
+						>
+							{<PlayArrow />}
+						</Fab>{" "}
+						to start training
+					</li>
+					<li>
+						Then press{" "}
+						<Button variant="contained" size="small">
+							EPOCH
+						</Button>{" "}
+						to see backpropagation animation
+					</li>
+					<li>
+						To go back to fitting mode click{" "}
+						<Button variant="contained" size="small">
+							EPOCH
+						</Button>{" "}
+						again
+					</li>
+				</ol>
 			</Typography>
 			<Typography variant="h6">
 				<b>If you need help, click on a </b>
 				<Help style={{ color: "#FFA500" }} />{" "}
 				<b>to reveal extra descriptions</b>
 			</Typography>
-			<br />
 		</div>
 	);
 

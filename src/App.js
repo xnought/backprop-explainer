@@ -9,7 +9,6 @@ import { Element } from "react-scroll";
 class App extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {};
 	}
 	componentDidMount() {
 		ReactGa.initialize("UA-192166007-1");

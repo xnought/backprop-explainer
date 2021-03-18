@@ -33,6 +33,7 @@ import {
 import {
 	Replay,
 	SlowMotionVideo,
+	FastForward,
 	PlayArrow,
 	Stop,
 	Help,
@@ -62,7 +63,7 @@ class MainTool extends Component {
 			y: [],
 			yhat: [],
 			shape: [1, 8, 8, 1],
-			lr: 0.005,
+			lr: 0.001,
 			epoch: 0,
 			cpyEpoch: 0,
 
@@ -112,6 +113,7 @@ class MainTool extends Component {
 			singleInputIndex: -1,
 			shouldNotRender: false,
 			status: "reset",
+			zoom: 1,
 		};
 
 		this.initNeuralNetwork = this.initNeuralNetwork.bind(this);
@@ -493,14 +495,24 @@ class MainTool extends Component {
 		this.asyncPause();
 		this.resetParameters(scale);
 	}
+
+	correctZoom(width) {
+		const zoomFactor = (1 - 0.75) / (1387 - 913);
+		const zoomShift = 0.75 - zoomFactor * 913;
+		const zoom = Math.min(1, zoomFactor * width + zoomShift - 0.2);
+		return zoom;
+	}
 	async componentDidMount() {
 		tf.setBackend("cpu");
 		this.genTensorData(tf.sin, this.state.scale, 50);
 		this.initNeuralNetwork(this.state.shape);
 		const model = tf.tidy(() => {
-			return this.modelCompile(0.01);
+			return this.modelCompile(this.state.lr);
 		});
-		this.setState({ tensorFlowNN: model });
+
+		const width = document.body.clientWidth;
+		const zoom = this.correctZoom(width);
+		this.setState({ tensorFlowNN: model, zoom });
 	}
 	shouldComponentUpdate() {
 		if (this.state.stopRender) {
@@ -545,10 +557,11 @@ class MainTool extends Component {
 			lossChange,
 			scatterHelp,
 			keyFrameScatter,
+			zoom,
 		} = this.state;
 		const { playing, speed } = controls;
 
-		const lrs = [0.001, 0.005, 0.01, 0.05, 0.1];
+		const lrs = [0.0001, 0.001, 0.003, 0.005, 0.05];
 		const dataSets = [
 			{ label: "sin", eqn: tf.sin, scale: 5 },
 			{ label: "cos", eqn: tf.cos, scale: 5 },
@@ -584,10 +597,10 @@ class MainTool extends Component {
 					</IconButton>
 				</Tooltip>
 				{PlayButtonClick}
-				<Tooltip title="slomo" arrow>
+				<Tooltip title="speed up" arrow>
 					<IconButton
 						style={{
-							color: speed === 0 ? "grey" : "#FFC006",
+							color: speed === 0 ? "#FFC006" : "grey",
 						}}
 						onClick={() => {
 							this.setState({
@@ -598,7 +611,7 @@ class MainTool extends Component {
 							});
 						}}
 					>
-						<SlowMotionVideo />
+						<FastForward />
 					</IconButton>
 				</Tooltip>
 			</CardActions>
@@ -665,19 +678,26 @@ class MainTool extends Component {
 						<Tooltip
 							title={
 								<Typography variant="h6">
-									{mode ? "Click: Back" : "Click: Epoch Mode"}
+									<b>
+										{mode
+											? "Click to go back to fitting"
+											: "Click to see backpropagation"}
+									</b>
 								</Typography>
 							}
 							arrow
-							placement="right-start"
-							open={loss !== null || (mode && !isAnimating)}
+							placement="top-start"
 						>
 							<Button
 								disabled={loss == null || isAnimating}
+								variant="contained"
 								onClick={async () => {
 									if (mode) {
-										this.setState({ subEpoch: "" });
-										this.setState({ mode: !mode });
+										this.setState({
+											subEpoch: "",
+											mode: !mode,
+										});
+										this.run();
 									} else {
 										this.randomInputGeneration(
 											X,
@@ -981,7 +1001,7 @@ class MainTool extends Component {
 							y={y}
 							yhat={yhat}
 							id={1}
-							duration={100}
+							duration={200}
 							select={-1}
 						/>
 					)}
@@ -1067,7 +1087,11 @@ class MainTool extends Component {
 						paddingBottom: "1em",
 					}}
 				>
-					<CardContent>
+					<CardContent
+						style={{
+							transform: `scale(${zoom})`,
+						}}
+					>
 						<Box display="flex" justifyContent="center">
 							<Box marginRight={90}>
 								<img src={keySVG}></img>
