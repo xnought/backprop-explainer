@@ -63,8 +63,10 @@ class NestedFunction extends Component {
 		const outputArr = [
 			{ output: output1, color: "#8db600" },
 			{ output: output2, color: "#FF8F00" },
-			{ output: output3, color: "blue" },
+			{ output: output3, color: "#56A8C7" },
 		];
+
+		//prettier-ignore
 		return (
 			<Box display="flex">
 				<Box width={580}>
@@ -179,6 +181,7 @@ class NestedFunction extends Component {
 								>
 									{this.state.output2}
 								</Typography>
+								
 								) = {weights[2]}(
 								<Typography
 									style={{ color: "#FF8F00" }}
@@ -186,9 +189,9 @@ class NestedFunction extends Component {
 								>
 									{this.state.output2}
 								</Typography>
-								) + {biases[2]}={" "}
+								) + {biases[2]} ={" "}
 								<Typography
-									style={{ color: "blue" }}
+									style={{ color: "#56A8C7" }}
 									variant="inline"
 								>
 									{this.state.output3}

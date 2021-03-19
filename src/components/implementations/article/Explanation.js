@@ -15,11 +15,13 @@ import { Nav } from "./Nav";
 import { Element } from "react-scroll";
 import SubTool from "./SubTool";
 import LinearScatter from "./LinearScatter";
+import NestedFunction from "./NestedFunction";
 /* Asset imports */
 import scaledGIF from "./assets/scaled.gif";
 import forwardSVG from "./assets/forward.svg";
 import backwardSVG from "./assets/backward.svg";
 import tanPNG from "./assets/tan.png";
+import gradPNG from "./assets/grad.png";
 
 /* Functional Component */
 const Explanation = () => {
@@ -288,7 +290,7 @@ const Explanation = () => {
 					<Box>
 						<Typography variant="h6">
 							{$$(
-								"\\nabla f(x,y) = \\begin{bmatrix} \\frac{\\partial f}{\\partial x} \\\\ \\frac{\\partial f}{\\partial y} \\\\ \\end{bmatrix}"
+								"\\nabla f(x,y) = \\begin{bmatrix} \\frac{\\partial f}{\\partial x} \\\\[4pt] \\frac{\\partial f}{\\partial y} \\\\ \\end{bmatrix}"
 							)}
 						</Typography>
 					</Box>
@@ -304,6 +306,47 @@ const Explanation = () => {
 				rule due to the nested nature of neural networks.
 			</Typography>
 			<Typography variant="h6">
+				<b>Below is a color coded example of the chain rule.</b>
+			</Typography>
+			<Typography variant="h6">
+				Start by sliding the slider and notice how the output is the
+				input to the next function and so forth.{" "}
+				<b>Then read the explanation below</b>.
+			</Typography>
+			<Box display="flex" justifyContent="center">
+				<Box>
+					<NestedFunction />
+				</Box>
+			</Box>
+			<br />
+			<Typography variant="h6">
+				Suppose we wanted to see how the{" "}
+				<em style={{ color: "#F50257" }}>pink</em> affects the{" "}
+				<em style={{ color: blue }}>blue</em>. We should start at{" "}
+				<em style={{ color: blue }}>blue</em>, then
+				<ol>
+					<li>
+						observe how <em style={{ color: orange }}>orange</em>{" "}
+						affects <em style={{ color: blue }}>blue</em>{" "}
+					</li>
+					<li>
+						observe how <em style={{ color: "#8db600" }}>green</em>{" "}
+						affects <em style={{ color: orange }}>orange</em>
+					</li>
+					<li>
+						observe how <em style={{ color: "#F50257" }}>pink</em>{" "}
+						affects <em style={{ color: "#8db600" }}>green</em>
+					</li>
+				</ol>
+				By chaining those values together, we get how the{" "}
+				<em style={{ color: "#F50257" }}>pink</em> affects the{" "}
+				<em style={{ color: blue }}>blue</em>.
+			</Typography>
+			<br />
+			<Typography variant="h6">
+				This logic applied to our one neuron neural network looks like
+			</Typography>
+			<Typography variant="h6">
 				{$$(
 					"\\frac{ \\partial \\text{loss}}{\\partial w} = \\frac{ \\partial \\text{loss}}{\\partial \\text{neuron}} \\frac{ \\partial \\text{neuron}}{\\partial w} "
 				)}
@@ -312,17 +355,30 @@ const Explanation = () => {
 				)}
 			</Typography>
 			<Typography variant="h6">
-				Even this chain can be broken up into more primatives (basis of
+				These chains can be broken up into more intermediate derivatives
+				all the way down to their primatives (basis of
 				{link(
 					"https://en.wikipedia.org/wiki/Automatic_differentiation",
 					"automatic differentiation"
 				)}
-				), but as long as you get that we are gauging rate of change,
-				where to see how loss was affected by a parameter we first ask
-				how the output of neuron affected its value, then go back and
-				ask how the parameter affected the neuron output, then you know
-				the foundations for what is going on in the chain rule and, in
-				this case, backpropagation.
+				). <b>The main takeaway</b> is that we first observe how the
+				neuron output affected the loss output{" "}
+				{$(
+					" \\frac{ \\partial \\text{loss}}{\\partial \\text{neuron}}"
+				)}
+				, but then we need to explain how the neuron output was affected
+				by the parameter{" "}
+				{$(
+					" \\frac{ \\partial \\text{neuron}}{\\partial \\text{parameter}}"
+				)}{" "}
+				and can combine these to observe how the paramter affected the
+				loss{" "}
+				{$(
+					" \\frac{ \\partial \\text{loss}}{\\partial \\text{parameter}}"
+				)}
+				. And notice how we compute these derivatives going backward,
+				which has the added benefit of reusing values computed in the
+				forward propagation.
 			</Typography>
 			<br />
 			{subtopic("Concrete Example")}
@@ -330,7 +386,7 @@ const Explanation = () => {
 				Let's go through a concrete example of a forward and backward
 				pass. We will define the input as {$("x_0 = 2.1")}, the weight
 				as {$("w_0 = 1")}, and the bias as {$("b = 0")}. This is just
-				one training example, in reality we would have more data.
+				one training example.
 			</Typography>
 			<img width="100%" src={forwardSVG} />
 			<Typography variant="h6">
@@ -343,8 +399,32 @@ const Explanation = () => {
 				{$$("\\frac{\\partial \\text{loss}}{\\partial b} = -3.8")}
 			</Typography>
 			<Typography variant="h6">
-				Reassign the parameters to opposite gradient to descend loss, in
-				this case learning rate is {$("\\text{lr} = 0.01")}
+				Then, we update the parameters to opposite gradient to descend
+				loss (
+				{definiton(
+					<span>gradient descent</span>,
+					<Box>
+						<Typography variant="caption">
+							What the loss function might look like graphed out.
+							Reaching the bottom is the goal.
+						</Typography>
+						<img src={gradPNG} width="100%"></img>
+						<Typography variant="body2">
+							{$(
+								"\\text{param} := \\text{param} -lr \\cdot \\frac{\\partial \\text{loss}}{\\partial \\text{param}}"
+							)}
+						</Typography>
+						<Typography variant="caption">
+							Since the gradient of the loss will be the direction
+							of steepest <em>ascent</em>, by going the opposite
+							direction, we go in the direction of steepest{" "}
+							<em>descent</em>. Learning rate lr then decides how
+							large of a step in the direction of steepest descent
+							we would like.
+						</Typography>
+					</Box>
+				)}
+				), in this case learning rate is {$("\\text{lr} = 0.01")}
 				{$$(
 					"w_0 := w_0 - \\text{lr} \\cdot \\frac{\\partial \\text{loss}}{\\partial w_0} = (1) - (0.01) \\cdot (-7.98) = 1.0798"
 				)}
@@ -372,14 +452,13 @@ const Explanation = () => {
 				>
 					{<PlayArrow />}
 				</Fab>{" "}
-				to start the training process under <b>Auto Best Fit</b>.
+				to start the training process under <b>Auto Best Fit</b>. Watch
+				how as the line gets better fit, the red dot descend the loss
+				contour.
 			</Typography>
 			<Element name="structLin">
 				<SubTool />
 			</Element>
-			Now you understand how the logic and intuition of backpropagation
-			and how neural networks learn, but what about neural networks with
-			more neurons?
 			<br />
 			{topic("Scaling up Neurons and Layers")}
 			{subtopic("The Changes")}
