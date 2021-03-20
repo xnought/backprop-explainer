@@ -17,34 +17,26 @@ import SubTool from "./SubTool";
 import LinearScatter from "./LinearScatter";
 import NestedFunction from "./NestedFunction";
 /* Asset imports */
+import nnPNG from "./assets/nn.png";
 import scaledGIF from "./assets/scaled.gif";
 import forwardSVG from "./assets/forward.svg";
 import backwardSVG from "./assets/backward.svg";
-import tanPNG from "./assets/tan.png";
-import gradPNG from "./assets/grad.png";
 
 /* Functional Component */
 const Explanation = () => {
+	const orange = "#FFA500";
+	const blue = "#56A8C7";
 	/* Link Component that can be reused */
 	const link = (href, content) => (
 		<Button
 			size="small"
-			color="primary"
+			style={{ color: orange }}
 			href={href}
 			target="_blank"
 			rel="noopener noreferrer"
 		>
 			{content}
 		</Button>
-	);
-	/* Google colab link button to be reused if I ever add google colab notebooks */
-	const colab = (href) => (
-		<a href={href}>
-			<img
-				src="https://colab.research.google.com/assets/colab-badge.svg"
-				alt="Open In Colab"
-			/>
-		</a>
 	);
 
 	const definiton = (word, desc) => (
@@ -65,8 +57,6 @@ const Explanation = () => {
 		</Tooltip>
 	);
 
-	const orange = "#FFA500";
-	const blue = "#56A8C7";
 	/* Topic formatted component */
 	const topic = (title) => (
 		<Typography variant="h3">
@@ -221,29 +211,18 @@ const Explanation = () => {
 				)}
 				(derivative), we get our point of interest and another point
 				that is infinitely close and calculate slope, this can be
-				visualized as a{" "}
-				{definiton(
-					<span>tangent line</span>,
-					<Box>
-						<img src={tanPNG} width="100%" />
-					</Box>
-				)}{" "}
-				at the point of interest.
+				visualized as a tangent line at the point of interest for a
+				function with one variable like {$("f(x)")}.
 			</Typography>
 			<Typography variant="h6">
 				&emsp;&emsp;&emsp;&emsp;In the context of our one neuron neural
 				network, we can compose the whole network as a nested function
-				(input {$("x")} into {$("\\text{neuron}(x) = wx+b")}; output of
-				neuron {$("\\text{neuron}(x)")} is input as {$("\\hat{y}")} into
-				loss function{" "}
-				{$("\\text{loss}(\\hat{y},y) = \\sum(\\hat{y} - y)^2")}; output
-				of loss function is the loss).
 				{$$("\\text{loss}(\\text{neuron}(x,w,b),y)")}
 			</Typography>
 			<Typography variant="h6">
-				And since we want to tune the parameters weight {$("w")} and
-				bias {$("b")}, we want how they will affect the loss, or in
-				other words, the{" "}
+				Since want to tune the parameters weight {$("w")} and bias{" "}
+				{$("b")}, we want to know how each parameters will affect the
+				loss, or in other words, the{" "}
 				{definiton(
 					<span>partial derivative</span>,
 					<Box>
@@ -283,8 +262,8 @@ const Explanation = () => {
 							with respect to {$("y")}
 						</Typography>
 					</Box>
-				)}{" "}
-				of loss with respect to each parameter, also called the{" "}
+				)}
+				. of loss with respect to each parameter, also called the{" "}
 				{definiton(
 					<span>gradient</span>,
 					<Box>
@@ -295,12 +274,37 @@ const Explanation = () => {
 						</Typography>
 					</Box>
 				)}
+				. After we compute the gradient from getting all the derivatives
+				backwards, we will have the direction of steepest{" "}
+				<em>ascent</em> on the loss function. But we want to lower loss,
+				therefore we use the opposite direction to get the direction of
+				steepest descent, to perform{" "}
+				{definiton(
+					<span>gradient descent</span>,
+					<Box>
+						<Typography variant="body2">
+							{$(
+								"\\text{param} := \\text{param} -lr \\cdot \\frac{\\partial \\text{loss}}{\\partial \\text{param}}"
+							)}
+						</Typography>
+						<Typography variant="caption">
+							Since the gradient of the loss will be the direction
+							of steepest <em>ascent</em>, by going the opposite
+							direction, we go in the direction of steepest{" "}
+							<em>descent</em>. Learning rate lr then decides how
+							large of a step in the direction of steepest descent
+							would like.
+						</Typography>
+					</Box>
+				)}
 				.
 			</Typography>
-			<Typography variant="h6">
-				{$$("\\frac{ \\partial \\text{loss}}{\\partial w}")}
-				{$$("\\frac{ \\partial \\text{loss}}{\\partial b}")}
+			<Typography variant="h4">
+				{$$(
+					"\\nabla \\text{loss} = \\begin{bmatrix} \\frac{ \\partial \\text{loss}}{\\partial w} \\\\[4pt] \\frac{ \\partial \\text{loss}}{\\partial b} \\\\ \\end{bmatrix}"
+				)}
 			</Typography>
+
 			<Typography variant="h6">
 				In order to calculate these derivatives we must use the chain
 				rule due to the nested nature of neural networks.
@@ -400,31 +404,7 @@ const Explanation = () => {
 			</Typography>
 			<Typography variant="h6">
 				Then, we update the parameters to opposite gradient to descend
-				loss (
-				{definiton(
-					<span>gradient descent</span>,
-					<Box>
-						<Typography variant="caption">
-							What the loss function might look like graphed out.
-							Reaching the bottom is the goal.
-						</Typography>
-						<img src={gradPNG} width="100%"></img>
-						<Typography variant="body2">
-							{$(
-								"\\text{param} := \\text{param} -lr \\cdot \\frac{\\partial \\text{loss}}{\\partial \\text{param}}"
-							)}
-						</Typography>
-						<Typography variant="caption">
-							Since the gradient of the loss will be the direction
-							of steepest <em>ascent</em>, by going the opposite
-							direction, we go in the direction of steepest{" "}
-							<em>descent</em>. Learning rate lr then decides how
-							large of a step in the direction of steepest descent
-							we would like.
-						</Typography>
-					</Box>
-				)}
-				), in this case learning rate is {$("\\text{lr} = 0.01")}
+				loss ( ), in this case learning rate is {$("\\text{lr} = 0.01")}
 				{$$(
 					"w_0 := w_0 - \\text{lr} \\cdot \\frac{\\partial \\text{loss}}{\\partial w_0} = (1) - (0.01) \\cdot (-7.98) = 1.0798"
 				)}
@@ -453,7 +433,7 @@ const Explanation = () => {
 					{<PlayArrow />}
 				</Fab>{" "}
 				to start the training process under <b>Auto Best Fit</b>. Watch
-				how as the line gets better fit, the red dot descend the loss
+				how as the line gets better fit, the red dot descends the loss
 				contour.
 			</Typography>
 			<Element name="structLin">
@@ -463,61 +443,61 @@ const Explanation = () => {
 			{topic("Scaling up Neurons and Layers")}
 			{subtopic("The Changes")}
 			<Typography variant="h6">
-				Scaling up to more neurons and layers. Doing backward
-				propagation on one neuron is not difficult and can produce great
-				results when fitting linear data. But as we want to process more
-				non linear data, we have to increase complexity to vary the
-				output and create more parameters that we can tune. We do this
-				by adding layers of neurons where all the outputs of one layer
-				are the inputs to the next, essentially a very nested function
-				where inputs are distributed to all functions. This is the
-				simple intuition in scaling up to more neurons and more layers.
-				Other than this we also use an activation function, ReLU in our
-				case, to introduce non linearity to the linear nature of each
-				neuron while also introducing a point of deactivation. This
-				point of deactivation is simply 0, which removes the impact of
-				that neuron on updating parameters allowing for certain neurons
-				to “fire” while others don't change at all depending on input.
+				To fit more interesting data that is not linear, we need to add
+				complexity to vary output, but still maintain differentiability
+				so we can tune the parameters. We can do this by adding
+				activation functions to each neuron, and by adding more neurons
+				in a specific way.
 			</Typography>
+
+			<Typography variant="h6">
+				Here is an example of a neural network with one inputs, 2 hidden
+				layers (each neuron has ReLU activation in these layers), and
+				one output neuron.
+			</Typography>
+			<Box display="flex" justifyContent="center">
+				<Box>
+					<img src={nnPNG} />
+				</Box>
+			</Box>
+			<Typography variant="h6">
+				the output of each neuron is fed into the neurons of the next
+				layer and so forth. This produces a very nested function with
+				many more weights and biases for us to tune.
+			</Typography>
+
 			<br />
 			{subtopic("The Process")}
 			<Typography variant="h6">
-				First we define the network, we push our inputs through the
-				model (forward propagation), then we calculate how each
-				parameter in the network affects the loss (backward
-				propagation), then we update the parameters with gradient
-				descent. Notice how this is the same process as the one neuron
-				network. THE PROCESS DOESNT CHANGE. We have to do more backward
-				calculations, more chain rule, but that process does not change
-				either.
+				<ol>
+					<li>Forward propagation resulting in an output and loss</li>
+					<li>
+						Backward propagation using the chain rule to compute the
+						gradient
+					</li>
+					<li>Descend the loss by performing gradient descent</li>
+				</ol>
 			</Typography>
-			<img width="100%" src={scaledGIF} />
 			<Typography variant="h6">
-				Above is an exaple of a forward pass, backward pass and update.
-				Notice the orange arrows that represent{" "}
+				The process doesn't change from the single neuron example! Since
+				the network is deeper, we have to calculate more derivatives
+				going backwards and have to tune more parameters with gradient
+				descent, but the logic stays the same.
+			</Typography>
+
+			<Typography variant="h6">
+				A great way to visualize backpropagation in a large network is
+				with vertial arrows representing the{" "}
 				{$(
-					"-\\frac{\\partial \\text{activation}}{\\partial \\text{loss}}"
+					"-\\frac{\\partial \\text{loss}}{\\partial \\text{activation} }"
 				)}
-				, which tells us which direction the activation of neuron should
-				be nudged to lower loss.
+				: which direction we need to nudge the neuron output in order to
+				lower loss. In the example, we use the original definiton of
+				stochastic gradient descent and only use one training example.
 			</Typography>
-			<Typography variant="body2">
-				In this training example we use the original definiton of SGD
-				(stochastic gradient descent) and only use one training example
-				(batch size 1).
-			</Typography>
-			<br />
-			{topic("Conclusion")}
-			<br />
-			{subtopic("Closing Statement")}
-			<Typography variant="h6">
-				By the end, I hope you gained some degree of intution for how
-				and why we perform backproagation in neural networks. Now if you
-				come into contact with neural networks and things aren't working
-				out don't simply throw more data at it like many do, instead
-				think back to the logic and intuition or the processes that
-				occur and you be able to solve your problems better and faster.
-			</Typography>
+
+			<img width="100%" src={scaledGIF} />
+			<Typography variant="h4">Now you try!</Typography>
 			<br />
 			<Typography variant="h4">
 				<b>Backprop Tool</b> Quick Start
@@ -533,7 +513,7 @@ const Explanation = () => {
 							}}
 							size="small"
 						>
-							{<PlayArrow />}
+							<PlayArrow />
 						</Fab>{" "}
 						to start training
 					</li>
@@ -558,6 +538,7 @@ const Explanation = () => {
 				<Help style={{ color: "#FFA500" }} />{" "}
 				<b>to reveal extra descriptions</b>
 			</Typography>
+			<br />
 		</div>
 	);
 
