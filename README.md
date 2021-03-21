@@ -34,4 +34,4 @@ Make sure you are in the backprop-explainer directory
 By <a href="http://donnybertucci.com">Donny Bertucci</a> and <a href="http://minsuk.com">Minsuk Kahng</a> (project advisor)
 
 To see full acknowledgements and how it was made (with links)
-navigate to the acknowledgments section at <a href="xnought.github.io/backprop-explainer">Live Website</a>
+navigate to the acknowledgments section at <a href="https://xnought.github.io/backprop-explainer/">Live Website</a>
