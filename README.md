@@ -29,7 +29,7 @@ Make sure you are in the backprop-explainer directory
 </li>
 </ol>
 
-## How and who made this?
+## Who made this and how was it made?
 
 By <a href="http://donnybertucci.com">Donny Bertucci</a> and <a href="http://minsuk.com">Minsuk Kahng</a> (project advisor)
 
