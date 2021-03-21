@@ -1153,7 +1153,11 @@ class BackpropTool extends Component {
 								</Typography>
 							</Box>
 						</Box>
-						<img src={epochModePNG} width="100%"></img>
+						<img
+							alt="epochMode"
+							src={epochModePNG}
+							width="100%"
+						></img>
 					</DialogContent>
 				</Dialog>
 				<Dialog
