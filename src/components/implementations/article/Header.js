@@ -41,7 +41,7 @@ class Header extends Component {
 		let thresholds = d3.range(darkness, 20, 1).map((i) => Math.pow(2, i));
 		let color = d3.scaleSequentialLog(
 			d3.extent(thresholds),
-			d3.interpolateMagma
+			d3.interpolateCool
 		);
 		const contours = d3.contours().size([n, m]).thresholds(thresholds)(
 			values

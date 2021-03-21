@@ -13,6 +13,7 @@ import {
 	ScatterPlot,
 	Loss,
 	AnimatedScatterPlot,
+	Summary,
 } from "../../exports";
 import {
 	Typography,
@@ -24,7 +25,6 @@ import {
 	Chip,
 	Button,
 	Fab,
-	Slider,
 	Tooltip,
 	Dialog,
 	DialogContent,
@@ -32,7 +32,6 @@ import {
 } from "@material-ui/core";
 import {
 	Replay,
-	SlowMotionVideo,
 	FastForward,
 	PlayArrow,
 	Stop,
@@ -40,9 +39,8 @@ import {
 	Close,
 } from "@material-ui/icons";
 import controlGif from "./assets/controlcenter.gif";
-import customGif from "./assets/customization.gif";
-import nnDiagram from "./assets/nn.png";
-import scatterGif from "./assets/scatter.gif";
+import singleSummarySVG from "./assets/singleSummary.svg";
+import epochModePNG from "./assets/epochMode.png";
 import keySVG from "./assets/key.svg";
 import { NeuralNetwork, tools } from "../../../nnMiniLibrary/exports";
 import { draw } from "../../../Utils/exports";
@@ -561,7 +559,7 @@ class MainTool extends Component {
 		} = this.state;
 		const { playing, speed } = controls;
 
-		const lrs = [0.0001, 0.001, 0.003, 0.005, 0.05];
+		const lrs = [0.0001, 0.001, 0.003, 0.005];
 		const dataSets = [
 			{ label: "sin", eqn: tf.sin, scale: 5 },
 			{ label: "cos", eqn: tf.cos, scale: 5 },
@@ -787,12 +785,12 @@ class MainTool extends Component {
 									keyFrameScatter < 3 ? "black" : "orangered",
 							}}
 						>
-							{mode && lossChange != 0
+							{mode && lossChange !== 0
 								? keyFrameScatter < 3
 									? "loss: "
 									: "new loss: "
 								: ""}
-							{mode && lossChange != 0 ? (
+							{mode && lossChange !== 0 ? (
 								<AnimatedNumber
 									value={lossChange}
 									formatValue={(value) =>
@@ -914,32 +912,14 @@ class MainTool extends Component {
 								))}
 							</CardActions>
 							<CardActions>
-								<Typography variant="caption">
-									Neurons
-								</Typography>
+								<Typography variant="caption">Layer</Typography>
 
-								<Slider
-									style={{ color: "#175676" }}
-									defaultValue={2}
-									disabled={playing || mode}
-									aria-labelledby="discrete-slider"
-									valueLabelDisplay="auto"
-									step={1}
-									marks
-									onChange={(e, n) => {
-										this.setState({ sliderVal: n });
-									}}
-									min={1}
-									max={8}
-								/>
 								<Button
 									disabled={playing || mode}
 									onClick={() => {
 										let a = shape;
 										if (a.length < 5) {
-											a[
-												a.length - 1
-											] = this.state.sliderVal;
+											a[a.length - 1] = 8;
 											a.push(1);
 											this.setState({ shape: a });
 											this.initNeuralNetwork(a);
@@ -1005,23 +985,6 @@ class MainTool extends Component {
 							select={-1}
 						/>
 					)}
-
-					<IconButton
-						size="small"
-						style={{
-							color: "orange",
-							position: "relative",
-							bottom: "300px",
-							right: "40px",
-						}}
-						onClick={() => {
-							this.setState({
-								scatterHelp: true,
-							});
-						}}
-					>
-						<Help />
-					</IconButton>
 				</Box>
 				<Box marginTop={10}>
 					<Loss lossArray={this.state.lossArray} duration={100} />
@@ -1094,7 +1057,7 @@ class MainTool extends Component {
 					>
 						<Box display="flex" justifyContent="center">
 							<Box marginRight={90}>
-								<img src={keySVG}></img>
+								<img src={keySVG} alt="key"></img>
 							</Box>
 							<Box>
 								<Typography variant="h2">
@@ -1140,37 +1103,48 @@ class MainTool extends Component {
 							width="100%"
 						/>
 
-						<Typography variant="caption">
-							The <em>control</em> center is where you{" "}
-							<em>control</em> the flow of the program. You can
-							play, pause, slow down and reset.
-						</Typography>
 						<Box display="flex" justifyContent="center">
-							<Box marginBottom={5}>
+							<Box marginBottom={1}>
 								<Typography variant="h6">
-									What is an Epoch?
-								</Typography>
-
-								<Typography variant="body2">
-									An epoch is single iteration of training.
-								</Typography>
-
-								<Typography variant="h6">
-									What is Loss?
-								</Typography>
-								<Typography variant="body2">
-									Loss tells you the error of the current
-									predicitions. Lower is better.
-								</Typography>
-
-								<Typography variant="h6">
-									How Do I go into Backpropogation Mode?
-								</Typography>
-								<Typography variant="body2">
-									Click on the EPOCH
+									<ol>
+										<li>
+											Press{" "}
+											<Fab
+												style={{
+													background: "#175676",
+													color: "white",
+												}}
+												size="small"
+											>
+												<PlayArrow fontSize="small" />
+											</Fab>{" "}
+											to start training
+										</li>
+										<li>
+											Then press{" "}
+											<Button
+												variant="contained"
+												size="small"
+											>
+												EPOCH
+											</Button>{" "}
+											to see backpropagation animation
+										</li>
+										<li>
+											To go back to fitting mode click{" "}
+											<Button
+												variant="contained"
+												size="small"
+											>
+												EPOCH
+											</Button>{" "}
+											again
+										</li>
+									</ol>
 								</Typography>
 							</Box>
 						</Box>
+						<img src={epochModePNG} width="100%"></img>
 					</DialogContent>
 				</Dialog>
 				<Dialog
@@ -1192,46 +1166,43 @@ class MainTool extends Component {
 					</DialogActions>
 
 					<DialogContent>
-						<img
-							src={customGif}
-							alt="how to use control center"
-							width="100%"
-						/>
-
-						<Typography variant="caption">
-							The <em>customization</em> is where you{" "}
-							<em>customize</em> data, learning rate, and model
-							shape.
-						</Typography>
 						<Box display="flex" justifyContent="center">
 							<Box marginBottom={5}>
+								<Typography variant="h4">Fixed</Typography>
 								<Typography variant="h6">
-									What is an Learning Rate?
+									By default, this Neural Network stays fixed
+									with
+									<ol>
+										<li>
+											one input neuron, at least one
+											hidden layer of eight ReLU neurons,
+											and an output layer with one linear
+											neuron.
+										</li>
+										<li>
+											Stochastic Gradient Descent (one
+											training example per epoch)
+										</li>
+									</ol>
 								</Typography>
 
-								<Typography variant="body2">
-									Learning rate roughly translates to the
-									magnitiude of change each time parameters
-									are updated. You could think of it as how
-									big your steps are down a gradient.
-								</Typography>
-
-								<Typography variant="body2">
-									The learning rate is applied to the opposite
-									gradient after backpropogation.
-								</Typography>
-
+								<Typography variant="h4">Variable</Typography>
 								<Typography variant="h6">
-									Why would I change learning rate?
-								</Typography>
-
-								<Typography variant="body2">
-									Depending on the shape of the model and the
-									amount of data,a higher learning rate could
-									allow your model to take less epochs to
-									reach the target loss. But if the learning
-									rate is too large, you will never reach the
-									minimum of loss that you want.
+									You have the ability to change
+									<ol>
+										<li>
+											Learning Rate (0.0001, 0.001, 0.003,
+											or 0.005)
+										</li>
+										<li>
+											Data set (sine wave, cosine wave, or
+											tanh curve)
+										</li>
+										<li>
+											Hidden layer neurons (min 1 and max
+											3)
+										</li>
+									</ol>
 								</Typography>
 							</Box>
 						</Box>
@@ -1257,65 +1228,42 @@ class MainTool extends Component {
 					</DialogActions>
 
 					<DialogContent>
-						<img
-							src={nnDiagram}
-							alt="how to use control center"
-							width="100%"
-						/>
-
+						<Box display="flex" justifyContent="center">
+							<Box>
+								<img src={Summary} alt="summary" width="400" />
+							</Box>
+						</Box>
 						<Box display="flex" justifyContent="center">
 							<Box marginBottom={5}>
-								<Typography variant="h6">Summary</Typography>
-
-								<Typography variant="body2">
-									Each grey square with a black outline is a
-									neuron. Each connection indicates where the
-									inputs travel. The thikness and the color of
-									each connection also indicate the weight
-									associated.
+								<Typography variant="h6">
+									Neural Network
 								</Typography>
-								<Typography variant="body2">
-									As the weights change, there will be a
-									visible change in stroke size.
+								<Typography variant="body1">
+									Each square is a neuron in the neural
+									network. To see the types of neurons check
+									the key located right above the neural
+									network.
 								</Typography>
 							</Box>
 						</Box>
-					</DialogContent>
-				</Dialog>
-
-				<Dialog
-					PaperProps={{
-						style: {
-							backgroundColor: "#F7F7F7",
-						},
-					}}
-					open={scatterHelp}
-				>
-					<DialogActions>
-						<IconButton
-							onClick={() => {
-								this.setState({ scatterHelp: false });
-							}}
-						>
-							<Close />
-						</IconButton>
-					</DialogActions>
-
-					<DialogContent>
-						<img src={scatterGif} alt="fitment" width="100%" />
-
+						<img
+							src={singleSummarySVG}
+							alt="singleSummary"
+							width="100%"
+						/>
 						<Box display="flex" justifyContent="center">
 							<Box marginBottom={5}>
-								<Typography variant="h6">Summary</Typography>
-
-								<Typography variant="body2">
-									The black line represents the current
-									predictions of the neural network.
+								<Typography variant="body1">
+									During a single epoch after clicking{" "}
+									<Button size="small" variant="contained">
+										EPOCH
+									</Button>{" "}
+									, each arrow will represent the direction to
+									nudge the output to lower loss.
 								</Typography>
-
-								<Typography variant="body2">
-									Each gray dot is a xy coordinate that
-									represents the input and input label.
+								<Typography variant="body1">
+									The fill color shows the activation output,
+									brighter is more active.
 								</Typography>
 							</Box>
 						</Box>

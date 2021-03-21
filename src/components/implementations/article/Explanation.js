@@ -17,9 +17,8 @@ import SubTool from "./SubTool";
 import LinearScatter from "./LinearScatter";
 import NestedFunction from "./NestedFunction";
 /* Asset imports */
-import nnPNG from "./assets/nn.png";
-import scaledGIF from "./assets/scaled.gif";
 import forwardSVG from "./assets/forward.svg";
+import summarySVG from "./assets/summary.svg";
 import backwardSVG from "./assets/backward.svg";
 
 /* Functional Component */
@@ -42,7 +41,7 @@ const Explanation = () => {
 	const definiton = (word, desc) => (
 		<Tooltip
 			style={{
-				backgroundColor: "#ed3d78",
+				backgroundColor: "#56A8C7",
 				color: "black",
 			}}
 			title={
@@ -81,9 +80,15 @@ const Explanation = () => {
 				Most people abstract the idea of backpropagation when learning
 				neural networks because it is by far the most notation heavy
 				part. The goal of this article is to build an intuition for
-				backpropagation in the context of how neural networks "learn."
-				By marrying explanation, notation, and interactive tools, the
-				aim is to get a understanding of the foundations.
+				backpropagation in the context of how neural networks{" "}
+				<em>learn</em>. By marrying explanation, notation, and
+				interactive tools, the aim is to get a understanding of the
+				foundations. Note that throughout the article there will be{" "}
+				{definiton(
+					<span>highlighted</span>,
+					<Typography varaint="h6">Example explanation</Typography>
+				)}{" "}
+				words that will give extra explanation on mouse over.
 			</Typography>
 			<br />
 			{topic("Backpropagation on One Neuron")}
@@ -282,12 +287,13 @@ const Explanation = () => {
 				{definiton(
 					<span>gradient descent</span>,
 					<Box>
-						<Typography variant="body2">
+						<Typography variant="body1">
 							{$(
 								"\\text{param} := \\text{param} -lr \\cdot \\frac{\\partial \\text{loss}}{\\partial \\text{param}}"
 							)}
 						</Typography>
-						<Typography variant="caption">
+						<br />
+						<Typography variant="body2">
 							Since the gradient of the loss will be the direction
 							of steepest <em>ascent</em>, by going the opposite
 							direction, we go in the direction of steepest{" "}
@@ -392,12 +398,12 @@ const Explanation = () => {
 				as {$("w_0 = 1")}, and the bias as {$("b = 0")}. This is just
 				one training example.
 			</Typography>
-			<img width="100%" src={forwardSVG} />
+			<img alt="forward pass" width="100%" src={forwardSVG} />
 			<Typography variant="h6">
 				Now we can go backwards and compute partial derivatives with the
 				chain rule to get the gradient {$("\\nabla \\text{loss}")}
 			</Typography>
-			<img width="100%" src={backwardSVG} />
+			<img alt="backward pass" width="100%" src={backwardSVG} />
 			<Typography variant="h6">
 				{$$("\\frac{\\partial \\text{loss}}{\\partial w_0} = -7.98")}
 				{$$("\\frac{\\partial \\text{loss}}{\\partial b} = -3.8")}
@@ -443,31 +449,61 @@ const Explanation = () => {
 			{topic("Scaling up Neurons and Layers")}
 			{subtopic("The Changes")}
 			<Typography variant="h6">
-				To fit more interesting data that is not linear, we need to add
-				complexity to vary output, but still maintain differentiability
-				so we can tune the parameters. We can do this by adding
-				activation functions to each neuron, and by adding more neurons
-				in a specific way.
+				To fit more interesting data that is non-linear (e.g. sine wave
+				or quadratic), we need to add complexity to vary output to make
+				sure we are not contrained to only linear outputs. We can do
+				this by adding more neurons, more layers, and activation
+				functions. If you think of our entire neural network as a
+				function, then by adding more neurons and more layers we are
+				creating a more nested function. Not only does this create more
+				parameters that we can tune to vary the output, it also
+				maintains the property of{" "}
+				{definiton(
+					<span>differentiability</span>,
+					<Box>
+						<Typography variant="h6">
+							The derivative exists for all inputs
+						</Typography>
+					</Box>
+				)}
+				: important so we can compute the gradient. And by adding
+				non-linear activation functions with points of deactivation,
+				certain neurons may have no effect on the output while others
+				may become more activated, contributing to outputs that don't
+				have to follow linear constraints. We will be using the{" "}
+				{definiton(
+					<span>ReLU</span>,
+					<Box>
+						<Typography variant="h6">
+							<b>Re</b>ctified <b>L</b>inear <b>U</b>nit
+						</Typography>
+						<Typography variant="h6">
+							{$(
+								" \\text{ReLU}(x) = \\left\\{ \\begin{array}{ll} 0 & x\\leq 0  \\\\ x & x > 0 \\\\ \\end{array} \\right. "
+							)}
+						</Typography>
+					</Box>
+				)}{" "}
+				activation function in the hidden layers.
 			</Typography>
 
-			<Typography variant="h6">
-				Here is an example of a neural network with one inputs, 2 hidden
-				layers (each neuron has ReLU activation in these layers), and
-				one output neuron.
-			</Typography>
 			<Box display="flex" justifyContent="center">
 				<Box>
-					<img src={nnPNG} />
+					<img alt="summary" src={summarySVG} width="100%" />
 				</Box>
 			</Box>
 			<Typography variant="h6">
-				the output of each neuron is fed into the neurons of the next
-				layer and so forth. This produces a very nested function with
-				many more weights and biases for us to tune.
+				<b>Above</b> is an example of a neural network with one input,
+				three hidden layers with eight neurons each, and one output
+				neuron. The output of each neuron is fed into the neurons of the
+				next layer and so forth (like a nested function). Each link
+				represents a weight and a corresponding input into the
+				respective neuron, notice how the more neurons we add, the more
+				links there are and the more parameters we can tune to get our
+				desired output.
 			</Typography>
-
 			<br />
-			{subtopic("The Process")}
+			{subtopic("Training Process")}
 			<Typography variant="h6">
 				<ol>
 					<li>Forward propagation resulting in an output and loss</li>
@@ -479,25 +515,24 @@ const Explanation = () => {
 				</ol>
 			</Typography>
 			<Typography variant="h6">
-				The process doesn't change from the single neuron example! Since
-				the network is deeper, we have to calculate more derivatives
-				going backwards and have to tune more parameters with gradient
-				descent, but the logic stays the same.
+				<b>
+					The process doesn't change from the single neuron example!
+				</b>{" "}
+				Since the network is deeper, we have to calculate more
+				derivatives going backwards and have to tune more parameters
+				with gradient descent, but the logic stays the same.
 			</Typography>
 
 			<Typography variant="h6">
-				A great way to visualize backpropagation in a large network is
-				with vertial arrows representing the{" "}
+				&emsp;&emsp;&emsp;&emsp;A great way to visualize backpropagation
+				in a large network is with vertical arrows representing which
+				direction we need to nudge the neuron output in order to lower
+				loss:{" "}
 				{$(
 					"-\\frac{\\partial \\text{loss}}{\\partial \\text{activation} }"
 				)}
-				: which direction we need to nudge the neuron output in order to
-				lower loss. In the example, we use the original definiton of
-				stochastic gradient descent and only use one training example.
 			</Typography>
 
-			<img width="100%" src={scaledGIF} />
-			<Typography variant="h4">Now you try!</Typography>
 			<br />
 			<Typography variant="h4">
 				<b>Backprop Tool</b> Quick Start
@@ -513,7 +548,7 @@ const Explanation = () => {
 							}}
 							size="small"
 						>
-							<PlayArrow />
+							<PlayArrow fontSize="small" />
 						</Fab>{" "}
 						to start training
 					</li>
@@ -534,8 +569,8 @@ const Explanation = () => {
 				</ol>
 			</Typography>
 			<Typography variant="h6">
-				<b>If you need help, click on a </b>
-				<Help style={{ color: "#FFA500" }} />{" "}
+				<b> Click on </b>
+				<Help variant="small" style={{ color: "#FFA500" }} />{" "}
 				<b>to reveal extra descriptions</b>
 			</Typography>
 			<br />

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import ContourLoss from "./ContourLoss";
 import { ScatterPlot } from "../../exports";
-import { $$, $ } from "./Typeset";
 
 import {
 	Fab,
@@ -182,8 +181,7 @@ class SubTool extends Component {
 	render() {
 		const { m, b } = this.state.linreg.tunableparams;
 		const { loss, speed, epochs } = this.state.linreg.hyperparams;
-		const { rsquared, data } = this.state.linreg;
-		const marginButtons = 3;
+		const { data } = this.state.linreg;
 		const nullColor = (val) => (val === null ? "#dce0dd" : "black");
 		const nullNumber = (num, precision) =>
 			num === null ? num : num.toPrecision(precision);

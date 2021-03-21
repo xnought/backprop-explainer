@@ -8,9 +8,6 @@ import { Element } from "react-scroll";
 import { Typeset } from "./components/exports";
 
 class App extends Component {
-	constructor(props) {
-		super(props);
-	}
 	componentDidMount() {
 		ReactGa.initialize("UA-192166007-1");
 		ReactGa.pageview("/");
@@ -28,13 +25,18 @@ class App extends Component {
 		);
 		const header = (
 			<div>
-				<img src={headerTitleSVG} width="100%" />
+				<img
+					src={headerTitleSVG}
+					alt={"header with title"}
+					width="100%"
+				/>
 			</div>
 		);
+
 		const acks = (
 			<Box display="flex" justifyContent="center">
-				<Box width="60%" marginTop={10}>
-					<Typography variant="h4">
+				<Box width="60%" marginTop={4}>
+					<Typography variant="h3">
 						<b>Acknowledgements</b>
 					</Typography>
 					<Typography variant="body1">
@@ -70,7 +72,7 @@ class App extends Component {
 						)}
 						by
 						{link(
-							"https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw",
+							"https://www.3blue1brown.com/",
 							"3Blue1Brown",
 							true
 						)}
@@ -177,7 +179,7 @@ class App extends Component {
 				<Element name="mainTool">
 					<MainTool />
 				</Element>
-				{acks}
+				<Element name="acknowledgements">{acks}</Element>
 				<br />
 			</div>
 		);

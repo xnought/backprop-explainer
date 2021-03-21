@@ -36,7 +36,7 @@ class ContourLoss extends Component {
 			.map((i) => Math.pow(2, i));
 		let color = d3.scaleSequentialLog(
 			d3.extent(thresholds),
-			d3.interpolateMagma
+			d3.interpolateCool
 		);
 		const contours = d3.contours().size([n, m]).thresholds(thresholds)(
 			values

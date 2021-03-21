@@ -3,10 +3,6 @@ import "../d3.css";
 import * as d3 from "d3";
 
 class AnimatedScatterPlot extends Component {
-	constructor(props) {
-		super(props);
-	}
-
 	plotPoints(node, formattedPoints, select) {
 		/* Now need to plot said data */
 		node.selectAll("circle")
@@ -96,7 +92,6 @@ class AnimatedScatterPlot extends Component {
 			id,
 			select,
 			potential,
-			times,
 		} = this.props;
 
 		let xScale = d3
