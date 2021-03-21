@@ -46,7 +46,7 @@ import { NeuralNetwork, tools } from "../../../nnMiniLibrary/exports";
 import { draw } from "../../../Utils/exports";
 /*  END IMPORTS  */
 
-class MainTool extends Component {
+class BackpropTool extends Component {
 	constructor(props) {
 		super(props);
 		/* 
@@ -104,8 +104,6 @@ class MainTool extends Component {
 			controlCenterHelp: false,
 			customizationHelp: false,
 			neuralNetworkHelp: false,
-			scatterHelp: false,
-			lossHelp: false,
 			lossChange: 0,
 			potentialYhat: [],
 			singleInputIndex: -1,
@@ -1270,4 +1268,4 @@ class MainTool extends Component {
 	}
 }
 
-export default MainTool;
+export default BackpropTool;

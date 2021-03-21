@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import headerTitleSVG from "./headerTitle.svg";
 import ReactGa from "react-ga";
-import { MainTool, Explanation } from "./components/exports";
+import { BackpropTool, Explanation } from "./components/exports";
 import { Typography, Button, Box, IconButton } from "@material-ui/core";
 import { GitHub } from "@material-ui/icons";
 import { Element } from "react-scroll";
@@ -177,7 +177,7 @@ class App extends Component {
 				{header}
 				<Explanation />
 				<Element name="mainTool">
-					<MainTool />
+					<BackpropTool />
 				</Element>
 				<Element name="acknowledgements">{acks}</Element>
 				<br />
