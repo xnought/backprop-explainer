@@ -4,7 +4,6 @@
 	MainTool.js is the main controller of all logic of the backprop explainer
 */
 
-/*  START IMPORTS  */
 import React, { Component } from "react";
 import * as tf from "@tensorflow/tfjs";
 import AnimatedNumber from "animated-number-react";
@@ -44,15 +43,10 @@ import epochModePNG from "./assets/epochMode.png";
 import keySVG from "./assets/key.svg";
 import { NeuralNetwork, tools } from "../../../nnMiniLibrary/exports";
 import { draw } from "../../../Utils/exports";
-/*  END IMPORTS  */
 
 class BackpropTool extends Component {
 	constructor(props) {
 		super(props);
-		/* 
-			App js state will be the main controller of logic to components
-			Note to self: Keep state as shallow as possible to avoid complexity with this.setState()
-		*/
 		this.state = {
 			/* State for NN */
 			tensorFlowNN: null,
@@ -70,12 +64,9 @@ class BackpropTool extends Component {
 			lossArray: [],
 			loss: null,
 			scale: 5,
-			rects: [],
 
-			weights: [],
 			shapedWeights: [],
 			shapedRects: [],
-
 			shapedLinks: [],
 
 			direction: "edgePaused",
@@ -86,7 +77,7 @@ class BackpropTool extends Component {
 				playing: false,
 				speed: 100,
 			},
-			sliderVal: 2,
+
 			mode: false,
 			stopRender: false,
 			keyFrameLayer: 0,
@@ -123,10 +114,14 @@ class BackpropTool extends Component {
 		this.asyncPause = this.asyncPause.bind(this);
 		this.changeModelLr = this.changeModelLr.bind(this);
 		this.anim = this.anim.bind(this);
-		this.randomInputGeneration = this.randomInputGeneration.bind(this);
+		this.randExampleEpoch = this.randExampleEpoch.bind(this);
 	}
-	randomInputGeneration(X, y, weightsData, biasesData, shape, lr, mode) {
-		const randomInput = tools.getRandomInt(50);
+	/* 
+		Entire Neural network process along with random generation of single training		
+		example.
+	*/
+	randExampleEpoch(X, y, weightsData, biasesData, shape, lr) {
+		const randomInput = tools.getRandomInt(this.state.X.length);
 		const singleInputExample = X[randomInput];
 		const singleLabelExample = y[randomInput];
 
@@ -134,19 +129,23 @@ class BackpropTool extends Component {
 		let nn = new NeuralNetwork(shape, formattedWeights, biasesData);
 		let clone = new NeuralNetwork(shape, formattedWeights, biasesData);
 
+		/* This is the actual neural network changes in animation */
 		nn.forward(singleInputExample, singleLabelExample);
 		nn.backward();
 
+		/* This is the clone that goes one more forward to get the projected changes */
 		clone.forward(singleInputExample, singleLabelExample);
 		clone.backward();
 		clone.update(lr);
 		clone.forward(singleInputExample, singleLabelExample);
 
+		/* Store outputs to variables */
 		const newOutput = clone.yhat;
 		const updatedLoss = clone.loss.output;
 		const lossSavings = updatedLoss;
 		const lossDifference = nn.loss.output - updatedLoss;
 
+		/* computes the predictions for all values form the copy */
 		const forwardAll = (inputArray) => {
 			/* Here we return an array of all the inputs fed forward */
 			const inputArrayLength = inputArray.length;
@@ -159,12 +158,12 @@ class BackpropTool extends Component {
 
 			return outputArray; //return the output array to be used elsewhere
 		};
-		let a = forwardAll(X);
+		const potential = forwardAll(X);
 
 		this.setState({
 			...this.state,
 			miniNN: nn,
-			potentialYhat: a,
+			potentialYhat: potential,
 			mode: true,
 			lossSavings,
 			lossDifference,
@@ -179,6 +178,9 @@ class BackpropTool extends Component {
 		});
 	}
 
+	/*
+		Controls the logic of the animation: keyframe animations controller	
+	*/
 	async anim() {
 		const { shape } = this.state;
 		const speed = 750;
@@ -240,10 +242,12 @@ class BackpropTool extends Component {
 			cpyEpoch: this.state.cpyEpoch + 1,
 			status: "pred",
 		});
-
-		/* animate update */
 	}
 
+	/* 
+		initialize the data for drawing the entire neural network
+		@param shape	
+	*/
 	initNeuralNetwork(shape) {
 		const { controls } = this.state;
 		const { playing } = controls;
@@ -290,14 +294,16 @@ class BackpropTool extends Component {
 			});
 		} else if (playing) {
 			const { weightsData, shape } = this.state;
-			const flattenedWeights = tools.flatten(weightsData);
 			//update the weights to be rendered
 			const shapedWeights = tools.formatWeightArray(weightsData, shape);
-
-			this.setState({ weights: flattenedWeights, shapedWeights });
+			this.setState({ shapedWeights });
 		}
 	}
 
+	/* 
+		changes the curent learning rate, tidy in case of memory leak here	
+		@param lrChange
+	*/
 	changeModelLr(lrChange) {
 		tf.tidy(() => {
 			this.setState({ lr: lrChange });
@@ -305,6 +311,9 @@ class BackpropTool extends Component {
 		});
 	}
 
+	/* 
+		runs the training and switches the playing the reflect playing	
+	*/
 	async run() {
 		const playing = !this.state.controls.playing;
 		this.mutate("controls", "playing", playing);
@@ -313,6 +322,10 @@ class BackpropTool extends Component {
 		}
 	}
 
+	/* 
+		mutate helper method	
+		@TODO remove this from the program	
+	*/
 	mutate(key, subkey, value) {
 		/* copy of the state */
 		tf.tidy(() => {
@@ -329,6 +342,10 @@ class BackpropTool extends Component {
 		});
 	}
 
+	/* 
+		adds configurations to sequential model
+		@param model : tfjs sequential 
+	*/
 	addModel(model) {
 		return tf.tidy(() => {
 			let shape = this.state.shape;
@@ -360,6 +377,11 @@ class BackpropTool extends Component {
 			return model;
 		});
 	}
+
+	/* 
+		compiles the model with learning rate given	
+		@lr : learning rate	
+	*/
 	modelCompile(lr) {
 		let model = tf.sequential();
 		this.addModel(model);
@@ -369,6 +391,11 @@ class BackpropTool extends Component {
 		});
 		return model;
 	}
+
+	/* 
+		trains the model on one epoch and one input
+		@param X, y
+	*/
 	async train(X, y) {
 		/* START SETUP */
 		const XTensor = tf.tidy(() => {
@@ -408,6 +435,11 @@ class BackpropTool extends Component {
 		tf.dispose(XTensor);
 		tf.dispose(yTensor);
 	}
+
+	/* 
+		generate the data in tensor form 	
+		@param eqn, scaled, volume	
+	*/
 	async genTensorData(eqn, scaled, volume) {
 		await tf.ready();
 		tf.tidy(() => {
@@ -430,6 +462,12 @@ class BackpropTool extends Component {
 			return undefined;
 		});
 	}
+
+	/* 
+		formats and updates the state for bias and weights from tfjs model 
+		in an effort to eventually print them / use them for svg
+		@param model, loss, yhat, epoch	
+	*/
 	printParameters(model, loss, yhat, epoch) {
 		let weightsData = [];
 		let biasesData = [];
@@ -449,9 +487,18 @@ class BackpropTool extends Component {
 		});
 		this.initNeuralNetwork(this.state.shape);
 	}
+
+	/* 
+		simply to pause
+	*/
 	async asyncPause() {
 		this.setState({ controls: { ...this.state.controls, playing: false } });
 	}
+
+	/* 
+		resets all the parameters
+		@param scale	
+	*/
 	async resetParameters(scale) {
 		tf.dispose(this.state.tensorFlowNN);
 		const { curve } = this.state;
@@ -475,7 +522,6 @@ class BackpropTool extends Component {
 		this.setState({
 			epoch: 0,
 			loss: null,
-			weights: [],
 			miniNN: null,
 			tensorFlowNN: model,
 			shapedWeights: [],
@@ -483,25 +529,36 @@ class BackpropTool extends Component {
 		});
 		tf.dispose(optimizer);
 	}
+
+	/* 
+		full reset	
+		resets the paramters and pauses 
+	*/
 	async reset(scale) {
 		this.asyncPause();
 		this.resetParameters(scale);
 	}
 
+	/* 
+		used a linear equation to get the zoom for the svg
+		@param clientWidth
+		@TODO figure out how to do this more dynamically	
+	*/
 	correctZoom(width) {
 		const zoomFactor = (1 - 0.75) / (1387 - 913);
 		const zoomShift = 0.75 - zoomFactor * 913;
 		const zoom = Math.min(1, zoomFactor * width + zoomShift - 0.2);
 		return zoom;
 	}
+
 	async componentDidMount() {
-		tf.setBackend("cpu");
+		/* initialize the everything on mount */
+		tf.setBackend("cpu"); //for some reason webgl not working on safari
 		this.genTensorData(tf.sin, this.state.scale, 50);
 		this.initNeuralNetwork(this.state.shape);
 		const model = tf.tidy(() => {
 			return this.modelCompile(this.state.lr);
 		});
-
 		const width = document.body.clientWidth;
 		const zoom = this.correctZoom(width);
 		this.setState({ tensorFlowNN: model, zoom });
@@ -513,7 +570,6 @@ class BackpropTool extends Component {
 			return true;
 		}
 	}
-
 	render() {
 		/* Destructure State*/
 		const {
@@ -525,8 +581,6 @@ class BackpropTool extends Component {
 			weightsData,
 			biasesData,
 			yhat,
-			rects,
-			weights,
 			mode,
 			epoch,
 			curve,
@@ -547,7 +601,6 @@ class BackpropTool extends Component {
 			customizationHelp,
 			neuralNetworkHelp,
 			lossChange,
-			scatterHelp,
 			keyFrameScatter,
 			zoom,
 		} = this.state;
@@ -624,7 +677,7 @@ class BackpropTool extends Component {
 
 					<Button
 						onClick={async () => {
-							this.randomInputGeneration(
+							this.randExampleEpoch(
 								X,
 								y,
 								weightsData,
@@ -691,7 +744,7 @@ class BackpropTool extends Component {
 										});
 										this.run();
 									} else {
-										this.randomInputGeneration(
+										this.randExampleEpoch(
 											X,
 											y,
 											weightsData,
@@ -996,8 +1049,6 @@ class BackpropTool extends Component {
 					shapedRects={shapedRects}
 					shape={shape}
 					biases={biasesData}
-					weights={weights}
-					rects={rects}
 					playing={
 						playing
 							? speed === 0
@@ -1034,44 +1085,8 @@ class BackpropTool extends Component {
 			</Box>
 		);
 
-		return (
-			<div id="app">
-				<Card
-					variant="outlined"
-					style={{
-						background: "#FAFAFA",
-						outlineColor: "white",
-						paddingBottom: "1em",
-					}}
-				>
-					<CardContent
-						style={{
-							transform: `scale(${zoom})`,
-						}}
-					>
-						<Box display="flex" justifyContent="center">
-							<Box marginRight={90}>
-								<img src={keySVG} alt="key"></img>
-							</Box>
-							<Box>
-								<Typography variant="h2">
-									<b>Backprop Tool</b>
-								</Typography>
-							</Box>
-						</Box>
-						<Box
-							className="regular"
-							display="flex"
-							justifyContent="center"
-							marginTop={2}
-						>
-							{neuralNetwork}
-							{scatter}
-							{controlCenter}
-						</Box>
-					</CardContent>
-				</Card>
-
+		const dialogs = (
+			<div>
 				<Dialog
 					PaperProps={{
 						style: {
@@ -1263,6 +1278,47 @@ class BackpropTool extends Component {
 						</Box>
 					</DialogContent>
 				</Dialog>
+			</div>
+		);
+
+		return (
+			<div id="app">
+				<Card
+					variant="outlined"
+					style={{
+						background: "#FAFAFA",
+						outlineColor: "white",
+						paddingBottom: "1em",
+					}}
+				>
+					<CardContent
+						style={{
+							transform: `scale(${zoom})`,
+						}}
+					>
+						<Box display="flex" justifyContent="center">
+							<Box marginRight={90}>
+								<img src={keySVG} alt="key"></img>
+							</Box>
+							<Box>
+								<Typography variant="h2">
+									<b>Backprop Tool</b>
+								</Typography>
+							</Box>
+						</Box>
+						<Box
+							className="regular"
+							display="flex"
+							justifyContent="center"
+							marginTop={2}
+						>
+							{neuralNetwork}
+							{scatter}
+							{controlCenter}
+						</Box>
+					</CardContent>
+				</Card>
+				{dialogs}
 			</div>
 		);
 	}
