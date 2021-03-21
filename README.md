@@ -10,7 +10,7 @@ The conclusion of the article is the main attraction.
 
 ## How to Run Locally
 
-Make sure you are in the backpop-explainer directory
+Make sure you are in the backprop-explainer directory
 
 <ol>
 
