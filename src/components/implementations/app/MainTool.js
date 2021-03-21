@@ -268,10 +268,7 @@ class MainTool extends Component {
 			/* END SETUP */
 
 			/* START GENERATING THE GRAPH */
-			const {
-				flattenedNeurons,
-				shapedNeurons,
-			} = draw.generateNeuronPlacement(
+			const shapedNeurons = draw.generateNeuronPlacement(
 				shape,
 				layerProportion,
 				squareWidth,
@@ -291,7 +288,6 @@ class MainTool extends Component {
 			//update the state of the links and rectangles to be rendered
 			this.setState({
 				shapedLinks: layerLinks,
-				rects: flattenedNeurons,
 				shapedRects: shapedNeurons,
 			});
 		} else if (playing) {

@@ -1,11 +1,24 @@
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		This file generates the drawing parts of the nerual network
+*/
 import * as d3 from "d3";
 
+/* 
+	Generate d3 linear scales for x and y	
+	@return {xScale, yScale}
+*/
 export function generateLinearScale(x, y) {
 	const xScale = d3.scaleLinear().domain(x.domain).range(x.range);
 	const yScale = d3.scaleLinear().domain(y.domain).range(y.range);
 	return { xScale, yScale };
 }
 
+/* 
+	Generate Bezier Curved Links
+	@return d3 link
+*/
 export function generateLink(adjustment) {
 	return d3
 		.linkHorizontal()
@@ -13,6 +26,10 @@ export function generateLink(adjustment) {
 		.y((d) => d.y + adjustment);
 }
 
+/* 
+	Generate the rectangles for neuron placement
+	@return  shapedNeurons
+*/
 export function generateNeuronPlacement(
 	shape,
 	layerProportion,
@@ -23,9 +40,7 @@ export function generateNeuronPlacement(
 	yScale
 ) {
 	let shapedNeurons = [];
-	let flattenedNeurons = [];
 	shapedNeurons.push([startNeuron]);
-	flattenedNeurons.push(startNeuron);
 
 	for (let layer = 1; layer < shape.length - 1; layer++) {
 		let dense = [];
@@ -36,17 +51,19 @@ export function generateNeuronPlacement(
 			};
 			// push to arrays
 			dense.push(coordinate);
-			flattenedNeurons.push(coordinate);
 		}
 		shapedNeurons.push(dense);
 	}
 
-	flattenedNeurons.push(stopNeuron);
 	shapedNeurons.push([stopNeuron]);
 
-	return { flattenedNeurons, shapedNeurons };
+	return shapedNeurons;
 }
 
+/* 
+	Generate the placement of links relative to neurons
+	@return layerLinks
+*/
 export function generateLinksPlacement(shape, shapedNeurons, linksGenerator) {
 	/* We start to iterate over ns */
 	let perLink = [];
