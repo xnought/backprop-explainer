@@ -1,25 +1,27 @@
 /* EXPORTS TO CLEAN UP IMPORT OF COMPONENTS */
 
-import NeuralNetworkComponent from "./implementations/graphs/NeuralNetworkComponent";
-import ScatterPlot from "./implementations/graphs/ScatterPlot";
-import AnimatedScatterPlot from "./implementations/graphs/AnimatedScatterPlot";
-import Loss from "./implementations/graphs/Loss";
+import NeuralNetworkComponent from "./implementations/subComponents/NeuralNetworkComponent";
+import ScatterPlot from "./implementations/subComponents/ScatterPlot";
+import AnimatedScatterPlot from "./implementations/subComponents/AnimatedScatterPlot";
+import Loss from "./implementations/subComponents/Loss";
 import Explanation from "./implementations/article/Explanation";
-import MainTool from "./implementations/app/MainTool";
+import BackpropTool from "./implementations/mainComponent/BackpropTool";
 import Header from "./implementations/article/Header";
 import SubTool from "./implementations/article/SubTool";
 import * as Typeset from "./implementations/article/Typeset";
 import Summary from "./implementations/article/assets/summary.svg";
+import Acknowledge from "./implementations/article/Acknowledge";
 
 export {
 	NeuralNetworkComponent,
 	ScatterPlot,
 	AnimatedScatterPlot,
 	Loss,
-	MainTool,
+	BackpropTool,
 	Header,
 	SubTool,
 	Typeset,
 	Explanation,
 	Summary,
+	Acknowledge,
 };

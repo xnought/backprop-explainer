@@ -1,6 +1,7 @@
 {
   "homepage": "http://xnought.github.io/backprop-explainer",
   "name": "backprop-explainer",
+  "license": "MIT",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

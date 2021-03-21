@@ -1,37 +1,32 @@
-.axis line {
-	stroke: rgba(128, 128, 128, 0.695);
-}
-.split {
-	stroke: rgba(172, 172, 172, 0.421);
-	stroke-dasharray: 20, 3;
+/*
+	Donny Bertucci: @xnought
+	Summary: 
+		This d3.css file gives styling to all elements manipualted by d3
+*/
+
+/* Edge styling and animations */
+.edgePaused,
+.edgeSlowed,
+.edgeBackward,
+.edgeForward {
+	stroke-dasharray: 49 4;
+	stroke-dashoffset: 4;
 }
 .edgePaused {
-	stroke-dasharray: 49 4;
-	stroke-dashoffset: 4;
-	animation: flowForward 0s linear infinite;
+	animation: flowForward linear infinite;
+	animation-duration: 0s;
 }
 .edgeBackward {
-	stroke-dasharray: 49 4;
-	stroke-dashoffset: 4;
 	animation: flowBackward linear infinite;
 	animation-duration: 0.3s;
 }
 .edgeSlowed {
-	stroke-dasharray: 49 4;
-	stroke-dashoffset: 4;
 	animation: flowForward linear infinite;
 	animation-duration: 1s;
 }
 .edgeForward {
-	stroke-dasharray: 49 4;
-	stroke-dashoffset: 4;
 	animation: flowForward linear infinite forwards;
 	animation-duration: 0.3s;
-}
-
-.edge {
-	stroke: rgb(0, 255, 110);
-	animation: flowForward 1s linear infinite;
 }
 @keyframes flowBackward {
 	from {
@@ -50,10 +45,17 @@
 	}
 }
 
+/* Axis Styling for the Graph */
+.axis line {
+	stroke: rgba(128, 128, 128, 0.695);
+}
+.split {
+	stroke: rgba(172, 172, 172, 0.421);
+	stroke-dasharray: 20, 3;
+}
 .axis path {
 	stroke: none;
 }
-
 .axis text {
 	fill: grey;
 }
@@ -64,16 +66,7 @@
 	fill: rgba(128, 128, 128, 0.099);
 }
 
-.grad {
-	background: linear-gradient(
-		90.03deg,
-		#d62839 0.03%,
-		rgba(232, 232, 232, 0) 50%,
-		#4ba3c3 99.97%
-	);
-}
-
-
+/* arrow and arrow animation */
 @keyframes invertArrow {
 	from {
 		stroke-width: 4;
@@ -82,12 +75,10 @@
 		stroke-width: 0;
 	}
 }
-
 .absorb {
 	stroke-width: 4;
 	animation: invertArrow 1s linear forwards;
 }
-
 .arrow {
 	stroke-width: 4;
 }
