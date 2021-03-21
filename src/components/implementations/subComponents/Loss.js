@@ -1,17 +1,19 @@
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		Loss.js is a component that plots the loss curve
+*/
 import React, { Component } from "react";
 import "../d3.css";
 import * as d3 from "d3";
 
 class Loss extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {};
-	}
 	componentDidMount() {
-		const container = d3.select("#sweet");
+		const container = d3.select("#sweet"); //I need to seriously get some therapy for my naming conventions
 		const height = 100;
 		const width = 300;
 		const padding = 0;
+
 		let xScale = d3
 			.scaleLinear()
 			.domain([0, -1])
@@ -77,10 +79,14 @@ class Loss extends Component {
 		let xAxis = d3.axisBottom().scale(xScale);
 		let yAxis = d3.axisRight().scale(yScale);
 		svg.select("#x")
+			.transition()
+			.duration(duration)
 			.attr("transform", `translate(0,${height - 2 * padding})`)
 			.call(xAxis.ticks(5));
 
 		svg.select("#y")
+			.transition()
+			.duration(duration)
 			.attr("transform", "translate(" + (width - 2 * padding) + ",0)")
 			.call(yAxis.ticks(5));
 		svg.select("#line")

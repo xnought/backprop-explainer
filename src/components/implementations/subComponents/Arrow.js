@@ -1,3 +1,9 @@
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		Arrow.js is designed to simply draw a small colored arrow
+*/
+
 import React from "react";
 import "../d3.css";
 const Arrow = ({ source, target, color, isAnimating }) => (
