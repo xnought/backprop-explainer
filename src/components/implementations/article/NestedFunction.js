@@ -26,7 +26,6 @@ class NestedFunction extends Component {
 	compute(input) {
 		const { weights, biases } = this.state;
 		const linfunc = (x, w, b) => w * x + b;
-		const relu = (x) => Math.max(0, x);
 
 		const output1 = linfunc(input, weights[0], biases[0]).toFixed(3);
 		const output2 = linfunc(output1, weights[1], biases[1]).toFixed(3);
@@ -63,8 +62,10 @@ class NestedFunction extends Component {
 		const outputArr = [
 			{ output: output1, color: "#8db600" },
 			{ output: output2, color: "#FF8F00" },
-			{ output: output3, color: "blue" },
+			{ output: output3, color: "#56A8C7" },
 		];
+
+		//prettier-ignore
 		return (
 			<Box display="flex">
 				<Box width={580}>
@@ -91,7 +92,7 @@ class NestedFunction extends Component {
 											{fixedInput}
 										</text>
 										{outputArr.map((d, i) => (
-											<g>
+											<g key={i} >
 												<rect
 													x={100 + 100 * i}
 													y={0}
@@ -132,17 +133,17 @@ class NestedFunction extends Component {
 							</Box>
 							<Typography variant="h5">
 								neuron1(
-								<Typography color="secondary" variant="inline">
+								<Typography color="secondary" variant="inherit">
 									{fixedInput}
 								</Typography>
 								) = {weights[0]}(
-								<Typography color="secondary" variant="inline">
+								<Typography color="secondary" variant="inherit">
 									{fixedInput}
 								</Typography>
 								) + {biases[0]} ={" "}
 								<Typography
 									style={{ color: "#8db600" }}
-									variant="inline"
+									variant="inherit"
 								>
 									{this.state.output1}
 								</Typography>
@@ -152,21 +153,21 @@ class NestedFunction extends Component {
 								neuron2(
 								<Typography
 									style={{ color: "#8db600" }}
-									variant="inline"
+									variant="inherit"
 								>
 									{this.state.output1}
 								</Typography>
 								) = {weights[1]}(
 								<Typography
 									style={{ color: "#8db600" }}
-									variant="inline"
+									variant="inherit"
 								>
 									{this.state.output1}
 								</Typography>
 								) + {biases[1]} ={" "}
 								<Typography
 									style={{ color: "#FF8F00" }}
-									variant="inline"
+									variant="inherit"
 								>
 									{this.state.output2}
 								</Typography>
@@ -175,21 +176,22 @@ class NestedFunction extends Component {
 								neuron3(
 								<Typography
 									style={{ color: "#FF8F00" }}
-									variant="inline"
+									variant="inherit"
 								>
 									{this.state.output2}
 								</Typography>
+								
 								) = {weights[2]}(
 								<Typography
 									style={{ color: "#FF8F00" }}
-									variant="inline"
+									variant="inherit"
 								>
 									{this.state.output2}
 								</Typography>
-								) + {biases[2]}={" "}
+								) + {biases[2]} ={" "}
 								<Typography
-									style={{ color: "blue" }}
-									variant="inline"
+									style={{ color: "#56A8C7" }}
+									variant="inherit"
 								>
 									{this.state.output3}
 								</Typography>

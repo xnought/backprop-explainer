@@ -1,8 +1,5 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
-import { Help } from "@material-ui/icons";
-import { IconButton } from "@material-ui/core";
-import Legend from "../svg/Legend";
 import Arrow from "../svg/Arrow";
 import "../d3.css";
 
@@ -45,10 +42,8 @@ class NeuralNetworkComponent extends Component {
 			subEpoch,
 			keyFrameLoss,
 			keyFrameLayer,
-			input,
-			label,
-			children,
 		} = this.props;
+		const colorOfMotion = "orange";
 		const link = d3
 			.linkHorizontal()
 			.x((d) => d.x)
@@ -86,7 +81,7 @@ class NeuralNetworkComponent extends Component {
 						d="M 750, 234 L 750, 300"
 						stroke={
 							keyFrameLoss === 2 || keyFrameLoss === 1
-								? "orange"
+								? colorOfMotion
 								: graphConnectionColor
 						}
 						className={
@@ -117,7 +112,7 @@ class NeuralNetworkComponent extends Component {
 					{shapedLinks.map((layer, i) => {
 						return layer.map((neuron, j) => {
 							let moving = "edgePaused";
-							let color = "orange";
+							let color = colorOfMotion;
 							let colorChange = false;
 							if (
 								mode &&
@@ -126,7 +121,6 @@ class NeuralNetworkComponent extends Component {
 							) {
 								moving = "edgeForward";
 								colorChange = true;
-								color = "orange";
 							} else if (
 								mode &&
 								subEpoch === "backward" &&
@@ -183,7 +177,7 @@ class NeuralNetworkComponent extends Component {
 								return (
 									<path
 										id={`cpath${i}${j}${k}`}
-										key={k}
+										key={`${i}${j}${k}`}
 										d={d}
 										className={mode ? moving : playing}
 										strokeWidth={sw}
@@ -216,7 +210,7 @@ class NeuralNetworkComponent extends Component {
 								actColor = true;
 							}
 							return (
-								<g>
+								<g key={`${i},${j}`}>
 									<rect
 										x={d.x}
 										y={d.y}
@@ -251,7 +245,7 @@ class NeuralNetworkComponent extends Component {
 													miniNN.model[i][j].dActStep
 												),
 												miniNN.model[i][j].dActStep < 0,
-												"orange"
+												colorOfMotion
 										  )
 										: ""}
 								</g>

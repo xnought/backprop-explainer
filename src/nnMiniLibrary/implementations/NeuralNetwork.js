@@ -32,7 +32,7 @@ export class NeuralNetwork {
 	add(array1, array2) {
 		const array1Length = array1.length;
 		const array2Length = array2.length;
-		if (array2Length != array1Length) {
+		if (array2Length !== array1Length) {
 			console.error(
 				`${array1Length} does not match ${array2Length}, so returned empty array`
 			);
@@ -97,7 +97,7 @@ export class NeuralNetwork {
 		Purpose: to feed backward the entire model per layer
 	*/
 	backward() {
-		const { sum, add, zeros } = this;
+		const { add, zeros } = this;
 		this.loss.backward();
 		let dValues = [this.loss.dInputs];
 		const lastLayer = this.model.length;

@@ -40,7 +40,7 @@
 <path d="M431.286 65.5078H328.341V64.3033H431.286V65.5078Z" fill="black"/>
 <defs>
 <linearGradient id="paint0_linear" x1="167" y1="67.1053" x2="281" y2="67.1053" gradientUnits="userSpaceOnUse">
-<stop/>
+<stop stop-color="#595959"/>
 <stop offset="1" stop-color="#C4C4C4" stop-opacity="0"/>
 </linearGradient>
 <linearGradient id="paint1_linear" x1="3" y1="66.1053" x2="117" y2="66.1053" gradientUnits="userSpaceOnUse">
