@@ -10,6 +10,7 @@ import Header from "./implementations/article/Header";
 import SubTool from "./implementations/article/SubTool";
 import * as Typeset from "./implementations/article/Typeset";
 import Summary from "./implementations/article/assets/summary.svg";
+import Acknowledge from "./implementations/article/Acknowledge";
 
 export {
 	NeuralNetworkComponent,
@@ -22,4 +23,5 @@ export {
 	Typeset,
 	Explanation,
 	Summary,
+	Acknowledge,
 };
