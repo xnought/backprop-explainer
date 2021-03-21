@@ -1,5 +1,5 @@
 <img src="./src/headerTitle.svg">
-<a href="xnought.github.io/backprop-explainer">Live Website</a>
+<a href="https://xnought.github.io/backprop-explainer/">Live Website</a>
 
 ## Overview
 
@@ -31,7 +31,7 @@ Make sure you are in the backpop-explainer directory
 
 ## How and who made this?
 
-By <a href="donnybertucci.com">Donny Bertucci</a> and <a href="minsuk.com">Minsuk Kahng</a> (project advisor)
+By <a href="http://donnybertucci.com">Donny Bertucci</a> and <a href="http://minsuk.com">Minsuk Kahng</a> (project advisor)
 
 To see full acknowledgements and how it was made (with links)
 navigate to the acknowledgments section at <a href="xnought.github.io/backprop-explainer">Live Website</a>
