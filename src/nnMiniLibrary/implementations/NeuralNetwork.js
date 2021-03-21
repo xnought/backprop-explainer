@@ -152,33 +152,35 @@ export class NeuralNetwork {
 			}
 		}
 	}
+	/* 
+		To throttle each number up and down for visualizations	
+	*/
+	//throttleForward(neuron, layer, change, label) {
+	///* First Change the value of the output of this neuron */
+	//const calcChange = this.model[layer][neuron].output + change;
+	//this.model[layer][neuron].output = calcChange;
 
-	throttleForward(neuron, layer, change, label) {
-		/* First Change the value of the output of this neuron */
-		const calcChange = this.model[layer][neuron].output + change;
-		this.model[layer][neuron].output = calcChange;
+	///* First construct the inputs for the next layer which is made out of the new outputs */
+	//let inputs = [];
+	//for (let n = 0; n < this.model[layer].length; n++) {
+	//inputs.push(this.model[layer][n].output);
+	//}
 
-		/* First construct the inputs for the next layer which is made out of the new outputs */
-		let inputs = [];
-		for (let n = 0; n < this.model[layer].length; n++) {
-			inputs.push(this.model[layer][n].output);
-		}
+	//const lastLayer = this.model.length;
+	//for (let l = layer + 1; l < lastLayer - 1; l++) {
+	///* Then iterate through each neuron in the layer */
+	//let outputs = [];
+	//for (let n = 0; n < this.model[l].length; n++) {
+	///* Then feed forward each individual neuron and push to output array */
+	//this.model[l][n].forward(inputs, this.ReLU);
+	//outputs.push(this.model[l][n].output);
+	//}
 
-		const lastLayer = this.model.length;
-		for (let l = layer + 1; l < lastLayer - 1; l++) {
-			/* Then iterate through each neuron in the layer */
-			let outputs = [];
-			for (let n = 0; n < this.model[l].length; n++) {
-				/* Then feed forward each individual neuron and push to output array */
-				this.model[l][n].forward(inputs, this.ReLU);
-				outputs.push(this.model[l][n].output);
-			}
-
-			/* Then outputs will be the inputs for the next layer */
-			inputs = outputs;
-		}
-		this.model[lastLayer - 1][0].forward(inputs, this.linear);
-		this.yhat = this.model[lastLayer - 1][0].output;
-		this.loss.forward(this.yhat, label);
-	}
+	///* Then outputs will be the inputs for the next layer */
+	//inputs = outputs;
+	//}
+	//this.model[lastLayer - 1][0].forward(inputs, this.linear);
+	//this.yhat = this.model[lastLayer - 1][0].output;
+	//this.loss.forward(this.yhat, label);
+	//}
 }
