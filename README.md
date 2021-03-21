@@ -1,26 +1,37 @@
-| Task                                     | Status      |
-| ---------------------------------------- | ----------- |
-| Create React App                         | Done ✅     |
-| Implement Neural Network                 | Done ✅     |
-| Test Neural Network                      | Done ✅     |
-| Create Scatter Plot                      | Done ✅     |
-| Plot Best Fit                            | Done ✅     |
-| Neural Network Graph                     | Done ✅     |
-| Neural Network Graph Rework              | Done ✅     |
-| Add Arrows on neuron for nudging         | Done ✅     |
-| change opacity based on activation       | Done ✅     |
-| Add easing transitions                   | Done ✅     |
-| Finish the main tool                     | Done ✅     |
-| Write the article                        | Done ✅     |
-| Transfer article to html                 | In progress |
-| Add components where see fit             | Not started |
-| Edit the article and edit the components | Not started |
-| Final Fixes                              | Not started |
+<img src="./src/headerTitle.svg">
+<a href="xnought.github.io/backprop-explainer">Live Website</a>
 
-## Getting Started
+## Overview
 
-While in the directory
+The development of this project started with the backprop tool and morphed into an explanatory article. The goal is to explain and visualize backpropagation to gain an intuiton for how it works.
 
-`npm install` or `yarn install`
+The conclusion of the article is the main attraction.
+<img src="./demo.gif">
 
-then `npm start` or `yarn start`
+## How to Run Locally
+
+Make sure you are in the backpop-explainer directory
+
+<ol>
+
+<li>
+
+`yarn install` to install node_modules
+
+</li>
+<li>
+
+`yarn run` to start development
+
+</li>
+<li>
+	navigate to http://localhost:3000/
+</li>
+</ol>
+
+## How and who made this?
+
+By <a href="donnybertucci.com">Donny Bertucci</a> and <a href="minsuk.com">Minsuk Kahng</a> (project advisor)
+
+To see full acknowledgements and how it was made (with links)
+navigate to the acknowledgments section at <a href="xnought.github.io/backprop-explainer">Live Website</a>

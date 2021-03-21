@@ -47,7 +47,7 @@ class App extends Component {
 						)}
 						by
 						{link("https://smilkov.com/", "Daniel Smilkov", true)}
-						{link("http://shancarter.com/", "shan carter", true)}
+						{link("http://shancarter.com/", "Shan Carter", true)}
 						<ul>
 							<li>
 								Inspiration for the representation of the neural
