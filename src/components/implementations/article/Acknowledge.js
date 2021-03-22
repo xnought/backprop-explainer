@@ -1,3 +1,9 @@
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		This component displays all the acknowledgements
+*/
+
 import React from "react";
 import { Typography, Button, Box, IconButton } from "@material-ui/core";
 import { GitHub } from "@material-ui/icons";
@@ -60,6 +66,25 @@ const Acknowledge = () => (
 			<br />
 			<Typography variant="body1">
 				{link(
+					"https://distill.pub/2020/communicating-with-interactive-articles/",
+					"Communicating with Interactive Articles",
+					false
+				)}
+				{link("https://fredhohman.com/", "Fred Hohman", true)}
+				{link("https://mathisonian.com/", "Matthew Conlen", true)}
+				{link(
+					"https://homes.cs.washington.edu/~jheer/",
+					"Jeffrey Heer",
+					true
+				)}
+				{link("https://www.cc.gatech.edu/~dchau/", "Polo Chau", true)}
+				<ul>
+					<li>Used colored labeling to toggle labels for notation</li>
+				</ul>
+			</Typography>
+			<br />
+			<Typography variant="body1">
+				{link(
 					"https://poloclub.github.io/cnn-explainer/",
 					"CNN explainer",
 					false
@@ -114,7 +139,7 @@ const Acknowledge = () => (
 			</Typography>
 			<Typography variant="body1">
 				Created by
-				{link("http://donnybertucci.com/", "Donny bertucci", true)}
+				{link("http://donnybertucci.com/", "Donny Bertucci", true)}
 			</Typography>
 			<Typography variant="body1">
 				Project advised by

@@ -1,4 +1,8 @@
-/* Imports from other files */
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		This file bringing everything together into the article
+*/
 import React from "react";
 import { $, $$ } from "./Typeset";
 import {
@@ -13,18 +17,28 @@ import {
 import { Help, PlayArrow } from "@material-ui/icons";
 import { Nav } from "./Nav";
 import { Element } from "react-scroll";
-import SubTool from "./SubTool";
-import LinearScatter from "./LinearScatter";
+import AutoTool from "./AutoTool";
+import ManualTool from "./ManualTool";
 import NestedFunction from "./NestedFunction";
-/* Asset imports */
-import forwardSVG from "./assets/forward.svg";
+import ToggleForward from "./ToggleForward";
+/* Assets imports */
 import summarySVG from "./assets/summary.svg";
-import backwardSVG from "./assets/backward.svg";
+import forwardKeySVG from "./assets/diagramSVG/forward-key.svg";
+import forwardNoKeySVG from "./assets/diagramSVG/forward.svg";
+import forwardComputationSVG from "./assets/diagramSVG/forwardComputation.svg";
+import backwardKeySVG from "./assets/diagramSVG/backward-key.svg";
+import backwardNoKeySVG from "./assets/diagramSVG/backward.svg";
+import backwardComputationSVG from "./assets/diagramSVG/backwardComputation.svg";
 
 /* Functional Component */
 const Explanation = () => {
 	const orange = "#FFA500";
 	const blue = "#56A8C7";
+
+	const orangeEM = <em style={{ color: orange }}>orange</em>;
+	const blueEM = <em style={{ color: blue }}>blue</em>;
+	const greenEM = <em style={{ color: "#8db600" }}>green</em>;
+	const pinkEM = <em style={{ color: "#F50257" }}>pink</em>;
 	/* Link Component that can be reused */
 	const link = (href, content) => (
 		<Button
@@ -69,7 +83,7 @@ const Explanation = () => {
 	const paper = (
 		<div>
 			<br />
-			{topic("Jump to a check point")}
+			{topic("Jump to a Checkpoint")}
 			<Typography variant="h6">
 				If you want to skip ahead, click on a checkpoint. Otherwise,
 				click <b>Article</b> or scroll to the start of the article.
@@ -79,11 +93,11 @@ const Explanation = () => {
 			<Typography variant="h6">
 				Most people abstract the idea of backpropagation when learning
 				neural networks because it is by far the most notation heavy
-				part. The goal of this article is to build an intuition for
-				backpropagation in the context of how neural networks{" "}
-				<em>learn</em>. By marrying explanation, notation, and
-				interactive tools, the aim is to get a understanding of the
-				foundations. Note that throughout the article there will be{" "}
+				part. The goal of this article is to build an intuition for why
+				and how we perform backpropagation. By marrying explanation,
+				notation, and interactive tools, the aim is to get a
+				understanding of the foundations. Note that throughout the
+				article there will be{" "}
 				{definiton(
 					<span>highlighted</span>,
 					<Typography varaint="h6">Example explanation</Typography>
@@ -171,13 +185,13 @@ const Explanation = () => {
 			</Typography>
 			<br />
 			<Element name="structMan">
-				<LinearScatter />
+				<ManualTool />
 			</Element>
 			<br />
 			{subtopic("Reflection")}
 			<Typography variant="h6">
 				<b>
-					The intuiton and logic from the exercise above, is the
+					The intuition and logic from the exercise above, is the
 					foundation for what backpropagation and optimization is and
 					aims to achieve.
 				</b>
@@ -186,8 +200,8 @@ const Explanation = () => {
 				&emsp;&emsp;&emsp;&emsp;When you start to change the weight, you
 				observe where the loss moves, if it moves up, you move the
 				weight the other direction to lower the loss. This, without the
-				math, is the main principle behind guaging the rate of change
-				and optimizing a nerual network.{" "}
+				math, is the main principle behind gauging the rate of change
+				and optimizing a neural network.{" "}
 				<b>Let's apply this method of thinking!</b>
 			</Typography>
 			<br />
@@ -267,8 +281,8 @@ const Explanation = () => {
 							with respect to {$("y")}
 						</Typography>
 					</Box>
-				)}
-				. of loss with respect to each parameter, also called the{" "}
+				)}{" "}
+				of loss with respect to each parameter, also called the{" "}
 				{definiton(
 					<span>gradient</span>,
 					<Box>
@@ -279,11 +293,11 @@ const Explanation = () => {
 						</Typography>
 					</Box>
 				)}
-				. After we compute the gradient from getting all the derivatives
-				backwards, we will have the direction of steepest{" "}
-				<em>ascent</em> on the loss function. But we want to lower loss,
-				therefore we use the opposite direction to get the direction of
-				steepest descent, to perform{" "}
+				. By computing the gradient, we effectively have gauged how
+				changing each parameter will affect the loss: the direction of
+				steepest ascent. But we want to lower loss, therefore we use the
+				opposite direction to get the direction of steepest descent, to
+				perform{" "}
 				{definiton(
 					<span>gradient descent</span>,
 					<Box>
@@ -316,13 +330,13 @@ const Explanation = () => {
 				rule due to the nested nature of neural networks.
 			</Typography>
 			<Typography variant="h6">
-				<b>Below is a color coded example of the chain rule.</b>
-			</Typography>
-			<Typography variant="h6">
-				Start by sliding the slider and notice how the output is the
-				input to the next function and so forth.{" "}
+				&emsp;&emsp;&emsp;&emsp;{" "}
+				<b>Below is a color coded example of the chain rule.</b> Start
+				by sliding the slider and notice how the output is the input to
+				the next function and so forth.{" "}
 				<b>Then read the explanation below</b>.
 			</Typography>
+			<br />
 			<Box display="flex" justifyContent="center">
 				<Box>
 					<NestedFunction />
@@ -330,27 +344,25 @@ const Explanation = () => {
 			</Box>
 			<br />
 			<Typography variant="h6">
-				Suppose we wanted to see how the{" "}
-				<em style={{ color: "#F50257" }}>pink</em> affects the{" "}
-				<em style={{ color: blue }}>blue</em>. We should start at{" "}
-				<em style={{ color: blue }}>blue</em>, then
+				<b>
+					Suppose we wanted to see how {blueEM} was affected by{" "}
+					{pinkEM}.
+				</b>
+				<br />
+				First lets start at {blueEM}, then
 				<ol>
 					<li>
-						observe how <em style={{ color: orange }}>orange</em>{" "}
-						affects <em style={{ color: blue }}>blue</em>{" "}
+						observe how {blueEM} was affected by {orangeEM}
 					</li>
 					<li>
-						observe how <em style={{ color: "#8db600" }}>green</em>{" "}
-						affects <em style={{ color: orange }}>orange</em>
+						observe how {orangeEM} was affected by {greenEM}
 					</li>
 					<li>
-						observe how <em style={{ color: "#F50257" }}>pink</em>{" "}
-						affects <em style={{ color: "#8db600" }}>green</em>
+						observe how {greenEM} was affected by {pinkEM}
 					</li>
 				</ol>
-				By chaining those values together, we get how the{" "}
-				<em style={{ color: "#F50257" }}>pink</em> affects the{" "}
-				<em style={{ color: blue }}>blue</em>.
+				By chaining these observations together, we get how how {blueEM}{" "}
+				was affected by {pinkEM}.
 			</Typography>
 			<br />
 			<Typography variant="h6">
@@ -366,62 +378,100 @@ const Explanation = () => {
 			</Typography>
 			<Typography variant="h6">
 				These chains can be broken up into more intermediate derivatives
-				all the way down to their primatives (basis of
-				{link(
-					"https://en.wikipedia.org/wiki/Automatic_differentiation",
-					"automatic differentiation"
-				)}
-				). <b>The main takeaway</b> is that we first observe how the
-				neuron output affected the loss output{" "}
+				all the way down to their primitives (basis of automatic
+				differentiation) . <b>The main takeaway</b> is that we first
+				observe how the loss output was affected by the neuron output{" "}
 				{$(
 					" \\frac{ \\partial \\text{loss}}{\\partial \\text{neuron}}"
 				)}
-				, but then we need to explain how the neuron output was affected
-				by the parameter{" "}
+				, then we observe how the neuron output was affected by each
+				parameter{" "}
 				{$(
 					" \\frac{ \\partial \\text{neuron}}{\\partial \\text{parameter}}"
 				)}{" "}
-				and can combine these to observe how the paramter affected the
-				loss{" "}
+				and can chain these to observe how the loss was affected by the
+				parameter{" "}
 				{$(
 					" \\frac{ \\partial \\text{loss}}{\\partial \\text{parameter}}"
 				)}
-				. And notice how we compute these derivatives going backward,
-				which has the added benefit of reusing values computed in the
-				forward propagation.
+				. Notice that we compute these derivatives going <b>backward</b>{" "}
+				(where the term <b>back</b>propagation comes from), which has
+				the added benefit of reusing values computed in the forward
+				propagation (for more on this check out{" "}
+				{link(
+					"https://rufflewind.com/2016-12-30/reverse-mode-automatic-differentiation",
+					"reverse mode automatic differentiation"
+				)}
+				).
 			</Typography>
 			<br />
 			{subtopic("Concrete Example")}
 			<Typography variant="h6">
-				Let's go through a concrete example of a forward and backward
-				pass. We will define the input as {$("x_0 = 2.1")}, the weight
-				as {$("w_0 = 1")}, and the bias as {$("b = 0")}. This is just
-				one training example.
+				Let's go through a concrete example of forward propagation, then
+				an emphasis on backward propagation. The training example will
+				be ({$("x = 2.1")}, {$("y = 4")}), the weight will be{" "}
+				{$("w = 1")}, and the bias will be {$("b = 0")}. {$("\\hat{y}")}{" "}
+				represents the neuron output and predicted value, and{" "}
+				{$("\\text{loss}")} represents squared error loss.
 			</Typography>
-			<img alt="forward pass" width="100%" src={forwardSVG} />
+			<br />
+
+			<ToggleForward
+				title={<Typography variant="h4">Forward Overview</Typography>}
+				noKeySVG={forwardNoKeySVG}
+				keySVG={forwardKeySVG}
+			/>
+			<br />
+			<Typography variant="h4">Forward Computation</Typography>
+			<img
+				src={forwardComputationSVG}
+				width="100%"
+				alt="forward computation"
+			/>
+			<br />
 			<Typography variant="h6">
-				Now we can go backwards and compute partial derivatives with the
-				chain rule to get the gradient {$("\\nabla \\text{loss}")}
+				Now we can go backward and compute partial derivatives with the
+				chain rule to get the {$("\\nabla \\text{loss}")}
 			</Typography>
-			<img alt="backward pass" width="100%" src={backwardSVG} />
-			<Typography variant="h6">
-				{$$("\\frac{\\partial \\text{loss}}{\\partial w_0} = -7.98")}
+
+			<br />
+
+			<ToggleForward
+				title={<Typography variant="h4">Backward Overview</Typography>}
+				noKeySVG={backwardNoKeySVG}
+				keySVG={backwardKeySVG}
+			/>
+			<br />
+
+			<Typography variant="h4">Backward Computation</Typography>
+			<img
+				src={backwardComputationSVG}
+				width="100%"
+				alt="backward computation"
+			/>
+
+			<Typography variant="h5">
+				{$$("\\frac{\\partial \\text{loss}}{\\partial w} = -7.98")}
 				{$$("\\frac{\\partial \\text{loss}}{\\partial b} = -3.8")}
 			</Typography>
 			<Typography variant="h6">
-				Then, we update the parameters to opposite gradient to descend
-				loss ( ), in this case learning rate is {$("\\text{lr} = 0.01")}
+				Then, we update the parameters with opposite gradient to descend
+				loss, in this case learning rate is {$("\\text{lr} = 0.01")}
 				{$$(
-					"w_0 := w_0 - \\text{lr} \\cdot \\frac{\\partial \\text{loss}}{\\partial w_0} = (1) - (0.01) \\cdot (-7.98) = 1.0798"
+					"w := w - \\text{lr} \\cdot \\frac{\\partial \\text{loss}}{\\partial w} = (1) - (0.01) \\cdot (-7.98) = 1.0798"
 				)}
 				{$$(
 					"b := b - \\text{lr} \\cdot \\frac{\\partial \\text{loss}}{\\partial b} = (0) - (0.01) \\cdot (-3.8) = 0.038 "
 				)}
-				Re calculate forward pass with new weight and bias
+				<b>
+					To see how well our tuned parameters do, let's do one more
+					forward pass
+				</b>
 				{$$("\\text{loss} = ((1.0798)(2.1) + 0.038) - 4)^2 = 2.87")}
 			</Typography>
 			<Typography variant="h6">
-				Total loss savings of {$("3.61 - 2.87 = 0.74")}
+				Total loss decrease of {$("3.61 - 2.87 = 0.74")}. Loss went
+				down!
 			</Typography>
 			<br />
 			{subtopic("See it in Action")}
@@ -435,15 +485,16 @@ const Explanation = () => {
 						color: "white",
 					}}
 					size="small"
+					disabled={true}
 				>
-					{<PlayArrow />}
+					{<PlayArrow fontSize="small" />}
 				</Fab>{" "}
 				to start the training process under <b>Auto Best Fit</b>. Watch
 				how as the line gets better fit, the red dot descends the loss
 				contour.
 			</Typography>
 			<Element name="structLin">
-				<SubTool />
+				<AutoTool />
 			</Element>
 			<br />
 			{topic("Scaling up Neurons and Layers")}
@@ -451,7 +502,7 @@ const Explanation = () => {
 			<Typography variant="h6">
 				To fit more interesting data that is non-linear (e.g. sine wave
 				or quadratic), we need to add complexity to vary output to make
-				sure we are not contrained to only linear outputs. We can do
+				sure we are not constrained to only linear outputs. We can do
 				this by adding more neurons, more layers, and activation
 				functions. If you think of our entire neural network as a
 				function, then by adding more neurons and more layers we are

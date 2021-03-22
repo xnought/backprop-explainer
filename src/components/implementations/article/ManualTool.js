@@ -1,3 +1,8 @@
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		This file is designed to generate the component for the manial linear scatter exercise
+*/
 import { Box, Card, CardContent, Slider, Button } from "@material-ui/core";
 import React, { Component } from "react";
 import { ScatterPlot } from "../../exports";

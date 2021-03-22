@@ -1,3 +1,8 @@
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		This file creates the navigation checkpoint coomponent
+*/
 import React from "react";
 import { scroller } from "react-scroll";
 import { Box, Button } from "@material-ui/core";
@@ -23,7 +28,6 @@ export const Nav = () => {
 						}}
 						color={backgroundColor}
 					>
-						{" "}
 						<img alt="article" src={structArtSVG} />
 					</Button>
 				</Box>

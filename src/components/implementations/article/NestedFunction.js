@@ -1,3 +1,8 @@
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		This is a component for the nested function chain rule example
+*/
 import React, { Component } from "react";
 import {
 	Typography,
