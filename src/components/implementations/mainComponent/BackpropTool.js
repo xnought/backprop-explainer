@@ -36,6 +36,7 @@ import {
 	Stop,
 	Help,
 	Close,
+	ArrowBackIos,
 } from "@material-ui/icons";
 import controlGif from "./assets/controlcenter.gif";
 import singleSummarySVG from "./assets/singleSummary.svg";
@@ -669,7 +670,11 @@ class BackpropTool extends Component {
 							await this.anim();
 						}}
 						disabled={isAnimating}
-						style={{ color: isAnimating ? "lightgrey" : "black" }}
+						style={{
+							color: isAnimating ? "lightgrey" : "black",
+
+							borderColor: isAnimating ? "lightgrey" : "black",
+						}}
 						variant="outlined"
 					>
 						<Replay /> {"  "}REPLAY
@@ -688,7 +693,10 @@ class BackpropTool extends Component {
 							);
 							await this.anim();
 						}}
-						style={{ color: isAnimating ? "lightgrey" : "#4BA3C3" }}
+						style={{
+							color: isAnimating ? "lightgrey" : "#4BA3C3",
+							borderColor: isAnimating ? "lightgrey" : "#4BA3C3",
+						}}
 						disabled={isAnimating}
 						variant="outlined"
 					>
@@ -720,48 +728,9 @@ class BackpropTool extends Component {
 						</Typography>
 						<div></div>
 
-						<Tooltip
-							title={
-								<Typography variant="h6">
-									<b>
-										{mode
-											? "Click to go back to fitting"
-											: "Click to see backpropagation"}
-									</b>
-								</Typography>
-							}
-							arrow
-							placement="top-start"
-						>
-							<Button
-								disabled={loss == null || isAnimating}
-								variant="contained"
-								onClick={async () => {
-									if (mode) {
-										this.setState({
-											subEpoch: "",
-											mode: !mode,
-										});
-										this.run();
-									} else {
-										this.randExampleEpoch(
-											X,
-											y,
-											weightsData,
-											biasesData,
-											shape,
-											lr,
-											mode
-										);
-										await this.anim();
-									}
-								}}
-							>
-								<Typography variant="h4">
-									Epoch: {mode ? this.state.cpyEpoch : epoch}
-								</Typography>
-							</Button>
-						</Tooltip>
+						<Typography variant="h4">
+							EPOCH: {mode ? this.state.cpyEpoch : epoch}
+						</Typography>
 
 						{mode ? (
 							<CardActions>
@@ -868,7 +837,44 @@ class BackpropTool extends Component {
 
 						{mode ? controlsBackProp : controlsReg}
 
-						<CardActions></CardActions>
+						<CardActions>
+							{loss == null || isAnimating ? (
+								""
+							) : (
+								<Button
+									variant="outlined"
+									style={{
+										borderColor: "#ffa500",
+										color: "#ffa500",
+									}}
+									onClick={async () => {
+										if (mode) {
+											this.setState({
+												subEpoch: "",
+												mode: !mode,
+											});
+											this.run();
+										} else {
+											this.randExampleEpoch(
+												X,
+												y,
+												weightsData,
+												biasesData,
+												shape,
+												lr,
+												mode
+											);
+											await this.anim();
+										}
+									}}
+								>
+									{mode ? <ArrowBackIos /> : ""}
+									{mode
+										? "go back to fitting"
+										: `Click to Animate epoch ${epoch}`}
+								</Button>
+							)}
+						</CardActions>
 					</CardContent>
 				</Card>
 
@@ -1306,7 +1312,7 @@ class BackpropTool extends Component {
 							</Box>
 							<Box>
 								<Typography variant="h2">
-									<b>Backprop Tool</b>
+									<b>Epoch Tool</b>
 								</Typography>
 							</Box>
 						</Box>
