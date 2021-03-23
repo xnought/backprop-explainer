@@ -5,8 +5,7 @@
 
 The development of this project started with the backprop tool and morphed into an explanatory article. The goal is to explain and visualize backpropagation to gain an intuiton for how it works.
 
-The conclusion of the article is the main attraction.
-<img src="./demo.gif">
+
 
 ## How to Run Locally
 
