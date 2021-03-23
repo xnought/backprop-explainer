@@ -5,7 +5,7 @@ import AnimatedScatterPlot from "./implementations/subComponents/AnimatedScatter
 import Loss from "./implementations/subComponents/Loss";
 import Article from "./implementations/article/Article";
 import Header from "./implementations/article/Header";
-import BackpropTool from "./implementations/mainComponent/BackpropTool";
+import EPOCHTool from "./implementations/mainComponent/EPOCHTool";
 import * as Typeset from "./implementations/article/Typeset";
 import Summary from "./implementations/article/assets/summary.svg";
 import Acknowledge from "./implementations/article/Acknowledge";
@@ -15,7 +15,7 @@ export {
 	ScatterPlot,
 	AnimatedScatterPlot,
 	Loss,
-	BackpropTool,
+	EPOCHTool,
 	Typeset,
 	Header,
 	Article,

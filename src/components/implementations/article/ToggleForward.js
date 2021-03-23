@@ -25,8 +25,11 @@ class ToggleForward extends Component {
 							onClick={() => {
 								this.setState({ key: !key });
 							}}
-							color="primary"
 							variant="outlined"
+							style={{
+								borderColor: "#175676",
+								color: "#175676",
+							}}
 						>
 							Toggle Key
 						</Button>

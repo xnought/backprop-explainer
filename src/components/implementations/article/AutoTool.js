@@ -1,6 +1,13 @@
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		This file contains the logic and component for autotool.
+		It brings together the control logic, the loss contour and the graph.
+*/
 import React, { Component } from "react";
 import ContourLoss from "./ContourLoss";
 import { ScatterPlot } from "../../exports";
+import autoKeySVG from "./assets/autoKey.svg";
 
 import {
 	Fab,
@@ -18,7 +25,7 @@ class SubTool extends Component {
 		super(props);
 		this.state = {
 			yhat: [],
-			darkness: -8,
+			darkness: -4,
 			playButton: true,
 			linreg: {
 				meanSquaredError: 0,
@@ -68,6 +75,7 @@ class SubTool extends Component {
 	}
 	generateData() {
 		tf.tidy(() => {
+			/* The data we will use */
 			const yhat = [0, 0, 0, 0, 0, 0];
 			const X = [0, 1, 2, 3, 4, 5];
 			const y = [5, 4, 3, 2, 1, 0];
@@ -93,7 +101,8 @@ class SubTool extends Component {
 
 	linearRegression() {
 		tf.tidy(() => {
-			if (this.state.linreg.hyperparams.epochs > 1000) {
+			/* It really doesnt need to go this far */
+			if (this.state.linreg.hyperparams.epochs > 10000) {
 				this.setState({ playButton: !this.state.playButton });
 				return;
 			}
@@ -243,6 +252,7 @@ class SubTool extends Component {
 									<Stop />
 								)}
 							</Fab>
+
 							<IconButton
 								style={{
 									color: speed === 200 ? "grey" : "#FFC006",
@@ -263,8 +273,10 @@ class SubTool extends Component {
 							>
 								<SlowMotionVideo />
 							</IconButton>
-						</CardContent>
+							<br />
 
+							<img src={autoKeySVG} alt="legend" width="40%" />
+						</CardContent>
 						<ContourLoss
 							ms={speed}
 							data={data}

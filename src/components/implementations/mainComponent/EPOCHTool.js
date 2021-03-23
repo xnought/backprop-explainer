@@ -44,7 +44,7 @@ import keySVG from "./assets/key.svg";
 import { NeuralNetwork, tools } from "../../../nnMiniLibrary/exports";
 import { draw } from "../../../Utils/exports";
 
-class BackpropTool extends Component {
+class EPOCHTool extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -1369,4 +1369,4 @@ class BackpropTool extends Component {
 	}
 }
 
-export default BackpropTool;
+export default EPOCHTool;

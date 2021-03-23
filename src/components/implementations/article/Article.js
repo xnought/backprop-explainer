@@ -44,7 +44,7 @@ const Explanation = () => {
 	const link = (href, content) => (
 		<Button
 			size="small"
-			style={{ color: orange }}
+			style={{ color: "#155676" }}
 			href={href}
 			target="_blank"
 			rel="noopener noreferrer"
@@ -53,7 +53,7 @@ const Explanation = () => {
 		</Button>
 	);
 
-	const definiton = (word, desc) => (
+	const definition = (word, desc) => (
 		<Tooltip
 			style={{
 				backgroundColor: "#56A8C7",
@@ -99,7 +99,7 @@ const Explanation = () => {
 				notation, and interactive tools, the aim is to get a
 				understanding of the foundations. Note that throughout the
 				article there will be{" "}
-				{definiton(
+				{definition(
 					<span>highlighted</span>,
 					<Typography variant="h6">Example explanation</Typography>
 				)}{" "}
@@ -111,7 +111,7 @@ const Explanation = () => {
 			<Typography variant="h6">
 				The goal in a neural network, or any optimization problem for
 				that matter, is to lower and minimize whatever{" "}
-				{definiton(
+				{definition(
 					<span>loss</span>,
 					<Typography variant="body1">
 						Error between predicted values {$("\\hat{y}")} and true
@@ -120,7 +120,7 @@ const Explanation = () => {
 				)}{" "}
 				function we define. For this article, we will be performing
 				regression and using mean squared error loss{" "}
-				{definiton(
+				{definition(
 					<span>MSE</span>,
 					<Box>
 						<Typography variant="h6">
@@ -145,7 +145,7 @@ const Explanation = () => {
 			</Typography>
 			<Typography variant="h6">
 				Before hitting the calculus, tune the{" "}
-				{definiton(
+				{definition(
 					<span>weight and bias on one neuron</span>,
 					<Box>
 						<Typography variant="h6">
@@ -173,11 +173,11 @@ const Explanation = () => {
 				help), press the{" "}
 				<Button
 					disabled={true}
+					variant="outlined"
 					size="small"
-					variant="contained"
 					style={{
-						backgroundColor: "#155676",
-						color: "white",
+						borderColor: "#175676",
+						color: "#175676",
 					}}
 				>
 					Click to reveal the graph
@@ -193,8 +193,8 @@ const Explanation = () => {
 			<Typography variant="h6">
 				<b>
 					The intuition and logic from the exercise above, is the
-					foundation for what backpropagation and optimization is and
-					aims to achieve.
+					foundation for what backpropagation and optimization aims to
+					achieve.
 				</b>
 			</Typography>
 			<Typography variant="h6">
@@ -209,7 +209,7 @@ const Explanation = () => {
 			{subtopic("Defining Backpropagation")}
 			<Typography variant="h6">
 				First to get the{" "}
-				{definiton(
+				{definition(
 					<span>instantaneous rate of change</span>,
 					<Box>
 						<Typography style={{ color: blue }} variant="h6">
@@ -243,7 +243,7 @@ const Explanation = () => {
 				Since want to tune the parameters weight {$("w")} and bias{" "}
 				{$("b")}, we want to know how each parameters will affect the
 				loss, or in other words, the{" "}
-				{definiton(
+				{definition(
 					<span>partial derivative</span>,
 					<Box>
 						<Typography style={{ color: blue }} variant="h6">
@@ -284,7 +284,7 @@ const Explanation = () => {
 					</Box>
 				)}{" "}
 				of loss with respect to each parameter, also called the{" "}
-				{definiton(
+				{definition(
 					<span>gradient</span>,
 					<Box>
 						<Typography variant="h6">
@@ -299,7 +299,7 @@ const Explanation = () => {
 				steepest ascent. But we want to lower loss, therefore we use the
 				opposite direction to get the direction of steepest descent, to
 				perform{" "}
-				{definiton(
+				{definition(
 					<span>gradient descent</span>,
 					<Box>
 						<Typography variant="body1">
@@ -367,7 +367,10 @@ const Explanation = () => {
 			</Typography>
 			<br />
 			<Typography variant="h6">
-				This logic applied to our one neuron neural network looks like
+				<b>
+					This logic applied to our one neuron neural network looks
+					like
+				</b>
 			</Typography>
 			<Typography variant="h6">
 				{$$(
@@ -380,7 +383,7 @@ const Explanation = () => {
 			<Typography variant="h6">
 				These chains can be broken up into more intermediate derivatives
 				all the way down to their primitives (basis of automatic
-				differentiation) . <b>The main takeaway</b> is that we first
+				differentiation). <b>The main takeaway</b> is that we first
 				observe how the loss output was affected by the neuron output{" "}
 				{$(
 					" \\frac{ \\partial \\text{loss}}{\\partial \\text{neuron}}"
@@ -510,7 +513,7 @@ const Explanation = () => {
 				creating a more nested function. Not only does this create more
 				parameters that we can tune to vary the output, it also
 				maintains the property of{" "}
-				{definiton(
+				{definition(
 					<span>differentiability</span>,
 					<Box>
 						<Typography variant="h6">
@@ -523,7 +526,7 @@ const Explanation = () => {
 				certain neurons may have no effect on the output while others
 				may become more activated, contributing to outputs that don't
 				have to follow linear constraints. We will be using the{" "}
-				{definiton(
+				{definition(
 					<span>ReLU</span>,
 					<Box>
 						<Typography variant="h6">
@@ -583,6 +586,9 @@ const Explanation = () => {
 				{$(
 					"-\\frac{\\partial \\text{loss}}{\\partial \\text{activation} }"
 				)}
+				. In the <b>EPOCH Tool</b> below, you will be able to visualize
+				all phases of a single epoch with an emphasis on{" "}
+				<b>backpropagation</b>.
 			</Typography>
 
 			<br />
@@ -619,7 +625,7 @@ const Explanation = () => {
 							Click to animate epoch #
 						</Button>{" "}
 						to see forward propagation, <b>backward propagation</b>{" "}
-						and update animation at the epoch #
+						and, update animation at the epoch #
 					</li>
 					<li>
 						To go back to fitting mode click{" "}

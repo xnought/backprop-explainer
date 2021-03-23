@@ -11,7 +11,7 @@ import { $ } from "./Typeset";
 
 const link = (href, content, isPerson) => (
 	<Button
-		style={{ color: isPerson ? "#56A8C7" : "#FFA500" }}
+		style={{ color: isPerson ? "#FFA500" : "#155676" }}
 		href={href}
 		target="_blank"
 		rel="noopener noreferrer"
@@ -66,25 +66,6 @@ const Acknowledge = () => (
 			<br />
 			<Typography variant="body1">
 				{link(
-					"https://distill.pub/2020/communicating-with-interactive-articles/",
-					"Communicating with Interactive Articles",
-					false
-				)}
-				{link("https://fredhohman.com/", "Fred Hohman", true)}
-				{link("https://mathisonian.com/", "Matthew Conlen", true)}
-				{link(
-					"https://homes.cs.washington.edu/~jheer/",
-					"Jeffrey Heer",
-					true
-				)}
-				{link("https://www.cc.gatech.edu/~dchau/", "Polo Chau", true)}
-				<ul>
-					<li>Used colored labeling to toggle labels for notation</li>
-				</ul>
-			</Typography>
-			<br />
-			<Typography variant="body1">
-				{link(
 					"https://poloclub.github.io/cnn-explainer/",
 					"CNN explainer",
 					false
@@ -103,8 +84,28 @@ const Acknowledge = () => (
 				{link("https://minsuk.com/", "Minsuk Kahng", true)}
 				{link("https://www.cc.gatech.edu/~dchau/", "Polo Chau", true)}
 				<ul>
+					<li>Model for what good animation look like</li>
 					<li>Inspiration for the article format with components</li>
 					<li>Inspiration for the name backprop explainer</li>
+				</ul>
+			</Typography>
+			<br />
+			<Typography variant="body1">
+				{link(
+					"https://distill.pub/2020/communicating-with-interactive-articles/",
+					"Communicating with Interactive Articles",
+					false
+				)}
+				{link("https://fredhohman.com/", "Fred Hohman", true)}
+				{link("https://mathisonian.com/", "Matthew Conlen", true)}
+				{link(
+					"https://homes.cs.washington.edu/~jheer/",
+					"Jeffrey Heer",
+					true
+				)}
+				{link("https://www.cc.gatech.edu/~dchau/", "Polo Chau", true)}
+				<ul>
+					<li>Used colored labeling to toggle labels for notation</li>
 				</ul>
 			</Typography>
 
@@ -127,11 +128,12 @@ const Acknowledge = () => (
 				<b>Found any errors?</b>
 			</Typography>
 			<Typography variant="body1">
-				If you found in error in an explanation, equation, or in one of
-				the interactive components please create an issue on Github
+				Please create an issue on
 				<IconButton href="https://github.com/xnought/backprop-explainer">
 					<GitHub />
 				</IconButton>
+				if you found an issue in the article, any of the components, or
+				in the <b>EPOCH Tool</b>.
 			</Typography>
 			<br />
 			<Typography variant="h4">

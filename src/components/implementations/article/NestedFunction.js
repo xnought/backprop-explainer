@@ -205,6 +205,11 @@ class NestedFunction extends Component {
 						<CardActions>
 							<Button
 								size="small"
+								variant="outlined"
+								style={{
+									borderColor: "#175676",
+									color: "#175676",
+								}}
 								onClick={async () => {
 									await this.initParams();
 									//this.compute(this.state.input);

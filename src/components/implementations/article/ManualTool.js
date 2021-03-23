@@ -189,12 +189,13 @@ class LinearScatter extends Component {
 									{$(`${loss.toFixed(7)}`)}
 								</em>
 							</h3>
+
 							<Button
 								size="small"
-								variant="contained"
+								variant="outlined"
 								style={{
-									backgroundColor: "#155676",
-									color: "white",
+									borderColor: "#175676",
+									color: "#175676",
 								}}
 								onClick={() => {
 									this.setState({ show: !this.state.show });

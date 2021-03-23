@@ -6,12 +6,7 @@
 
 import React, { Component } from "react";
 import ReactGa from "react-ga";
-import {
-	BackpropTool,
-	Article,
-	Acknowledge,
-	Header,
-} from "./components/exports";
+import { EPOCHTool, Article, Acknowledge, Header } from "./components/exports";
 import { Element } from "react-scroll";
 
 class App extends Component {
@@ -26,7 +21,7 @@ class App extends Component {
 				<Header />
 				<Article />
 				<Element name="mainTool">
-					<BackpropTool />
+					<EPOCHTool />
 				</Element>
 				<Element name="acknowledgements">
 					<Acknowledge />
