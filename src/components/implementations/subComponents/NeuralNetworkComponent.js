@@ -222,14 +222,19 @@ const NeuralNetworkComponent = (props) => {
 									y={d.y}
 									width={squareWidth}
 									height={squareWidth}
-									fill={d3
-										.rgb(104, 104, 104)
-										.brighter(
-											actColor
-												? miniNN.model[i][j].actStep +
-														lr
-												: 1
-										)}
+									fill={
+										d.x === 734 && d.y === 234 && mode
+											? "#C6C6C6"
+											: d3
+													.rgb(104, 104, 104)
+													.brighter(
+														actColor
+															? miniNN.model[i][j]
+																	.actStep +
+																	lr
+															: 1
+													)
+									}
 									stroke={
 										d.x === 734 && d.y === 234
 											? "#507BB6"

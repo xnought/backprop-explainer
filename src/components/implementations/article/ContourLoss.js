@@ -1,3 +1,8 @@
+/* 
+	Donny Bertucci: @xnought
+	Summary: 
+		This component renders the contour and a dot to represent where we are
+*/
 import React, { Component } from "react";
 import * as d3 from "d3";
 class ContourLoss extends Component {
@@ -16,6 +21,10 @@ class ContourLoss extends Component {
 			m = height,
 			values = new Array(n * m);
 
+		/* 
+			this code below was adapted from
+			d3-contour documentation examples
+		*/
 		for (let j = 0.5, k = 0; j < m; ++j) {
 			for (let i = 0.5; i < n; ++i, ++k) {
 				values[k] = loss((i / n) * 10 - 5, (j / m) * 20);
