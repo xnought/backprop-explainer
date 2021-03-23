@@ -1,4 +1,4 @@
-<img src="./src/headerTitle.svg">
+<img src="./src/components/implementations/article/assets/headerTitle.svg">
 <a href="https://xnought.github.io/backprop-explainer/">Live Website</a>
 
 ## Overview
