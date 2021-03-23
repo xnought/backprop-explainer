@@ -14,7 +14,8 @@ import {
 	Card,
 	CardContent,
 } from "@material-ui/core";
-import { Help, PlayArrow } from "@material-ui/icons";
+import { Help, PlayArrow, ArrowBackIos } from "@material-ui/icons";
+
 import { Nav } from "./Nav";
 import { Element } from "react-scroll";
 import AutoTool from "./AutoTool";
@@ -100,7 +101,7 @@ const Explanation = () => {
 				article there will be{" "}
 				{definiton(
 					<span>highlighted</span>,
-					<Typography varaint="h6">Example explanation</Typography>
+					<Typography variant="h6">Example explanation</Typography>
 				)}{" "}
 				words that will give extra explanation on mouse over.
 			</Typography>
@@ -586,7 +587,7 @@ const Explanation = () => {
 
 			<br />
 			<Typography variant="h4">
-				<b>Backprop Tool</b> Quick Start
+				<b>EPOCH Tool</b> Quick Start
 			</Typography>
 			<Typography variant="h6">
 				<ol>
@@ -598,6 +599,7 @@ const Explanation = () => {
 								color: "white",
 							}}
 							size="small"
+							disabled={true}
 						>
 							<PlayArrow fontSize="small" />
 						</Fab>{" "}
@@ -605,17 +607,33 @@ const Explanation = () => {
 					</li>
 					<li>
 						Then press{" "}
-						<Button variant="contained" size="small">
-							EPOCH
+						<Button
+							variant="outlined"
+							size="small"
+							style={{
+								borderColor: "#175676",
+								color: "#175676",
+							}}
+							disabled={true}
+						>
+							Click to animate epoch #
 						</Button>{" "}
-						to see backpropagation animation
+						to see forward propagation, <b>backward propagation</b>{" "}
+						and update animation at the epoch #
 					</li>
 					<li>
 						To go back to fitting mode click{" "}
-						<Button variant="contained" size="small">
-							EPOCH
+						<Button
+							variant="outlined"
+							size="small"
+							style={{
+								borderColor: "#175676",
+								color: "#175676",
+							}}
+							disabled={true}
+						>
+							<ArrowBackIos /> Go back to fitting
 						</Button>{" "}
-						again
 					</li>
 				</ol>
 			</Typography>

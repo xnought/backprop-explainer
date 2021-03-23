@@ -38,7 +38,6 @@ import {
 	Close,
 	ArrowBackIos,
 } from "@material-ui/icons";
-import controlGif from "./assets/controlcenter.gif";
 import singleSummarySVG from "./assets/singleSummary.svg";
 import epochModePNG from "./assets/epochMode.png";
 import keySVG from "./assets/key.svg";
@@ -676,8 +675,9 @@ class BackpropTool extends Component {
 							borderColor: isAnimating ? "lightgrey" : "black",
 						}}
 						variant="outlined"
+						size="small"
 					>
-						<Replay /> {"  "}REPLAY
+						REPLAY
 					</Button>
 
 					<Button
@@ -699,6 +699,7 @@ class BackpropTool extends Component {
 						}}
 						disabled={isAnimating}
 						variant="outlined"
+						size="small"
 					>
 						New Training Example
 					</Button>
@@ -844,8 +845,8 @@ class BackpropTool extends Component {
 								<Button
 									variant="outlined"
 									style={{
-										borderColor: "#ffa500",
-										color: "#ffa500",
+										color: "#175676",
+										borderColor: "#175676",
 									}}
 									onClick={async () => {
 										if (mode) {
@@ -887,7 +888,7 @@ class BackpropTool extends Component {
 									color: "#4BA3C3",
 								}}
 							>
-								{"Customization "}
+								{"Customization"}
 								<IconButton
 									size="small"
 									style={{ color: "orange" }}
@@ -1112,15 +1113,12 @@ class BackpropTool extends Component {
 					</DialogActions>
 
 					<DialogContent>
-						<img
-							src={controlGif}
-							alt="how to use control center"
-							width="100%"
-						/>
-
 						<Box display="flex" justifyContent="center">
 							<Box marginBottom={1}>
-								<Typography variant="h6">
+								<Typography variant="h5">
+									<b>Getting Stuck?</b>
+								</Typography>
+								<Typography variant="body1">
 									<ol>
 										<li>
 											Press{" "}
@@ -1130,40 +1128,58 @@ class BackpropTool extends Component {
 													color: "white",
 												}}
 												size="small"
+												disabled={true}
 											>
 												<PlayArrow fontSize="small" />
 											</Fab>{" "}
-											to start training
+											to start training and fitting the
+											curve to the data
 										</li>
 										<li>
 											Then press{" "}
 											<Button
-												variant="contained"
+												variant="outlined"
 												size="small"
+												style={{
+													borderColor: "#175676",
+													color: "#175676",
+												}}
+												disabled={true}
 											>
-												EPOCH
+												Click to animate epoch #
 											</Button>{" "}
-											to see backpropagation animation
+											to see forward propagation,{" "}
+											<b>backward propagation</b>, and
+											update animation at the epoch #.
+											While in this mode, you will have
+											access to the control center{" "}
+											<b>below</b>
+											<img
+												alt="epochMode"
+												src={epochModePNG}
+												width="100%"
+											></img>
 										</li>
 										<li>
-											To go back to fitting mode click{" "}
+											To go back to training and fitting
+											the curve to the data click{" "}
 											<Button
-												variant="contained"
+												variant="outlined"
 												size="small"
+												style={{
+													borderColor: "#175676",
+													color: "#175676",
+												}}
+												disabled={true}
 											>
-												EPOCH
+												<ArrowBackIos /> Go back to
+												fitting
 											</Button>{" "}
-											again
 										</li>
 									</ol>
 								</Typography>
 							</Box>
 						</Box>
-						<img
-							alt="epochMode"
-							src={epochModePNG}
-							width="100%"
-						></img>
 					</DialogContent>
 				</Dialog>
 				<Dialog
@@ -1187,8 +1203,14 @@ class BackpropTool extends Component {
 					<DialogContent>
 						<Box display="flex" justifyContent="center">
 							<Box marginBottom={5}>
-								<Typography variant="h4">Fixed</Typography>
+								<Typography variant="h5">
+									<b>What you can't and can change</b>
+								</Typography>
+								<br />
 								<Typography variant="h6">
+									<b>Fixed</b>
+								</Typography>
+								<Typography variant="body1">
 									By default, this Neural Network stays fixed
 									with
 									<ol>
@@ -1205,8 +1227,10 @@ class BackpropTool extends Component {
 									</ol>
 								</Typography>
 
-								<Typography variant="h4">Variable</Typography>
 								<Typography variant="h6">
+									<b>Variable</b>
+								</Typography>
+								<Typography variant="body1">
 									You have the ability to change
 									<ol>
 										<li>
@@ -1255,13 +1279,13 @@ class BackpropTool extends Component {
 						<Box display="flex" justifyContent="center">
 							<Box marginBottom={5}>
 								<Typography variant="h6">
-									Neural Network
+									<b>Neural Network</b>
 								</Typography>
 								<Typography variant="body1">
 									Each square is a neuron in the neural
-									network. To see the types of neurons check
-									the key located right above the neural
-									network.
+									network. To see what activation function the
+									neuron has, check the key located right
+									above the neural network.
 								</Typography>
 							</Box>
 						</Box>
@@ -1272,10 +1296,21 @@ class BackpropTool extends Component {
 						/>
 						<Box display="flex" justifyContent="center">
 							<Box marginBottom={5}>
+								<Typography variant="h6">
+									<b>Single EPOCH mode</b>
+								</Typography>
 								<Typography variant="body1">
 									During a single epoch after clicking{" "}
-									<Button size="small" variant="contained">
-										EPOCH
+									<Button
+										variant="outlined"
+										size="small"
+										style={{
+											borderColor: "#175676",
+											color: "#175676",
+										}}
+										disabled={true}
+									>
+										Click to animate epoch #
 									</Button>{" "}
 									, each arrow will represent the direction to
 									nudge the output to lower loss.
@@ -1312,7 +1347,7 @@ class BackpropTool extends Component {
 							</Box>
 							<Box>
 								<Typography variant="h2">
-									<b>Epoch Tool</b>
+									<b>EPOCH Tool</b>
 								</Typography>
 							</Box>
 						</Box>
