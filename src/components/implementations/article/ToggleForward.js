@@ -31,7 +31,7 @@ class ToggleForward extends Component {
 								color: "#175676",
 							}}
 						>
-							Toggle Key
+							Click here to see descriptions of the diagram above
 						</Button>
 					</CardContent>
 				</Card>

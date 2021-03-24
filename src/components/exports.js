@@ -9,6 +9,7 @@ import EPOCHTool from "./implementations/mainComponent/EPOCHTool";
 import * as Typeset from "./implementations/article/Typeset";
 import Summary from "./implementations/article/assets/summary.svg";
 import Acknowledge from "./implementations/article/Acknowledge";
+import Nav from "./implementations/article/Nav";
 
 export {
 	NeuralNetworkComponent,
@@ -21,4 +22,5 @@ export {
 	Article,
 	Summary,
 	Acknowledge,
+	Nav,
 };

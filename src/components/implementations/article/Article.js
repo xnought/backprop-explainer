@@ -13,10 +13,10 @@ import {
 	Tooltip,
 	Card,
 	CardContent,
+	Divider,
 } from "@material-ui/core";
 import { Help, PlayArrow, ArrowBackIos } from "@material-ui/icons";
 
-import { Nav } from "./Nav";
 import { Element } from "react-scroll";
 import AutoTool from "./AutoTool";
 import ManualTool from "./ManualTool";
@@ -72,25 +72,17 @@ const Explanation = () => {
 	);
 
 	/* Topic formatted component */
-	const topic = (title) => (
-		<Typography variant="h3">
-			<b>{title}</b>
-		</Typography>
-	);
+	const topic = (title) => <Typography variant="h3">{title}</Typography>;
 	/* SubTopic formatted component */
 	const subtopic = (title) => <Typography variant="h4">{title}</Typography>;
 
 	/* Explanation paper */
 	const paper = (
-		<div>
+		<Box>
 			<br />
-			{topic("Jump to a Checkpoint")}
-			<Typography variant="h6">
-				If you want to skip ahead, click on a checkpoint. Otherwise,
-				click <b>Article</b> or scroll to the start of the article.
-			</Typography>
-			<Nav />
 			<Element name="article">{topic("Introduction")}</Element>
+			<Divider />
+			<br />
 			<Typography variant="h6">
 				Most people abstract the idea of backpropagation when learning
 				neural networks because it is by far the most notation heavy
@@ -106,8 +98,12 @@ const Explanation = () => {
 				words that will give extra explanation on mouse over.
 			</Typography>
 			<br />
-			{topic("Backpropagation on One Neuron")}
-			{subtopic("Getting Started")}
+			<Element name="oneNeuron">
+				{topic("Backpropagation on One Neuron")}
+			</Element>
+
+			<Divider />
+			<Element name="getting">{subtopic("Getting Started")}</Element>
 			<Typography variant="h6">
 				The goal in a neural network, or any optimization problem for
 				that matter, is to lower and minimize whatever{" "}
@@ -206,7 +202,10 @@ const Explanation = () => {
 				<b>Let's apply this method of thinking!</b>
 			</Typography>
 			<br />
-			{subtopic("Defining Backpropagation")}
+
+			<Element name="definition">
+				{subtopic("Defining Backpropagation")}
+			</Element>
 			<Typography variant="h6">
 				First to get the{" "}
 				{definition(
@@ -409,7 +408,8 @@ const Explanation = () => {
 				).
 			</Typography>
 			<br />
-			{subtopic("Concrete Example")}
+
+			<Element name="concrete">{subtopic("Concrete Example")}</Element>
 			<Typography variant="h6">
 				Let's go through a concrete example of forward propagation, then
 				an emphasis on backward propagation. The training example will
@@ -421,12 +421,12 @@ const Explanation = () => {
 			<br />
 
 			<ToggleForward
-				title={<Typography variant="h4">Forward Overview</Typography>}
+				title={<Typography variant="h5">Forward Overview</Typography>}
 				noKeySVG={forwardNoKeySVG}
 				keySVG={forwardKeySVG}
 			/>
 			<br />
-			<Typography variant="h4">Forward Computation</Typography>
+			<Typography variant="h5">Forward Computation</Typography>
 			<img
 				src={forwardComputationSVG}
 				width="100%"
@@ -441,13 +441,13 @@ const Explanation = () => {
 			<br />
 
 			<ToggleForward
-				title={<Typography variant="h4">Backward Overview</Typography>}
+				title={<Typography variant="h5">Backward Overview</Typography>}
 				noKeySVG={backwardNoKeySVG}
 				keySVG={backwardKeySVG}
 			/>
 			<br />
 
-			<Typography variant="h4">Backward Computation</Typography>
+			<Typography variant="h5">Backward Computation</Typography>
 			<img
 				src={backwardComputationSVG}
 				width="100%"
@@ -478,7 +478,7 @@ const Explanation = () => {
 				down!
 			</Typography>
 			<br />
-			{subtopic("See it in Action")}
+			<Element name="see1">{subtopic("See it in Action")}</Element>
 			<Typography variant="h6">
 				To see the what we just did (forward, backward, update) on more
 				data and on the entire batch as opposed to a single training
@@ -501,8 +501,12 @@ const Explanation = () => {
 				<AutoTool />
 			</Element>
 			<br />
-			{topic("Scaling up Neurons and Layers")}
-			{subtopic("The Changes")}
+			<Element name="scaling">
+				{topic("Scaling up Neurons and Layers")}
+			</Element>
+
+			<Divider />
+			<Element name="changes">{subtopic("The Changes")}</Element>
 			<Typography variant="h6">
 				To fit more interesting data that is non-linear (e.g. sine wave
 				or quadratic), we need to add complexity to vary output to make
@@ -558,7 +562,7 @@ const Explanation = () => {
 				desired output.
 			</Typography>
 			<br />
-			{subtopic("Training Process")}
+			<Element name="training">{subtopic("Training Process")}</Element>
 			<Typography variant="h6">
 				<ol>
 					<li>Forward propagation resulting in an output and loss</li>
@@ -592,9 +596,9 @@ const Explanation = () => {
 			</Typography>
 
 			<br />
-			<Typography variant="h4">
-				<b>EPOCH Tool</b> Quick Start
-			</Typography>
+			<Element name="see2">
+				<Typography variant="h4">(insert name) Quick Start</Typography>
+			</Element>
 			<Typography variant="h6">
 				<ol>
 					<li>
@@ -649,7 +653,7 @@ const Explanation = () => {
 				<b>to reveal extra descriptions</b>
 			</Typography>
 			<br />
-		</div>
+		</Box>
 	);
 
 	return (

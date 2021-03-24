@@ -1,15 +1,13 @@
 <img src="./src/components/implementations/article/assets/headerTitle.svg">
 <a href="https://xnought.github.io/backprop-explainer/">Live Website</a>
 
-
-
 ## Overview
 
 The development of this project started with the backprop tool and morphed into an explanatory article. The goal is to explain and visualize backpropagation to gain an intuiton for how it works.
 
 Click the thumbnail below to see the <a href="https://youtu.be/gsDiiGWkgkY">demo</a> of the entire article
 <a href="https://youtu.be/gsDiiGWkgkY">
-<img src="./demo.jpg"  />
+<img src="src/components/implementations/article/assets/demo.gif"  />
 </a>
 
 ## How to Run Locally

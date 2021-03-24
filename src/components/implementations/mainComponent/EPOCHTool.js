@@ -1347,7 +1347,7 @@ class EPOCHTool extends Component {
 							</Box>
 							<Box>
 								<Typography variant="h2">
-									<b>EPOCH Tool</b>
+									(INSERT NAME)
 								</Typography>
 							</Box>
 						</Box>

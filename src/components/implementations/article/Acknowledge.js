@@ -5,7 +5,13 @@
 */
 
 import React from "react";
-import { Typography, Button, Box, IconButton } from "@material-ui/core";
+import {
+	Typography,
+	Button,
+	Box,
+	IconButton,
+	Divider,
+} from "@material-ui/core";
 import { GitHub } from "@material-ui/icons";
 import { $ } from "./Typeset";
 
@@ -22,10 +28,10 @@ const link = (href, content, isPerson) => (
 
 const Acknowledge = () => (
 	<Box display="flex" justifyContent="center">
-		<Box width="60%" marginTop={4}>
-			<Typography variant="h3">
-				<b>Acknowledgements</b>
-			</Typography>
+		<Box width="60%">
+			<Typography variant="h3">Acknowledgements</Typography>
+			<Divider />
+			<br />
 			<Typography variant="body1">
 				{link(
 					"https://playground.tensorflow.org/",
@@ -108,11 +114,15 @@ const Acknowledge = () => (
 					<li>Used colored labeling to toggle labels for notation</li>
 				</ul>
 			</Typography>
-
 			<br />
-			<Typography variant="h4">
-				<b>How was this made?</b>
+			<Typography variant="h4">Who made this?</Typography>
+			<Typography variant="body1">
+				Created by
+				{link("http://donnybertucci.com/", "Donny Bertucci", true)} and
+				{link("http://minsuk.com/", "Minsuk Kahng", true)} (project
+				advisor)
 			</Typography>
+			<Typography variant="h4">How was this made?</Typography>
 			<Typography variant="body1">
 				Made with{link("https://d3js.org/", "d3.js", false)}
 				and
@@ -123,29 +133,14 @@ const Acknowledge = () => (
 				{link("https://katex.org/", $("\\KaTeX"), false)}
 				to render {$("\\LaTeX")} math equations.
 			</Typography>
-			<br />
-			<Typography variant="h4">
-				<b>Found any errors?</b>
-			</Typography>
+			<Typography variant="h4">Found any errors?</Typography>
 			<Typography variant="body1">
 				Please create an issue on
 				<IconButton href="https://github.com/xnought/backprop-explainer">
 					<GitHub />
 				</IconButton>
 				if you found an issue in the article, any of the components, or
-				in the <b>EPOCH Tool</b>.
-			</Typography>
-			<br />
-			<Typography variant="h4">
-				<b>Who made this?</b>
-			</Typography>
-			<Typography variant="body1">
-				Created by
-				{link("http://donnybertucci.com/", "Donny Bertucci", true)}
-			</Typography>
-			<Typography variant="body1">
-				Project advised by
-				{link("http://minsuk.com/", "Minsuk Kahng", true)}
+				in the (insert name).
 			</Typography>
 			<br />
 		</Box>

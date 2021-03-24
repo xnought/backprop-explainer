@@ -6,8 +6,49 @@
 
 import React, { Component } from "react";
 import ReactGa from "react-ga";
-import { EPOCHTool, Article, Acknowledge, Header } from "./components/exports";
+import { createMuiTheme, ThemeProvider, Divider, Box } from "@material-ui/core";
+import {
+	EPOCHTool,
+	Article,
+	Acknowledge,
+	Header,
+	Nav,
+} from "./components/exports";
 import { Element } from "react-scroll";
+
+const globalWeight = 350;
+const theme = createMuiTheme({
+	overrides: {
+		MuiTypography: {
+			h1: {
+				fontWeight: globalWeight,
+			},
+			h2: {
+				fontWeight: globalWeight,
+			},
+			h3: {
+				marginTop: 15,
+				fontWeight: globalWeight,
+			},
+			h4: {
+				marginTop: 15,
+				fontWeight: globalWeight,
+			},
+			h5: {
+				fontWeight: globalWeight,
+			},
+			h6: {
+				fontWeight: globalWeight,
+			},
+			body1: {
+				fontWeight: globalWeight,
+			},
+			body2: {
+				fontWeight: globalWeight,
+			},
+		},
+	},
+});
 
 class App extends Component {
 	componentDidMount() {
@@ -17,17 +58,26 @@ class App extends Component {
 	}
 	render() {
 		return (
-			<div>
-				<Header />
-				<Article />
-				<Element name="mainTool">
-					<EPOCHTool />
-				</Element>
-				<Element name="acknowledgements">
-					<Acknowledge />
-				</Element>
-				<br />
-			</div>
+			<ThemeProvider theme={theme}>
+				<div>
+					<Header />
+					<Box justifyContent="center" display="flex">
+						<Box>
+							<Nav />
+						</Box>
+					</Box>
+					<br />
+					<Divider />
+					<Article />
+					<Element name="mainTool">
+						<EPOCHTool />
+					</Element>
+					<Element name="acknowledgements">
+						<Acknowledge />
+					</Element>
+					<br />
+				</div>
+			</ThemeProvider>
 		);
 	}
 }
