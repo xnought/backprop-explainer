@@ -61,13 +61,16 @@ class App extends Component {
 			<ThemeProvider theme={theme}>
 				<div>
 					<Header />
-					<Box justifyContent="center" display="flex">
+					<Box
+						justifyContent="center"
+						display="flex"
+						style={{ backgroundColor: "#F8F8F8" }}
+					>
 						<Box>
 							<Nav />
 						</Box>
 					</Box>
 					<br />
-					<Divider />
 					<Article />
 					<Element name="mainTool">
 						<BackpropExplainer />
