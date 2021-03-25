@@ -140,7 +140,7 @@ const Acknowledge = () => (
 					<GitHub />
 				</IconButton>
 				if you found an issue in the article, any of the components, or
-				in the (insert name).
+				in the Backprop Explainer.
 			</Typography>
 			<br />
 		</Box>

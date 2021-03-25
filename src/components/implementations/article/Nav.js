@@ -44,10 +44,7 @@ export const Nav = () => {
 				<ul style={{ listStyleType: "none" }}>
 					<li>{mainButton("Introduction", "article")}</li>
 					<li>
-						{mainButton(
-							"backpropagation on one neuron",
-							"oneNeuron"
-						)}
+						{mainButton("Grasping the concept", "oneNeuron")}
 						<ul style={{ listStyleType: "none" }}>
 							<li>{subButton("Getting started", "getting")}</li>
 							<li>
@@ -61,11 +58,14 @@ export const Nav = () => {
 						</ul>
 					</li>
 					<li>
-						{mainButton("scaling up neurons and layers", "scaling")}
+						{mainButton(
+							"Implementation on Neural Network",
+							"scaling"
+						)}
 						<ul style={{ listStyleType: "none" }}>
 							<li>{subButton("the changes", "changes")}</li>
 							<li>{subButton("training process", "training")}</li>
-							<li>{subButton("(insert name)", "see2")}</li>
+							<li>{subButton("Backprop Explainer", "see2")}</li>
 						</ul>
 					</li>
 					<li>
@@ -76,7 +76,7 @@ export const Nav = () => {
 
 			<Box margin={7} width={"50%"}>
 				<Typography variant="caption">
-					Preview of (insert name)
+					Preview of Backprop Explainer
 				</Typography>
 				<br />
 				<Button

@@ -84,13 +84,13 @@ const Explanation = () => {
 			<Divider />
 			<br />
 			<Typography variant="h6">
-				Most people abstract the idea of backpropagation when learning
-				neural networks because it is by far the most notation heavy
-				part. The goal of this article is to build an intuition for why
-				and how we perform backpropagation. By marrying explanation,
-				notation, and interactive tools, the aim is to get a
-				understanding of the foundations. Note that throughout the
-				article there will be{" "}
+				Most people abstract the idea of <b>backprop</b>(<b>backprop</b>
+				agation) when learning neural networks because it is by far the
+				most notation heavy part. The goal of this article is to build
+				an intuition for why and how we perform backpropagation. By
+				marrying explanation, notation, and interactive tools, the aim
+				is to get a understanding of the foundations. Note that
+				throughout the article there will be{" "}
 				{definition(
 					<span>highlighted</span>,
 					<Typography variant="h6">Example explanation</Typography>
@@ -98,9 +98,7 @@ const Explanation = () => {
 				words that will give extra explanation on mouse over.
 			</Typography>
 			<br />
-			<Element name="oneNeuron">
-				{topic("Backpropagation on One Neuron")}
-			</Element>
+			<Element name="oneNeuron">{topic("Grasping the Concept")}</Element>
 
 			<Divider />
 			<Element name="getting">{subtopic("Getting Started")}</Element>
@@ -502,7 +500,7 @@ const Explanation = () => {
 			</Element>
 			<br />
 			<Element name="scaling">
-				{topic("Scaling up Neurons and Layers")}
+				{topic("Implementation on (larger) Neural Network")}
 			</Element>
 
 			<Divider />
@@ -597,7 +595,9 @@ const Explanation = () => {
 
 			<br />
 			<Element name="see2">
-				<Typography variant="h4">(insert name) Quick Start</Typography>
+				<Typography variant="h4">
+					Backprop Explainer Quick Start
+				</Typography>
 			</Element>
 			<Typography variant="h6">
 				<ol>

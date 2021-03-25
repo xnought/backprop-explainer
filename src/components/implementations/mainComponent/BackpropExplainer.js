@@ -44,7 +44,7 @@ import keySVG from "./assets/key.svg";
 import { NeuralNetwork, tools } from "../../../nnMiniLibrary/exports";
 import { draw } from "../../../Utils/exports";
 
-class EPOCHTool extends Component {
+class BackpropExplainer extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -1346,8 +1346,8 @@ class EPOCHTool extends Component {
 								<img src={keySVG} alt="key"></img>
 							</Box>
 							<Box>
-								<Typography variant="h2">
-									(INSERT NAME)
+								<Typography variant="h3">
+									Backprop Explainer
 								</Typography>
 							</Box>
 						</Box>
@@ -1369,4 +1369,4 @@ class EPOCHTool extends Component {
 	}
 }
 
-export default EPOCHTool;
+export default BackpropExplainer;

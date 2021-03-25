@@ -8,7 +8,7 @@ import React, { Component } from "react";
 import ReactGa from "react-ga";
 import { createMuiTheme, ThemeProvider, Divider, Box } from "@material-ui/core";
 import {
-	EPOCHTool,
+	BackpropExplainer,
 	Article,
 	Acknowledge,
 	Header,
@@ -70,7 +70,7 @@ class App extends Component {
 					<Divider />
 					<Article />
 					<Element name="mainTool">
-						<EPOCHTool />
+						<BackpropExplainer />
 					</Element>
 					<Element name="acknowledgements">
 						<Acknowledge />
