@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/backprop-explainer/static/css/main.5718bf6e.chunk.css",
-    "main.js": "/backprop-explainer/static/js/main.3a53b79a.chunk.js",
-    "main.js.map": "/backprop-explainer/static/js/main.3a53b79a.chunk.js.map",
+    "main.js": "/backprop-explainer/static/js/main.f4b26330.chunk.js",
+    "main.js.map": "/backprop-explainer/static/js/main.f4b26330.chunk.js.map",
     "runtime-main.js": "/backprop-explainer/static/js/runtime-main.9e09216f.js",
     "runtime-main.js.map": "/backprop-explainer/static/js/runtime-main.9e09216f.js.map",
     "static/css/2.6eaf588d.chunk.css": "/backprop-explainer/static/css/2.6eaf588d.chunk.css",
@@ -19,7 +19,7 @@
     "static/media/backward-key.af99d48b.svg": "/backprop-explainer/static/media/backward-key.af99d48b.svg",
     "static/media/backward.6cd01f92.svg": "/backprop-explainer/static/media/backward.6cd01f92.svg",
     "static/media/backwardComputation.6427121a.svg": "/backprop-explainer/static/media/backwardComputation.6427121a.svg",
-    "static/media/demo.53081202.gif": "/backprop-explainer/static/media/demo.53081202.gif",
+    "static/media/demo.e2638fef.gif": "/backprop-explainer/static/media/demo.e2638fef.gif",
     "static/media/epochMode.0ae87189.png": "/backprop-explainer/static/media/epochMode.0ae87189.png",
     "static/media/forward-key.faefbb8b.svg": "/backprop-explainer/static/media/forward-key.faefbb8b.svg",
     "static/media/forward.ff39da98.svg": "/backprop-explainer/static/media/forward.ff39da98.svg",
@@ -34,6 +34,6 @@
     "static/css/2.6eaf588d.chunk.css",
     "static/js/2.140424e8.chunk.js",
     "static/css/main.5718bf6e.chunk.css",
-    "static/js/main.3a53b79a.chunk.js"
+    "static/js/main.f4b26330.chunk.js"
   ]
 }
