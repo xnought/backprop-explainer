@@ -75,6 +75,7 @@ class App extends Component {
 					<Element name="mainTool">
 						<BackpropExplainer />
 					</Element>
+					<br />
 					<Element name="acknowledgements">
 						<Acknowledge />
 					</Element>
