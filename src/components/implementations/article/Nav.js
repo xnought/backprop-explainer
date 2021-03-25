@@ -40,6 +40,7 @@ export const Nav = () => {
 	return (
 		<Box display="flex">
 			<Box>
+				<br />
 				<Typography variant="h4">Table Of Contents</Typography>
 				<ul style={{ listStyleType: "none" }}>
 					<li>{mainButton("Introduction", "article")}</li>
@@ -72,10 +73,11 @@ export const Nav = () => {
 						{mainButton("acknowledgements", "acknowledgements")}
 					</li>
 				</ul>
+				<br />
 			</Box>
 
-			<Box margin={7} width={"50%"}>
-				<Typography variant="caption">
+			<Box margin={10}>
+				<Typography variant="caption" style={{ color: "darkgrey" }}>
 					Preview of Backprop Explainer
 				</Typography>
 				<br />
@@ -88,7 +90,11 @@ export const Nav = () => {
 						});
 					}}
 				>
-					<img src={demoGIF} alt="demo"></img>
+					<img
+						src={demoGIF}
+						alt="demo"
+						width={document.body.clientWidth / 3}
+					></img>
 				</Button>
 			</Box>
 		</Box>
