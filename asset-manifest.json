@@ -1,19 +1,19 @@
 {
   "files": {
     "main.css": "/backprop-explainer/static/css/main.5718bf6e.chunk.css",
-    "main.js": "/backprop-explainer/static/js/main.6ba89846.chunk.js",
-    "main.js.map": "/backprop-explainer/static/js/main.6ba89846.chunk.js.map",
-    "runtime-main.js": "/backprop-explainer/static/js/runtime-main.1a48749e.js",
-    "runtime-main.js.map": "/backprop-explainer/static/js/runtime-main.1a48749e.js.map",
+    "main.js": "/backprop-explainer/static/js/main.cd4a4d92.chunk.js",
+    "main.js.map": "/backprop-explainer/static/js/main.cd4a4d92.chunk.js.map",
+    "runtime-main.js": "/backprop-explainer/static/js/runtime-main.3d1a2cc9.js",
+    "runtime-main.js.map": "/backprop-explainer/static/js/runtime-main.3d1a2cc9.js.map",
     "static/css/2.6eaf588d.chunk.css": "/backprop-explainer/static/css/2.6eaf588d.chunk.css",
-    "static/js/2.2b2ee518.chunk.js": "/backprop-explainer/static/js/2.2b2ee518.chunk.js",
-    "static/js/2.2b2ee518.chunk.js.map": "/backprop-explainer/static/js/2.2b2ee518.chunk.js.map",
-    "static/js/3.d7f56f3e.chunk.js": "/backprop-explainer/static/js/3.d7f56f3e.chunk.js",
-    "static/js/3.d7f56f3e.chunk.js.map": "/backprop-explainer/static/js/3.d7f56f3e.chunk.js.map",
+    "static/js/2.97691567.chunk.js": "/backprop-explainer/static/js/2.97691567.chunk.js",
+    "static/js/2.97691567.chunk.js.map": "/backprop-explainer/static/js/2.97691567.chunk.js.map",
+    "static/js/3.35aa11c8.chunk.js": "/backprop-explainer/static/js/3.35aa11c8.chunk.js",
+    "static/js/3.35aa11c8.chunk.js.map": "/backprop-explainer/static/js/3.35aa11c8.chunk.js.map",
     "index.html": "/backprop-explainer/index.html",
     "static/css/2.6eaf588d.chunk.css.map": "/backprop-explainer/static/css/2.6eaf588d.chunk.css.map",
     "static/css/main.5718bf6e.chunk.css.map": "/backprop-explainer/static/css/main.5718bf6e.chunk.css.map",
-    "static/js/2.2b2ee518.chunk.js.LICENSE.txt": "/backprop-explainer/static/js/2.2b2ee518.chunk.js.LICENSE.txt",
+    "static/js/2.97691567.chunk.js.LICENSE.txt": "/backprop-explainer/static/js/2.97691567.chunk.js.LICENSE.txt",
     "static/media/katex.min.css": "/backprop-explainer/static/media/KaTeX_Typewriter-Regular.c5441b17.ttf",
     "static/media/autoKey.c81582c4.svg": "/backprop-explainer/static/media/autoKey.c81582c4.svg",
     "static/media/backward-key.af99d48b.svg": "/backprop-explainer/static/media/backward-key.af99d48b.svg",
@@ -25,15 +25,15 @@
     "static/media/forward.ff39da98.svg": "/backprop-explainer/static/media/forward.ff39da98.svg",
     "static/media/forwardComputation.42bcf438.svg": "/backprop-explainer/static/media/forwardComputation.42bcf438.svg",
     "static/media/headerTitle.66b764c3.svg": "/backprop-explainer/static/media/headerTitle.66b764c3.svg",
-    "static/media/key.84fb58e0.svg": "/backprop-explainer/static/media/key.84fb58e0.svg",
+    "static/media/key.a581ba62.svg": "/backprop-explainer/static/media/key.a581ba62.svg",
     "static/media/singleSummary.8525cefd.svg": "/backprop-explainer/static/media/singleSummary.8525cefd.svg",
     "static/media/summary.c45974a2.svg": "/backprop-explainer/static/media/summary.c45974a2.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.1a48749e.js",
+    "static/js/runtime-main.3d1a2cc9.js",
     "static/css/2.6eaf588d.chunk.css",
-    "static/js/2.2b2ee518.chunk.js",
+    "static/js/2.97691567.chunk.js",
     "static/css/main.5718bf6e.chunk.css",
-    "static/js/main.6ba89846.chunk.js"
+    "static/js/main.cd4a4d92.chunk.js"
   ]
 }
