@@ -118,7 +118,7 @@ const Acknowledge = () => (
 			<Typography variant="h4">Who made this?</Typography>
 			<Typography variant="body1">
 				Created by
-				{link("http://donnybertucci.com/", "Donny Bertucci", true)} and
+				{link("http://donnybertucci.com/", "Donald Bertucci", true)} and
 				{link("http://minsuk.com/", "Minsuk Kahng", true)} (project
 				advisor)
 			</Typography>
