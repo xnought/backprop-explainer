@@ -509,12 +509,12 @@ const Explanation = () => {
 				To fit more interesting data that is non-linear (e.g. sine wave
 				or quadratic), we need to add complexity to vary output to make
 				sure we are not constrained to only linear outputs. We can do
-				this by adding more neurons, more layers, and activation
-				functions. If you think of our entire neural network as a
-				function, then by adding more neurons and more layers we are
-				creating a more nested function. Not only does this create more
-				parameters that we can tune to vary the output, it also
-				maintains the property of{" "}
+				this by adding more neurons per layer, more layers, and adding
+				non-linearities (activation functions) to the outputs. If you
+				think of our entire neural network as a function, then by adding
+				more neurons and more layers we are creating a more nested
+				function. Not only does this create more parameters that we can
+				tune to vary the output, it also maintains the property of{" "}
 				{definition(
 					<span>differentiability</span>,
 					<Box>
@@ -555,9 +555,9 @@ const Explanation = () => {
 				neuron. The output of each neuron is fed into the neurons of the
 				next layer and so forth (like a nested function). Each link
 				represents a weight and a corresponding input into the
-				respective neuron, notice how the more neurons we add, the more
-				links there are and the more parameters we can tune to get our
-				desired output.
+				respective neuron: notice how the more neurons we add, the more
+				connections there are and the more parameters we can tune to get
+				our desired output.
 			</Typography>
 			<br />
 			<Element name="training">{subtopic("Training Process")}</Element>
