@@ -27,11 +27,12 @@ const theme = createMuiTheme({
 				fontWeight: globalWeight,
 			},
 			h3: {
-				marginTop: 15,
+				marginTop: 25,
 				fontWeight: globalWeight,
 			},
 			h4: {
-				marginTop: 15,
+				marginTop: 20,
+				marginBottom: 10,
 				fontWeight: globalWeight,
 			},
 			h5: {
