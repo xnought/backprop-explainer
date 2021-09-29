@@ -1,0 +1,4 @@
+.line {
+	stroke-dasharray: 20 4;
+	stroke-dashoffset: 4;
+}

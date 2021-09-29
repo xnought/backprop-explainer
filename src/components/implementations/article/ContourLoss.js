@@ -5,12 +5,70 @@
 */
 import React, { Component } from "react";
 import * as d3 from "d3";
+import "./line.css";
+
+function addAxes({
+	node,
+	xScale,
+	yScale,
+	width,
+	height,
+	ticks = 10,
+	padding = 0,
+}) {
+	const xAxis = d3.axisTop().scale(xScale),
+		yAxis = d3.axisLeft().scale(yScale);
+
+	node.select("#xAxis-contour")
+		.attr("class", "axis")
+		.attr("transform", `translate(0,0)`)
+		.call(xAxis.ticks(ticks));
+	node.select("#yAxis-contour")
+		.attr("class", "axis")
+		.attr("transform", "translate(" - (width - 2 * padding) + ",0)")
+		.call(yAxis.ticks(ticks));
+}
+
+function updateLines({
+	node,
+	m = [
+		[0, 0],
+		[0, 0],
+	],
+	b = [
+		[0, 0],
+		[0, 0],
+	],
+	stroke = "none",
+}) {
+	node.select("#m-line")
+		.attr("x1", m[0][0])
+		.attr("y1", m[0][1])
+		.attr("x2", m[1][0])
+		.attr("y2", m[1][1])
+		.attr("class", "line")
+		.attr("id", "m-line")
+		.style("stroke", stroke);
+
+	node.select("#b-line")
+		.attr("x1", b[0][0])
+		.attr("y1", b[0][1])
+		.attr("x2", b[1][0])
+		.attr("y2", b[1][1])
+		.attr("id", "b-line")
+		.attr("class", "line")
+		.style("stroke", stroke);
+}
+
+const mTransform = (m, width) => width / 2 + (m / 10) * width;
+const bTransform = (b, height) => (b / 20) * height;
+
 class ContourLoss extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			width: 400,
-			height: 400,
+			width: 250,
+			height: 250,
 		};
 	}
 	async componentDidMount() {
@@ -25,11 +83,25 @@ class ContourLoss extends Component {
 			this code below was adapted from
 			d3-contour documentation examples
 		*/
+		const ms = [],
+			bs = [];
 		for (let j = 0.5, k = 0; j < m; ++j) {
 			for (let i = 0.5; i < n; ++i, ++k) {
-				values[k] = loss((i / n) * 10 - 5, (j / m) * 20);
+				const tempM = (i / n) * 10 - 5;
+				const tempB = (j / m) * 20;
+
+				ms.push(tempM);
+				bs.push(tempB);
+
+				const outputLoss = loss(tempM, tempB);
+				values[k] = outputLoss;
 			}
 		}
+
+		const msExtrema = d3.extent(ms);
+		const bsExtrema = d3.extent(bs);
+		const getMin = (extrema) => extrema[0];
+		const getMax = (extrema) => extrema[1];
 
 		function loss(m, b) {
 			let x = data.X,
@@ -40,6 +112,7 @@ class ContourLoss extends Component {
 			}
 			return summed / (2 * x.length);
 		}
+
 		let thresholds = await d3
 			.range(darkness, 20, 1)
 			.map((i) => Math.pow(2, i));
@@ -50,6 +123,25 @@ class ContourLoss extends Component {
 		const contours = d3.contours().size([n, m]).thresholds(thresholds)(
 			values
 		);
+
+		const xScale = d3
+				.scaleLinear()
+				.domain([getMin(msExtrema), getMax(msExtrema)])
+				.range([0, width]),
+			yScale = d3
+				.scaleLinear()
+				.domain([getMin(bsExtrema), getMax(bsExtrema)])
+				.range([0, height]);
+
+		addAxes({
+			node: svg,
+			height,
+			width,
+			xScale,
+			yScale,
+			padding: 0,
+			ticks: 10,
+		});
 		svg.append("g")
 			.attr("fill", "none")
 			.selectAll("path")
@@ -57,6 +149,22 @@ class ContourLoss extends Component {
 			.join("path")
 			.attr("fill", (d) => color(d.value))
 			.attr("d", d3.geoPath());
+
+		svg.append("line")
+			.attr("x1", 0)
+			.attr("y1", 0)
+			.attr("x2", 0)
+			.attr("y2", 0)
+			.attr("id", "b-line")
+			.style("stroke", "none");
+
+		svg.append("line")
+			.attr("x1", 0)
+			.attr("y1", 0)
+			.attr("x2", 0)
+			.attr("y2", 0)
+			.attr("id", "m-line")
+			.style("stroke", "none");
 
 		svg.append("circle")
 			.attr("cx", width / 2)
@@ -76,24 +184,65 @@ class ContourLoss extends Component {
 				.attr("r", 5)
 				.style("fill", "none")
 				.style("stroke", "none");
+
+			updateLines({ node: svg });
+			svg.select("#m-text").attr("fill", "#0000");
+			svg.select("#b-text").attr("fill", "#0000");
 			return;
 		}
 		if (loss < 1000) {
+			const newM = mTransform(m, width),
+				newB = bTransform(b, height);
 			svg.select("circle")
 				.transition()
 				.duration(200 - ms)
-				.attr("cx", width / 2 + (m / 10) * width)
-				.attr("cy", (b / 20) * height)
-				.attr("r", loss * 2 + 5)
+				.attr("cx", newM)
+				.attr("cy", newB)
+				.attr("r", 5)
 				.style("fill", "red")
-				.style("opacity", "0.5");
+				.style("opacity", "1.0");
+
+			svg.select("#m-text")
+				.text(`m = ${m.toFixed(2)}`)
+				.attr("x", newM)
+				.attr("y", -20)
+				.attr("fill", "black");
+			svg.select("#b-text")
+				.text(`b = ${b.toFixed(2)}`)
+				.attr("x", -20)
+				.attr("y", newB + 5)
+				.attr("fill", "black");
+
+			updateLines({
+				node: svg,
+				b: [
+					[-15, newB],
+					[newM, newB],
+				],
+				m: [
+					[newM, -15],
+					[newM, newB],
+				],
+				stroke: "black",
+			});
 		}
 	}
 	render() {
 		const { width, height } = this.state;
 		return (
-			<div id="divContour">
-				<svg style={{ width, height }} id="contour"></svg>
+			<div
+				id="divContour"
+				style={{ margin: "50px", overflow: "visible", padding: "50px" }}
+			>
+				<svg
+					style={{ width, height, overflow: "visible" }}
+					id="contour"
+				>
+					<g id="xAxis-contour" />
+					<g id="yAxis-contour" />
+					<text id="m-text" style={{ textAnchor: "middle" }}></text>
+					<text id="b-text" style={{ textAnchor: "end" }}></text>
+				</svg>
 			</div>
 		);
 	}

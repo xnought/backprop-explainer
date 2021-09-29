@@ -214,11 +214,19 @@ class SubTool extends Component {
 					</Box>
 					<Card variant="outlined">
 						<CardContent>
-							<h2>Auto Best Fit</h2>
 							<Typography variant="h4" component="h2">
 								EPOCH: {epochs}
 							</Typography>
 
+							<Typography
+								variant="h6"
+								component="h2"
+								style={{
+									color: nullColor(loss),
+								}}
+							>
+								m = {nullNumber(m, 2)}, b = {nullNumber(b, 2)}
+							</Typography>
 							<Typography
 								variant="h6"
 								component="h2"
