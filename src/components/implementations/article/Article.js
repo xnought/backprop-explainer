@@ -629,8 +629,8 @@ const Explanation = () => {
 						>
 							Click to animate epoch #
 						</Button>{" "}
-						to see forward propagation, <b>backward propagation</b>{" "}
-						and, update animation at the epoch #
+						to see forward propagation, <b>backward propagation</b>,
+						and update animation at the epoch #
 					</li>
 					<li>
 						To go back to fitting mode click{" "}
