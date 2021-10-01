@@ -7,6 +7,7 @@ import React, { Component } from "react";
 import * as d3 from "d3";
 import "./line.css";
 
+const redColor = "#BF0A30";
 function addAxes({
 	node,
 	xScale,
@@ -60,6 +61,33 @@ function updateLines({
 		.style("stroke", stroke);
 }
 
+function updateLossText(
+	node,
+	{
+		x = 0,
+		y = 0,
+		hidden = true,
+		text = "none",
+		textColor = redColor,
+		rectFillColor = "hsla(0, 0%, 100%, 0.5)",
+	}
+) {
+	const rectX = x + 10;
+	const rectY = y + 10;
+	node.select("#loss-rect")
+		.attr("x", rectX)
+		.attr("y", rectY)
+		.attr("width", 100)
+		.attr("height", 30)
+		.attr("fill", hidden ? "none" : rectFillColor)
+		.attr("stroke", hidden ? "none" : textColor);
+	node.select("#loss-text")
+		.attr("x", rectX + 10)
+		.attr("y", rectY + 20)
+		.attr("fill", hidden ? "none" : textColor)
+		.text(text);
+}
+
 const mTransform = (m, width) => width / 2 + (m / 10) * width;
 const bTransform = (b, height) => (b / 20) * height;
 
@@ -67,9 +95,20 @@ class ContourLoss extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			width: 250,
-			height: 250,
+			width: 200,
+			height: 200,
 		};
+		this.loss = this.loss.bind(this);
+	}
+	loss(m, b) {
+		const { data } = this.props;
+		let x = data.X,
+			y = data.y;
+		let summed = 0;
+		for (let i = 0; i < data.X.length; i++) {
+			summed += Math.pow(m * x[i] + b - y[i], 2);
+		}
+		return summed / (2 * x.length);
 	}
 	async componentDidMount() {
 		const { width, height } = await this.state;
@@ -93,7 +132,7 @@ class ContourLoss extends Component {
 				ms.push(tempM);
 				bs.push(tempB);
 
-				const outputLoss = loss(tempM, tempB);
+				const outputLoss = this.loss(tempM, tempB);
 				values[k] = outputLoss;
 			}
 		}
@@ -102,16 +141,6 @@ class ContourLoss extends Component {
 		const bsExtrema = d3.extent(bs);
 		const getMin = (extrema) => extrema[0];
 		const getMax = (extrema) => extrema[1];
-
-		function loss(m, b) {
-			let x = data.X,
-				y = data.y;
-			let summed = 0;
-			for (let i = 0; i < data.X.length; i++) {
-				summed += Math.pow(m * x[i] + b - y[i], 2);
-			}
-			return summed / (2 * x.length);
-		}
 
 		let thresholds = await d3
 			.range(darkness, 20, 1)
@@ -172,6 +201,10 @@ class ContourLoss extends Component {
 			.attr("r", 5)
 			.style("fill", "none")
 			.style("stoke", "none");
+
+		svg.append("rect").attr("id", "loss-rect");
+		svg.append("text").attr("id", "loss-text");
+		updateLossText(svg, { hidden: true });
 	}
 	componentDidUpdate() {
 		const { width, height } = this.state;
@@ -188,6 +221,7 @@ class ContourLoss extends Component {
 			updateLines({ node: svg });
 			svg.select("#m-text").attr("fill", "#0000");
 			svg.select("#b-text").attr("fill", "#0000");
+			updateLossText(svg, { hidden: true });
 			return;
 		}
 		if (loss < 1000) {
@@ -225,6 +259,12 @@ class ContourLoss extends Component {
 				],
 				stroke: "black",
 			});
+			updateLossText(svg, {
+				hidden: false,
+				text: `loss: ${loss.toFixed(3)}`,
+				x: newM,
+				y: newB,
+			});
 		}
 	}
 	render() {
@@ -232,7 +272,11 @@ class ContourLoss extends Component {
 		return (
 			<div
 				id="divContour"
-				style={{ margin: "50px", overflow: "visible", padding: "50px" }}
+				style={{
+					paddingLeft: "85px",
+					paddingTop: "40px",
+					overflow: "visible",
+				}}
 			>
 				<svg
 					style={{ width, height, overflow: "visible" }}
