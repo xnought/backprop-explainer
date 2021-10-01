@@ -7,6 +7,8 @@
 import React, { Component } from "react";
 import ContourLoss from "./ContourLoss";
 import { ScatterPlot } from "../../exports";
+import { $ } from "../article/Typeset";
+import * as d3 from "d3";
 import autoKeySVG from "./assets/autoKey.svg";
 
 import {
@@ -193,14 +195,14 @@ class SubTool extends Component {
 		const { data } = this.state.linreg;
 		const nullColor = (val) => (val === null ? "#dce0dd" : "black");
 		const nullNumber = (num, precision) =>
-			num === null ? num : num.toPrecision(precision);
+			num === null ? num : num.toFixed(precision);
 		return (
 			<div>
 				<Box display="flex" justifyContent="center" marginTop={2}>
 					<Box marginTop={10} marginRight={10}>
 						<ScatterPlot
-							width={400}
-							height={400}
+							width={300}
+							height={300}
 							padding={0}
 							start={0}
 							stop={5}
@@ -217,25 +219,24 @@ class SubTool extends Component {
 							<Typography variant="h4" component="h2">
 								EPOCH: {epochs}
 							</Typography>
+							<Typography variant="h6">
+								{$("y = ")}
+								<span
+									style={{ color: d3.color("cyan").darker() }}
+								>
+									{$(`${nullNumber(m, 2)}`)}
+								</span>
+								{$(` x\\ + \\ `)}
+								<span
+									style={{
+										color: d3.color("magenta").darker(),
+									}}
+								>
+									{$(`${nullNumber(b, 2)}`)}
+								</span>
+							</Typography>
+							<div style={{ margin: "20px 10px" }} />
 
-							<Typography
-								variant="h6"
-								component="h2"
-								style={{
-									color: nullColor(loss),
-								}}
-							>
-								m = {nullNumber(m, 2)}, b = {nullNumber(b, 2)}
-							</Typography>
-							<Typography
-								variant="h6"
-								component="h2"
-								style={{
-									color: nullColor(loss),
-								}}
-							>
-								{` loss = ${nullNumber(loss, 10)}`}
-							</Typography>
 							<IconButton onClick={this.reset}>
 								<Replay />
 							</IconButton>
@@ -281,18 +282,26 @@ class SubTool extends Component {
 							>
 								<SlowMotionVideo />
 							</IconButton>
-							<br />
 
-							<img src={autoKeySVG} alt="legend" width="40%" />
+							<div
+								style={{
+									height: "1px",
+									width: "100%",
+									background: "#0001",
+									marginTop: "25px",
+								}}
+							/>
+
+							{/* <img src={autoKeySVG} alt="legend" width="40%" /> */}
+							<ContourLoss
+								ms={speed}
+								data={data}
+								m={isFinite(m) ? m : 0}
+								b={isFinite(b) ? b : 0}
+								loss={loss}
+								darkness={this.state.darkness}
+							/>
 						</CardContent>
-						<ContourLoss
-							ms={speed}
-							data={data}
-							m={isFinite(m) ? m : 0}
-							b={isFinite(b) ? b : 0}
-							loss={loss}
-							darkness={this.state.darkness}
-						/>
 					</Card>
 				</Box>
 			</div>

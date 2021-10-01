@@ -8,6 +8,9 @@ import * as d3 from "d3";
 import "./line.css";
 
 const redColor = "#BF0A30";
+const mColor = "cyan";
+const bColor = "magenta";
+
 function addAxes({
 	node,
 	xScale,
@@ -41,6 +44,8 @@ function updateLines({
 		[0, 0],
 	],
 	stroke = "none",
+	mStroke = stroke,
+	bStroke = stroke,
 }) {
 	node.select("#m-line")
 		.attr("x1", m[0][0])
@@ -49,7 +54,7 @@ function updateLines({
 		.attr("y2", m[1][1])
 		.attr("class", "line")
 		.attr("id", "m-line")
-		.style("stroke", stroke);
+		.style("stroke", mStroke);
 
 	node.select("#b-line")
 		.attr("x1", b[0][0])
@@ -58,7 +63,7 @@ function updateLines({
 		.attr("y2", b[1][1])
 		.attr("id", "b-line")
 		.attr("class", "line")
-		.style("stroke", stroke);
+		.style("stroke", bStroke);
 }
 
 function updateLossText(
@@ -240,12 +245,12 @@ class ContourLoss extends Component {
 				.text(`m = ${m.toFixed(2)}`)
 				.attr("x", newM)
 				.attr("y", -20)
-				.attr("fill", "black");
+				.attr("fill", d3.color(mColor).darker());
 			svg.select("#b-text")
 				.text(`b = ${b.toFixed(2)}`)
 				.attr("x", -20)
 				.attr("y", newB + 5)
-				.attr("fill", "black");
+				.attr("fill", d3.color(bColor).darker());
 
 			updateLines({
 				node: svg,
@@ -257,7 +262,8 @@ class ContourLoss extends Component {
 					[newM, -15],
 					[newM, newB],
 				],
-				stroke: "black",
+				mStroke: mColor,
+				bStroke: bColor,
 			});
 			updateLossText(svg, {
 				hidden: false,

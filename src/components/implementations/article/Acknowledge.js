@@ -29,19 +29,24 @@ const link = (href, content, isPerson) => (
 const Acknowledge = () => (
 	<Box display="flex" justifyContent="center">
 		<Box width="60%">
+			<div style={{ marginTop: "50px" }} />
 			<Typography variant="h3">Conclusion</Typography>
 			<Divider />
 			<div style={{ marginTop: "20px" }} />
 			<Typography variant="h6">
-				By building up knowledge starting from one neuron (linear
-				example), to multiple-neurons with activation functions
-				(non-linear example), it becomes apparent that backpropagation
-				is just our way to decide what parameters need to be updated. It
-				doesn't tell us the exact value for the best parameters, just
-				the direction that we want to head towards. By performing the
-				whole process forward propagation, backward propagation, then
-				optimization, after some iterations we eventually can minimize
-				our loss function and get a better fit to our data.
+				By building up knowledge starting from{" "}
+				<b>one neuron (linear example)</b>, to{" "}
+				<b>
+					multiple neurons with activation functions (non-linear
+					example)
+				</b>
+				, it becomes apparent that backpropagation is just our way to
+				decide what parameters need to be updated. It doesn't tell us
+				the exact value for the best parameters, just the direction that
+				we want to head towards. By performing the whole process forward
+				propagation, backward propagation, then optimization, after some
+				iterations we eventually can minimize our loss function and get
+				a better fit to our data.
 				<br />
 				<br />
 				Going forward, you can use this knowledge to visualize and
