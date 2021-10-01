@@ -161,9 +161,9 @@ const Explanation = () => {
 						</Typography>
 					</Box>
 				)}{" "}
-				by sliding the sliders under <b>Manual Best Fit</b>. By
-				observing changes in the <em style={{ color: "red" }}>loss</em>,
-				try to make it reach 0. When you feel like you've lowered the{" "}
+				by dragging the slider. By observing changes in the{" "}
+				<em style={{ color: "red" }}>loss</em>, try to make it reach 0.
+				When you feel like you've lowered the{" "}
 				<em style={{ color: "red" }}>loss</em> enough (or need some
 				help), press the{" "}
 				<Button
@@ -492,9 +492,8 @@ const Explanation = () => {
 				>
 					{<PlayArrow fontSize="small" />}
 				</Fab>{" "}
-				to start the training process under <b>Auto Best Fit</b>. Watch
-				how as the line gets better fit, the red dot descends the loss
-				contour.
+				to start the training process. Watch how as the line gets better
+				fit, the loss decreases.
 			</Typography>
 			<Element name="structLin">
 				<AutoTool />
