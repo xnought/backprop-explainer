@@ -30,6 +30,8 @@ import forwardComputationSVG from "./assets/diagramSVG/forwardComputation.svg";
 import backwardKeySVG from "./assets/diagramSVG/backward-key.svg";
 import backwardNoKeySVG from "./assets/diagramSVG/backward.svg";
 import backwardComputationSVG from "./assets/diagramSVG/backwardComputation.svg";
+import contourExplain from "./assets/contour-explain.svg";
+import gdExplain from "./assets/gd-explain.svg";
 
 /* Functional Component */
 const Explanation = () => {
@@ -292,11 +294,19 @@ const Explanation = () => {
 						</Typography>
 					</Box>
 				)}
-				. By computing the gradient, we effectively have gauged how
-				changing each parameter will affect the loss: the direction of
-				steepest ascent. But we want to lower loss, therefore we use the
-				opposite direction to get the direction of steepest descent, to
-				perform{" "}
+				. By computing the{" "}
+				{definition(
+					<span>gradient of loss</span>,
+					<Typography variant="h6">
+						{$$(
+							"\\nabla \\text{loss} = \\begin{bmatrix} \\frac{ \\partial \\text{loss}}{\\partial w} \\\\[4pt] \\frac{ \\partial \\text{loss}}{\\partial b} \\\\ \\end{bmatrix}"
+						)}
+					</Typography>
+				)}
+				, we effectively have gauged how changing each parameter will
+				affect the loss: the direction of steepest ascent. But we want
+				to lower loss, therefore we use the opposite direction to get
+				the direction of steepest descent, to perform{" "}
 				{definition(
 					<span>gradient descent</span>,
 					<Box>
@@ -318,21 +328,67 @@ const Explanation = () => {
 				)}
 				.
 			</Typography>
-			<Typography variant="h4">
-				{$$(
-					"\\nabla \\text{loss} = \\begin{bmatrix} \\frac{ \\partial \\text{loss}}{\\partial w} \\\\[4pt] \\frac{ \\partial \\text{loss}}{\\partial b} \\\\ \\end{bmatrix}"
-				)}
+
+			<br />
+			<Typography variant="h6">
+				This step is can be visualized by graphing out a loss function.
+				Let's graph the Mean Squared error loss function with same data
+				that will show up in a couple of paragraphs (stay tuned).{" "}
+				<b>Below</b> is the result.
 			</Typography>
+			<center>
+				<img
+					src={contourExplain}
+					alt="contour-explained"
+					width="500px"
+				/>
+			</center>
+			<Typography variant="h6">
+				This plot shows us the different losses (shades from green to
+				purple) and the corresponding weights (represented by the x
+				axis) and biases (represented by the y axis) that create those
+				losses. Notice how you can see the most optimal combination that
+				would produce a loss of 0; that would be the place we want to
+				eventually get to. You could also think of it as a physical hole
+				where the colors represent depth. It is at the bottom of the
+				hole where we want to reach (in white on the contour plot) in
+				order to find the minimum loss.
+			</Typography>
+			<br />
+			<Typography variant="h6">
+				The idea of gradient descent for optimization is as follows{" "}
+				<b>below</b> starting with <b>1)</b>
+			</Typography>
+			<br />
+
+			<center>
+				<img
+					src={gdExplain}
+					alt="gradient-descent-explained"
+					width="75%"
+				/>
+			</center>
+			<Typography variant="h6">
+				And thats all there is to gradient descent! <b>1)</b> Start with
+				a point, get the <b>2)</b> steepest ascent, <b>3)</b> flip it to
+				reflect the steepest descent, then <b>4)</b> take a step in that
+				direction. After doing this enough times, we will reach the
+				minimum loss possible.
+			</Typography>
+			<br />
 
 			<Typography variant="h6">
-				In order to calculate these derivatives we must use the chain
-				rule due to the nested nature of neural networks.
+				The question then becomes, how can we calculate the gradient? To
+				answer that, we need a bit of calculus to calculate all the
+				derivatives with respect to the loss. Mainly you will need to
+				use the <b>chain rule</b> from calculus because of the nature of
+				the function we've composed.
 			</Typography>
+			<br />
 			<Typography variant="h6">
-				&emsp;&emsp;&emsp;&emsp;{" "}
-				<b>Below is a color coded example of the chain rule.</b> Start
-				by sliding the slider and notice how the output is the input to
-				the next function and so forth.{" "}
+				&emsp;&emsp;&emsp;&emsp; Below is a color coded example of the{" "}
+				<b>chain rule.</b> Start by sliding the slider and notice how
+				the output is the input to the next function and so forth.{" "}
 				<b>Then read the explanation below</b>.
 			</Typography>
 			<br />
