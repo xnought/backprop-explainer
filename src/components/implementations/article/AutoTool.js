@@ -22,6 +22,8 @@ import {
 import { PlayArrow, Stop, Replay, SlowMotionVideo } from "@material-ui/icons";
 import * as tf from "@tensorflow/tfjs";
 
+const orange = "#FFA500";
+const blue = "#56A8C7";
 class SubTool extends Component {
 	constructor(props) {
 		super(props);
@@ -220,16 +222,18 @@ class SubTool extends Component {
 								EPOCH: {epochs}
 							</Typography>
 							<Typography variant="h6">
-								{$("y = ")}
+								{$("\\text{neuron}(x) = ")}
 								<span
-									style={{ color: d3.color("cyan").darker() }}
+									style={{
+										color: blue,
+									}}
 								>
 									{$(`${nullNumber(m, 2)}`)}
 								</span>
 								{$(` x\\ + \\ `)}
 								<span
 									style={{
-										color: d3.color("magenta").darker(),
+										color: orange,
 									}}
 								>
 									{$(`${nullNumber(b, 2)}`)}
@@ -300,6 +304,8 @@ class SubTool extends Component {
 								b={isFinite(b) ? b : 0}
 								loss={loss}
 								darkness={this.state.darkness}
+								wColor={blue}
+								bColor={orange}
 							/>
 						</CardContent>
 					</Card>

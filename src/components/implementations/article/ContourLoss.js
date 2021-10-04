@@ -7,9 +7,7 @@ import React, { Component } from "react";
 import * as d3 from "d3";
 import "./line.css";
 
-const redColor = "#BF0A30";
-const mColor = "cyan";
-const bColor = "magenta";
+const redColor = "red";
 
 function addAxes({
 	node,
@@ -213,7 +211,7 @@ class ContourLoss extends Component {
 	}
 	componentDidUpdate() {
 		const { width, height } = this.state;
-		const { loss, ms, m, b } = this.props;
+		const { loss, ms, m, b, wColor, bColor } = this.props;
 		const svg = d3.select("#divContour").select("#contour");
 		if (loss == null) {
 			svg.select("circle")
@@ -237,20 +235,24 @@ class ContourLoss extends Component {
 				.duration(200 - ms)
 				.attr("cx", newM)
 				.attr("cy", newB)
-				.attr("r", 5)
-				.style("fill", "red")
+				.attr("r", 4)
+				.style("stroke", "white")
+				.style("stroke-width", 3)
+				.style("fill", redColor)
 				.style("opacity", "1.0");
 
 			svg.select("#m-text")
-				.text(`m = ${m.toFixed(2)}`)
+				.text(`w = ${m.toFixed(2)}`)
 				.attr("x", newM)
 				.attr("y", -20)
-				.attr("fill", d3.color(mColor).darker());
+				.attr("fill", wColor)
+				.style("font-weight", 500);
 			svg.select("#b-text")
 				.text(`b = ${b.toFixed(2)}`)
 				.attr("x", -20)
 				.attr("y", newB + 5)
-				.attr("fill", d3.color(bColor).darker());
+				.attr("fill", bColor)
+				.style("font-weight", 500);
 
 			updateLines({
 				node: svg,
@@ -262,8 +264,8 @@ class ContourLoss extends Component {
 					[newM, -15],
 					[newM, newB],
 				],
-				mStroke: mColor,
-				bStroke: bColor,
+				mStroke: d3.color(wColor).brighter(),
+				bStroke: d3.color(bColor).brighter(),
 			});
 			updateLossText(svg, {
 				hidden: false,
