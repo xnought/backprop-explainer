@@ -196,13 +196,13 @@ const Explanation = () => {
 					achieve.
 				</b>
 			</Typography>
+			<br />
 			<Typography variant="h6">
-				&emsp;&emsp;&emsp;&emsp;When you start to change the weight, you
-				observe where the loss moves, if it moves up, you move the
-				weight the other direction to lower the loss. This, without the
-				math, is the main principle behind gauging the rate of change
-				and optimizing a neural network.{" "}
-				<b>Let's apply this method of thinking!</b>
+				When you start to change the weight, you observe where the loss
+				moves, if it moves up, you move the weight the other direction
+				to lower the loss. This, without the math, is the main principle
+				behind gauging the rate of change and optimizing a neural
+				network. <b>Let's apply this method of thinking!</b>
 			</Typography>
 			<br />
 
@@ -236,9 +236,10 @@ const Explanation = () => {
 				visualized as a tangent line at the point of interest for a
 				function with one variable like {$("f(x)")}.
 			</Typography>
+			<br />
 			<Typography variant="h6">
-				&emsp;&emsp;&emsp;&emsp;In the context of our one neuron neural
-				network, we can compose the whole network as a nested function
+				In the context of our one neuron neural network, we can compose
+				the whole network as a nested function
 				{$$("\\text{loss}(\\text{neuron}(x,w,b),y)")}
 			</Typography>
 			<Typography variant="h6">
@@ -387,10 +388,12 @@ const Explanation = () => {
 				the function we've composed.
 			</Typography>
 			<br />
+			<br />
 			<Typography variant="h6">
-				&emsp;&emsp;&emsp;&emsp; Below is a color coded example of the{" "}
-				<b>chain rule.</b> Start by sliding the slider and notice how
-				the output is the input to the next function and so forth.{" "}
+				{" "}
+				Below is a color coded example of the <b>chain rule.</b> Start
+				by sliding the slider and notice how the output is the input to
+				the next function and so forth.{" "}
 				<b>Then read the explanation below</b>.
 			</Typography>
 			<br />
@@ -638,11 +641,11 @@ const Explanation = () => {
 				with gradient descent, but the logic stays the same.
 			</Typography>
 
+			<br />
 			<Typography variant="h6">
-				&emsp;&emsp;&emsp;&emsp;A great way to visualize backpropagation
-				in a large network is with vertical arrows representing which
-				direction we need to nudge the neuron output in order to lower
-				loss:{" "}
+				A great way to visualize backpropagation in a large network is
+				with vertical arrows representing which direction we need to
+				nudge the neuron output in order to lower loss:{" "}
 				{$(
 					"-\\frac{\\partial \\text{loss}}{\\partial \\text{activation} }"
 				)}

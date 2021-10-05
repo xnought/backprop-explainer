@@ -44,19 +44,16 @@ const Acknowledge = () => (
 					example)
 				</b>
 				, it becomes apparent that backpropagation is just our way to
-				decide what parameters need to be updated. It doesn't tell us
-				the exact value for the best parameters, just the direction that
-				we want to head towards. By performing the whole process forward
-				propagation, backward propagation, then optimization, after some
-				iterations we eventually can minimize our loss function and get
-				a better fit to our data.
+				decide what parameters need to be updated. Unsurprisingly, this
+				is salient when we want to tune the parameters to lower loss.
 				<br />
 				<br />
-				Going forward, you can use this knowledge to visualize and
-				understand algorithms or texts that reference “train by
-				backpropagating loss” and know that backpropagation is not a
-				complex algorithm that only a few understand, it's actually just
-				a simple learning rule that can be used in a powerful way.
+				Thankfully, Backpropagation is not just limited to these small
+				examples, as far as neural networks reach, backpropagation will
+				follow. Nowadays, no matter the problem, if there is data to
+				learn from, someone will apply a neural network to it (for
+				better or for worse). Incredibly, through a simple
+				backpropagation algorithm, <i>learning</i> becomes possible.
 			</Typography>
 
 			<Typography variant="h3">Acknowledgements</Typography>
