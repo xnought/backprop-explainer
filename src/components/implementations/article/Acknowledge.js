@@ -12,6 +12,7 @@ import {
 	IconButton,
 	Divider,
 } from "@material-ui/core";
+import { Element } from "react-scroll";
 import { GitHub } from "@material-ui/icons";
 import { $ } from "./Typeset";
 
@@ -30,7 +31,9 @@ const Acknowledge = () => (
 	<Box display="flex" justifyContent="center">
 		<Box width="60%">
 			<div style={{ marginTop: "50px" }} />
-			<Typography variant="h3">Conclusion</Typography>
+			<Element name="conclusion">
+				<Typography variant="h3">Conclusion</Typography>
+			</Element>
 			<Divider />
 			<div style={{ marginTop: "20px" }} />
 			<Typography variant="h6">

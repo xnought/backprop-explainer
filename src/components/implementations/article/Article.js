@@ -101,7 +101,9 @@ const Explanation = () => {
 				words that will give extra explanation on mouse over.
 			</Typography>
 			<br />
-			<Element name="oneNeuron">{topic("Grasping the Concept")}</Element>
+			<Element name="oneNeuron">
+				{topic("Backprop on a Linear Problem")}
+			</Element>
 
 			<Divider />
 			<Element name="getting">{subtopic("Getting Started")}</Element>
@@ -556,7 +558,7 @@ const Explanation = () => {
 			</Element>
 			<br />
 			<Element name="scaling">
-				{topic("Implementation on (larger) Neural Network")}
+				{topic("Backprop on a Non-Linear Problem")}
 			</Element>
 
 			<Divider />
