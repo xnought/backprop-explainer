@@ -52,8 +52,11 @@ const Acknowledge = () => (
 				examples, as far as neural networks reach, backpropagation will
 				follow. Nowadays, no matter the problem, if there is data to
 				learn from, someone will apply a neural network to it (for
-				better or for worse). Incredibly, through a simple
-				backpropagation algorithm, <i>learning</i> becomes possible.
+				better or for worse).
+				<br />
+				<br />
+				Most Incredibly, through a simple backpropagation algorithm,{" "}
+				<i>learning</i> becomes possible.
 			</Typography>
 
 			<Typography variant="h3">Acknowledgements</Typography>
