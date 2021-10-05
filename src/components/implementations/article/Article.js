@@ -89,8 +89,13 @@ const Explanation = () => {
 				<b>Backprop</b>agation is one of the most important concepts in
 				neural networks, however, it is challenging for learners to
 				understand its concept because it is the most notation heavy
-				part. The goal of this article is to build an intuition for why
-				and how we perform backpropagation. By marrying explanation,
+				part. Luckily, when the layers of notation are pealed back, the
+				simplicity of backprop is revealed. Backprop is just a very
+				simple process to tell us which parameters to change in a neural
+				network.
+				<br />
+				<br />
+				For the remainder of the article, by marrying explanation,
 				notation, and interactive tools, the aim is to get a
 				understanding of the foundations. Note that throughout the
 				article there will be{" "}
