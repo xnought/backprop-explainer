@@ -341,8 +341,8 @@ const Explanation = () => {
 			<Typography variant="h6">
 				This step is can be visualized by graphing out a loss function.
 				Let's graph the Mean Squared error loss function with same data
-				that will show up in a couple of paragraphs (stay tuned).{" "}
-				<b>Below</b> is the result.
+				that will show up later (stay tuned). The contour plot{" "}
+				<b>below</b> is the result.
 			</Typography>
 			<center>
 				<img
@@ -352,20 +352,37 @@ const Explanation = () => {
 				/>
 			</center>
 			<Typography variant="h6">
-				This plot shows us the different losses (shades from green to
-				purple) and the corresponding weights (represented by the x
-				axis) and biases (represented by the y axis) that create those
-				losses. Notice how you can see the most optimal combination that
-				would produce a loss of 0; that would be the place we want to
-				eventually get to. You could also think of it as a physical hole
-				where the colors represent depth. It is at the bottom of the
-				hole where we want to reach (in white on the contour plot) in
-				order to find the minimum loss.
+				This plot shows the different{" "}
+				<span style={{ color: "red" }}>losses</span> represented by
+				colors descending down from the{" "}
+				<span style={{ backgroundColor: "black", color: "#5FCABC" }}>
+					greens
+				</span>
+				, to the{" "}
+				<span style={{ backgroundColor: "black", color: "#4E9AD9" }}>
+					blues
+				</span>
+				, to the{" "}
+				<span style={{ backgroundColor: "black", color: "#6745A4" }}>
+					purples
+				</span>
+				, down to a <span style={{ color: "red" }}>loss</span> of 0 in{" "}
+				<span style={{ backgroundColor: "black", color: "white" }}>
+					white
+				</span>
+				. It also shows the weights represented by the <b>x axis</b> and
+				biases represented by the <b>y axis</b>. For example if you have
+				a weight=-1 and bias=5 <b>the point of (-1, 5) on the plot</b>,
+				we see that the loss is 0.0 (white on the contour); that would
+				be the place we want to eventually get to. You could also think
+				of it as a physical hole where the colors represent depth. You
+				might already see how we could take small steps down the hole
+				till we reach the bottom where loss is minimized.{" "}
 			</Typography>
 			<br />
 			<Typography variant="h6">
-				The idea of gradient descent for optimization is as follows{" "}
-				<b>below</b> starting with <b>1)</b>
+				The idea of gradient descent for optimization is <b>below</b>{" "}
+				starting with <b>1)</b>
 			</Typography>
 			<br />
 
@@ -654,9 +671,10 @@ const Explanation = () => {
 				{$(
 					"-\\frac{\\partial \\text{loss}}{\\partial \\text{activation} }"
 				)}
-				. In the <b>EPOCH Tool</b> below, you will be able to visualize
-				all phases of a single epoch with an emphasis on{" "}
-				<b>backpropagation</b>.
+				. In the neural network below, you will be able to visualize all
+				phases of a single epoch with an emphasis on{" "}
+				<b>backpropagation</b>. Read the instructions below to get a
+				quick start!
 			</Typography>
 
 			<br />
