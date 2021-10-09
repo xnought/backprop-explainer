@@ -7,6 +7,8 @@
 import React, { Component } from "react";
 import ContourLoss from "./ContourLoss";
 import { ScatterPlot } from "../../exports";
+import { $ } from "../article/Typeset";
+import * as d3 from "d3";
 import autoKeySVG from "./assets/autoKey.svg";
 
 import {
@@ -20,6 +22,8 @@ import {
 import { PlayArrow, Stop, Replay, SlowMotionVideo } from "@material-ui/icons";
 import * as tf from "@tensorflow/tfjs";
 
+const orange = "#FFA500";
+const blue = "#56A8C7";
 class SubTool extends Component {
 	constructor(props) {
 		super(props);
@@ -193,14 +197,14 @@ class SubTool extends Component {
 		const { data } = this.state.linreg;
 		const nullColor = (val) => (val === null ? "#dce0dd" : "black");
 		const nullNumber = (num, precision) =>
-			num === null ? num : num.toPrecision(precision);
+			num === null ? num : num.toFixed(precision);
 		return (
 			<div>
 				<Box display="flex" justifyContent="center" marginTop={2}>
 					<Box marginTop={10} marginRight={10}>
 						<ScatterPlot
-							width={400}
-							height={400}
+							width={300}
+							height={300}
 							padding={0}
 							start={0}
 							stop={5}
@@ -214,20 +218,29 @@ class SubTool extends Component {
 					</Box>
 					<Card variant="outlined">
 						<CardContent>
-							<h2>Auto Best Fit</h2>
 							<Typography variant="h4" component="h2">
 								EPOCH: {epochs}
 							</Typography>
-
-							<Typography
-								variant="h6"
-								component="h2"
-								style={{
-									color: nullColor(loss),
-								}}
-							>
-								{` loss = ${nullNumber(loss, 10)}`}
+							<Typography variant="h6">
+								{$("\\text{neuron}(x) = ")}
+								<span
+									style={{
+										color: blue,
+									}}
+								>
+									{$(`${nullNumber(m, 2)}`)}
+								</span>
+								{$(` x\\ + \\ `)}
+								<span
+									style={{
+										color: orange,
+									}}
+								>
+									{$(`${nullNumber(b, 2)}`)}
+								</span>
 							</Typography>
+							<div style={{ margin: "20px 10px" }} />
+
 							<IconButton onClick={this.reset}>
 								<Replay />
 							</IconButton>
@@ -273,18 +286,28 @@ class SubTool extends Component {
 							>
 								<SlowMotionVideo />
 							</IconButton>
-							<br />
 
-							<img src={autoKeySVG} alt="legend" width="40%" />
+							<div
+								style={{
+									height: "1px",
+									width: "100%",
+									background: "#0001",
+									marginTop: "25px",
+								}}
+							/>
+
+							{/* <img src={autoKeySVG} alt="legend" width="40%" /> */}
+							<ContourLoss
+								ms={speed}
+								data={data}
+								m={isFinite(m) ? m : 0}
+								b={isFinite(b) ? b : 0}
+								loss={loss}
+								darkness={this.state.darkness}
+								wColor={blue}
+								bColor={orange}
+							/>
 						</CardContent>
-						<ContourLoss
-							ms={speed}
-							data={data}
-							m={isFinite(m) ? m : 0}
-							b={isFinite(b) ? b : 0}
-							loss={loss}
-							darkness={this.state.darkness}
-						/>
 					</Card>
 				</Box>
 			</div>

@@ -110,7 +110,6 @@ class LinearScatter extends Component {
 				<Box marginLeft={7}>
 					<Card variant="outlined">
 						<CardContent>
-							<h2>Manual Best Fit</h2>
 							<p>
 								Manually tune{" "}
 								<em style={{ color: weightColor }}>weight</em>{" "}

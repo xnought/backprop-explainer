@@ -30,6 +30,8 @@ import forwardComputationSVG from "./assets/diagramSVG/forwardComputation.svg";
 import backwardKeySVG from "./assets/diagramSVG/backward-key.svg";
 import backwardNoKeySVG from "./assets/diagramSVG/backward.svg";
 import backwardComputationSVG from "./assets/diagramSVG/backwardComputation.svg";
+import contourExplain from "./assets/contour-explain.svg";
+import gdExplain from "./assets/gd-explain.svg";
 
 /* Functional Component */
 const Explanation = () => {
@@ -87,8 +89,13 @@ const Explanation = () => {
 				<b>Backprop</b>agation is one of the most important concepts in
 				neural networks, however, it is challenging for learners to
 				understand its concept because it is the most notation heavy
-				part. The goal of this article is to build an intuition for why
-				and how we perform backpropagation. By marrying explanation,
+				part. Luckily, when the layers of notation are pealed back, the
+				simplicity of backprop is revealed. Backprop is just a very
+				simple process to tell us which parameters to change in a neural
+				network.
+				<br />
+				<br />
+				For the remainder of the article, by marrying explanation,
 				notation, and interactive tools, the aim is to get a
 				understanding of the foundations. Note that throughout the
 				article there will be{" "}
@@ -99,7 +106,9 @@ const Explanation = () => {
 				words that will give extra explanation on mouse over.
 			</Typography>
 			<br />
-			<Element name="oneNeuron">{topic("Grasping the Concept")}</Element>
+			<Element name="oneNeuron">
+				{topic("Backprop on a Linear Problem")}
+			</Element>
 
 			<Divider />
 			<Element name="getting">{subtopic("Getting Started")}</Element>
@@ -161,9 +170,9 @@ const Explanation = () => {
 						</Typography>
 					</Box>
 				)}{" "}
-				by sliding the sliders under <b>Manual Best Fit</b>. By
-				observing changes in the <em style={{ color: "red" }}>loss</em>,
-				try to make it reach 0. When you feel like you've lowered the{" "}
+				by dragging the slider. By observing changes in the{" "}
+				<em style={{ color: "red" }}>loss</em>, try to make it reach 0.
+				When you feel like you've lowered the{" "}
 				<em style={{ color: "red" }}>loss</em> enough (or need some
 				help), press the{" "}
 				<Button
@@ -192,13 +201,13 @@ const Explanation = () => {
 					achieve.
 				</b>
 			</Typography>
+			<br />
 			<Typography variant="h6">
-				&emsp;&emsp;&emsp;&emsp;When you start to change the weight, you
-				observe where the loss moves, if it moves up, you move the
-				weight the other direction to lower the loss. This, without the
-				math, is the main principle behind gauging the rate of change
-				and optimizing a neural network.{" "}
-				<b>Let's apply this method of thinking!</b>
+				When you start to change the weight, you observe where the loss
+				moves, if it moves up, you move the weight the other direction
+				to lower the loss. This, without the math, is the main principle
+				behind gauging the rate of change and optimizing a neural
+				network. <b>Let's apply this method of thinking!</b>
 			</Typography>
 			<br />
 
@@ -232,9 +241,10 @@ const Explanation = () => {
 				visualized as a tangent line at the point of interest for a
 				function with one variable like {$("f(x)")}.
 			</Typography>
+			<br />
 			<Typography variant="h6">
-				&emsp;&emsp;&emsp;&emsp;In the context of our one neuron neural
-				network, we can compose the whole network as a nested function
+				In the context of our one neuron neural network, we can compose
+				the whole network as a nested function
 				{$$("\\text{loss}(\\text{neuron}(x,w,b),y)")}
 			</Typography>
 			<Typography variant="h6">
@@ -292,11 +302,19 @@ const Explanation = () => {
 						</Typography>
 					</Box>
 				)}
-				. By computing the gradient, we effectively have gauged how
-				changing each parameter will affect the loss: the direction of
-				steepest ascent. But we want to lower loss, therefore we use the
-				opposite direction to get the direction of steepest descent, to
-				perform{" "}
+				. By computing the{" "}
+				{definition(
+					<span>gradient of loss</span>,
+					<Typography variant="h6">
+						{$$(
+							"\\nabla \\text{loss} = \\begin{bmatrix} \\frac{ \\partial \\text{loss}}{\\partial w} \\\\[4pt] \\frac{ \\partial \\text{loss}}{\\partial b} \\\\ \\end{bmatrix}"
+						)}
+					</Typography>
+				)}
+				, we effectively have gauged how changing each parameter will
+				affect the loss: the direction of steepest ascent. But we want
+				to lower loss, therefore we use the opposite direction to get
+				the direction of steepest descent, to perform{" "}
 				{definition(
 					<span>gradient descent</span>,
 					<Box>
@@ -318,19 +336,84 @@ const Explanation = () => {
 				)}
 				.
 			</Typography>
-			<Typography variant="h4">
-				{$$(
-					"\\nabla \\text{loss} = \\begin{bmatrix} \\frac{ \\partial \\text{loss}}{\\partial w} \\\\[4pt] \\frac{ \\partial \\text{loss}}{\\partial b} \\\\ \\end{bmatrix}"
-				)}
+
+			<br />
+			<Typography variant="h6">
+				This step is can be visualized by graphing out a loss function.
+				Let's graph the Mean Squared error loss function with same data
+				that will show up later (stay tuned). The contour plot{" "}
+				<b>below</b> is the result.
 			</Typography>
+			<center>
+				<img
+					src={contourExplain}
+					alt="contour-explained"
+					width="500px"
+				/>
+			</center>
+			<Typography variant="h6">
+				This plot shows the different{" "}
+				<span style={{ color: "red" }}>losses</span> represented by
+				colors descending down from the{" "}
+				<span style={{ backgroundColor: "black", color: "#5FCABC" }}>
+					greens
+				</span>
+				, to the{" "}
+				<span style={{ backgroundColor: "black", color: "#4E9AD9" }}>
+					blues
+				</span>
+				, to the{" "}
+				<span style={{ backgroundColor: "black", color: "#6745A4" }}>
+					purples
+				</span>
+				, down to a <span style={{ color: "red" }}>loss</span> of 0 in{" "}
+				<span style={{ backgroundColor: "black", color: "white" }}>
+					white
+				</span>
+				. It also shows the weights represented by the <b>x axis</b> and
+				biases represented by the <b>y axis</b>. For example if you have
+				a weight=-1 and bias=5 <b>the point of (-1, 5) on the plot</b>,
+				we see that the loss is 0.0 (white on the contour); that would
+				be the place we want to eventually get to. You could also think
+				of it as a physical hole where the colors represent depth. You
+				might already see how we could take small steps down the hole
+				till we reach the bottom where loss is minimized.{" "}
+			</Typography>
+			<br />
+			<Typography variant="h6">
+				The idea of gradient descent for optimization is <b>below</b>{" "}
+				starting with <b>1)</b>
+			</Typography>
+			<br />
+
+			<center>
+				<img
+					src={gdExplain}
+					alt="gradient-descent-explained"
+					width="75%"
+				/>
+			</center>
+			<Typography variant="h6">
+				And thats all there is to gradient descent! <b>1)</b> Start with
+				a point, get the <b>2)</b> steepest ascent, <b>3)</b> flip it to
+				reflect the steepest descent, then <b>4)</b> take a step in that
+				direction. After doing this enough times, we will reach the
+				minimum loss possible.
+			</Typography>
+			<br />
 
 			<Typography variant="h6">
-				In order to calculate these derivatives we must use the chain
-				rule due to the nested nature of neural networks.
+				The question then becomes, how can we calculate the gradient? To
+				answer that, we need a bit of calculus to calculate all the
+				derivatives with respect to the loss. Mainly you will need to
+				use the <b>chain rule</b> from calculus because of the nature of
+				the function we've composed.
 			</Typography>
+			<br />
+			<br />
 			<Typography variant="h6">
-				&emsp;&emsp;&emsp;&emsp;{" "}
-				<b>Below is a color coded example of the chain rule.</b> Start
+				{" "}
+				Below is a color coded example of the <b>chain rule.</b> Start
 				by sliding the slider and notice how the output is the input to
 				the next function and so forth.{" "}
 				<b>Then read the explanation below</b>.
@@ -492,16 +575,15 @@ const Explanation = () => {
 				>
 					{<PlayArrow fontSize="small" />}
 				</Fab>{" "}
-				to start the training process under <b>Auto Best Fit</b>. Watch
-				how as the line gets better fit, the red dot descends the loss
-				contour.
+				to start the training process. Watch how as the line gets better
+				fit, the loss decreases.
 			</Typography>
 			<Element name="structLin">
 				<AutoTool />
 			</Element>
 			<br />
 			<Element name="scaling">
-				{topic("Implementation on (larger) Neural Network")}
+				{topic("Backprop on a Non-Linear Problem")}
 			</Element>
 
 			<Divider />
@@ -581,17 +663,18 @@ const Explanation = () => {
 				with gradient descent, but the logic stays the same.
 			</Typography>
 
+			<br />
 			<Typography variant="h6">
-				&emsp;&emsp;&emsp;&emsp;A great way to visualize backpropagation
-				in a large network is with vertical arrows representing which
-				direction we need to nudge the neuron output in order to lower
-				loss:{" "}
+				A great way to visualize backpropagation in a large network is
+				with vertical arrows representing which direction we need to
+				nudge the neuron output in order to lower loss:{" "}
 				{$(
 					"-\\frac{\\partial \\text{loss}}{\\partial \\text{activation} }"
 				)}
-				. In the <b>EPOCH Tool</b> below, you will be able to visualize
-				all phases of a single epoch with an emphasis on{" "}
-				<b>backpropagation</b>.
+				. In the neural network below, you will be able to visualize all
+				phases of a single epoch with an emphasis on{" "}
+				<b>backpropagation</b>. Read the instructions below to get a
+				quick start!
 			</Typography>
 
 			<br />
@@ -629,8 +712,8 @@ const Explanation = () => {
 						>
 							Click to animate epoch #
 						</Button>{" "}
-						to see forward propagation, <b>backward propagation</b>{" "}
-						and, update animation at the epoch #
+						to see forward propagation, <b>backward propagation</b>,
+						and update animation at the epoch #
 					</li>
 					<li>
 						To go back to fitting mode click{" "}

@@ -45,7 +45,10 @@ export const Nav = () => {
 				<ul style={{ listStyleType: "none" }}>
 					<li>{mainButton("Introduction", "article")}</li>
 					<li>
-						{mainButton("Grasping the concept", "oneNeuron")}
+						{mainButton(
+							"Backprop on a Linear Problem",
+							"oneNeuron"
+						)}
 						<ul style={{ listStyleType: "none" }}>
 							<li>{subButton("Getting started", "getting")}</li>
 							<li>
@@ -60,7 +63,7 @@ export const Nav = () => {
 					</li>
 					<li>
 						{mainButton(
-							"Implementation on Neural Network",
+							"Backprop on a Non-Linear Problem",
 							"scaling"
 						)}
 						<ul style={{ listStyleType: "none" }}>
@@ -69,6 +72,7 @@ export const Nav = () => {
 							<li>{subButton("Backprop Explainer", "see2")}</li>
 						</ul>
 					</li>
+					<li>{mainButton("conclusion", "conclusion")}</li>
 					<li>
 						{mainButton("acknowledgements", "acknowledgements")}
 					</li>

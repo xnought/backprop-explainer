@@ -12,6 +12,7 @@ import {
 	IconButton,
 	Divider,
 } from "@material-ui/core";
+import { Element } from "react-scroll";
 import { GitHub } from "@material-ui/icons";
 import { $ } from "./Typeset";
 
@@ -29,6 +30,35 @@ const link = (href, content, isPerson) => (
 const Acknowledge = () => (
 	<Box display="flex" justifyContent="center">
 		<Box width="60%">
+			<div style={{ marginTop: "50px" }} />
+			<Element name="conclusion">
+				<Typography variant="h3">Conclusion</Typography>
+			</Element>
+			<Divider />
+			<div style={{ marginTop: "20px" }} />
+			<Typography variant="h6">
+				By building up knowledge starting from{" "}
+				<b>one neuron (linear example)</b>, to{" "}
+				<b>
+					multiple neurons with activation functions (non-linear
+					example)
+				</b>
+				, it becomes apparent that backpropagation is just our way to
+				decide what parameters need to be updated. Unsurprisingly, this
+				is salient when we want to tune the parameters to lower loss.
+				<br />
+				<br />
+				Thankfully, Backpropagation is not just limited to these small
+				examples, as far as neural networks reach, backpropagation will
+				follow. Nowadays, no matter the problem, if there is data to
+				learn from, someone will apply a neural network to it (for
+				better or for worse).
+				<br />
+				<br />
+				Most Incredibly, through a simple backpropagation algorithm,{" "}
+				<i>learning</i> becomes possible.
+			</Typography>
+
 			<Typography variant="h3">Acknowledgements</Typography>
 			<Divider />
 			<br />
