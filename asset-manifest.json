@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/backprop-explainer/static/css/main.b6590448.chunk.css",
-    "main.js": "/backprop-explainer/static/js/main.755face8.chunk.js",
-    "main.js.map": "/backprop-explainer/static/js/main.755face8.chunk.js.map",
+    "main.js": "/backprop-explainer/static/js/main.f4176bef.chunk.js",
+    "main.js.map": "/backprop-explainer/static/js/main.f4176bef.chunk.js.map",
     "runtime-main.js": "/backprop-explainer/static/js/runtime-main.06541614.js",
     "runtime-main.js.map": "/backprop-explainer/static/js/runtime-main.06541614.js.map",
     "static/css/2.6eaf588d.chunk.css": "/backprop-explainer/static/css/2.6eaf588d.chunk.css",
@@ -26,7 +26,7 @@
     "static/media/forward.ff39da98.svg": "/backprop-explainer/static/media/forward.ff39da98.svg",
     "static/media/forwardComputation.42bcf438.svg": "/backprop-explainer/static/media/forwardComputation.42bcf438.svg",
     "static/media/gd-explain.8aebb83e.svg": "/backprop-explainer/static/media/gd-explain.8aebb83e.svg",
-    "static/media/headerTitle.6b4ced72.svg": "/backprop-explainer/static/media/headerTitle.6b4ced72.svg",
+    "static/media/headerTitle.176dfa10.svg": "/backprop-explainer/static/media/headerTitle.176dfa10.svg",
     "static/media/key.a581ba62.svg": "/backprop-explainer/static/media/key.a581ba62.svg",
     "static/media/singleSummary.8525cefd.svg": "/backprop-explainer/static/media/singleSummary.8525cefd.svg",
     "static/media/summary.c45974a2.svg": "/backprop-explainer/static/media/summary.c45974a2.svg"
@@ -36,6 +36,6 @@
     "static/css/2.6eaf588d.chunk.css",
     "static/js/2.468fac95.chunk.js",
     "static/css/main.b6590448.chunk.css",
-    "static/js/main.755face8.chunk.js"
+    "static/js/main.f4176bef.chunk.js"
   ]
 }
