@@ -1,3 +1,5 @@
+
+
 <img src="./src/components/implementations/article/assets/headerTitle.svg">
 <a href="https://xnought.github.io/backprop-explainer/">https://xnought.github.io/backprop-explainer/</a>
 
@@ -22,7 +24,7 @@ Make sure you are in the backprop-explainer directory
 </li>
 <li>
 
-`yarn run` to start development
+`yarn start` to start development
 
 </li>
 <li>
